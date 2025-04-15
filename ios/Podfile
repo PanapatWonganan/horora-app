@@ -1,0 +1,73 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '12.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  pod 'app_links', :path => '.symlinks/plugins/app_links/ios'
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    
+    # Add the following code to disable code signing for pods
+    target.build_configurations.each do |config|
+      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
+      config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
+      config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
+      
+      # แก้ไขปัญหา app_links ไม่ถูกสร้าง framework
+      if target.name == 'app_links'
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+      end
+    end
+  end
+  
+  # Add privacy manifests to third-party frameworks
+  installer.aggregate_targets.each do |aggregate_target|
+    aggregate_target.user_project.targets.each do |project_target|
+      project_target.build_phases.each do |build_phase|
+        if build_phase.is_a?(Xcodeproj::Project::Object::PBXNativeTarget)
+          # Add a new run script phase to the target
+          privacy_script_phase = project_target.new_shell_script_build_phase("Add Privacy Manifests")
+          privacy_script_phase.shell_script = "$FLUTTER_ROOT/../.pub-cache/hosted/pub.dev/share_plus-7.2.2/ios/Classes/add_privacy_manifest.sh"
+          # Move the privacy script phase to be the last phase
+          project_target.build_phases.move(privacy_script_phase, project_target.build_phases.count - 1)
+        end
+      end
+    end
+    aggregate_target.user_project.save
+  end
+end

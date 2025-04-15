@@ -1,0 +1,1 @@
+android { namespace = 'com.aboutyou.dart_packages.sign_in_with_apple'; compileSdkVersion 28; sourceSets { main.java.srcDirs += 'src/main/kotlin' }; defaultConfig { minSdkVersion 16; testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }; lintOptions { disable 'InvalidPackage' } }

@@ -1,0 +1,289 @@
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/theme/theme.dart';
+
+class AboutAppScreen extends StatelessWidget {
+  const AboutAppScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'เกี่ยวกับแอป',
+          style: TextStyle(
+            color: AppColors.lightText,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: AppColors.lightText,
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.darkBackground,
+              const Color(0xFF1A1A2E),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildAppLogo(),
+                const SizedBox(height: 24),
+                _buildAppInfo(),
+                const SizedBox(height: 32),
+                _buildDivider(),
+                const SizedBox(height: 24),
+                _buildSectionTitle('เกี่ยวกับเรา'),
+                const SizedBox(height: 16),
+                _buildAboutUs(),
+                const SizedBox(height: 24),
+                _buildDivider(),
+                const SizedBox(height: 24),
+                _buildSectionTitle('นโยบายและข้อตกลง'),
+                const SizedBox(height: 16),
+                _buildPolicyItem(
+                  'นโยบายความเป็นส่วนตัว',
+                  () => _launchURL('https://astrologyapp.com/privacy-policy'),
+                ),
+                _buildPolicyItem(
+                  'ข้อตกลงการใช้งาน',
+                  () => _launchURL('https://astrologyapp.com/terms-of-service'),
+                ),
+                _buildPolicyItem(
+                  'นโยบายการคืนเงิน',
+                  () => _launchURL('https://astrologyapp.com/refund-policy'),
+                ),
+                const SizedBox(height: 24),
+                _buildDivider(),
+                const SizedBox(height: 24),
+                _buildSectionTitle('ติดต่อเรา'),
+                const SizedBox(height: 16),
+                _buildContactInfo(),
+                const SizedBox(height: 32),
+                _buildCopyright(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppLogo() {
+    return Column(
+      children: [
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.auto_awesome,
+            color: AppColors.primary,
+            size: 60,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Astrology App',
+          style: TextStyle(
+            color: AppColors.lightText,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'เวอร์ชัน 1.0.0',
+          style: TextStyle(
+            color: AppColors.lightText.withOpacity(0.7),
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppInfo() {
+    return Text(
+      'แอปพลิเคชันดูดวงและทำนายชะตาชีวิตที่ครบวงจร ทั้งดูดวงจากราศี อ่านไพ่ทาโรต์ และสนทนากับนักพยากรณ์ ให้คุณได้รับคำทำนายที่แม่นยำและเข้าใจชีวิตได้ดียิ่งขึ้น',
+      style: TextStyle(
+        color: AppColors.lightText.withOpacity(0.7),
+        fontSize: 16,
+        height: 1.5,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      height: 1,
+      color: AppColors.lightText.withOpacity(0.1),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: AppColors.lightText,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildAboutUs() {
+    return Text(
+      'Astrology App เป็นแอปพลิเคชันที่พัฒนาโดยทีมงานผู้เชี่ยวชาญด้านโหราศาสตร์และการพัฒนาซอฟต์แวร์ เรามุ่งมั่นที่จะนำเสนอคำทำนายที่แม่นยำและเข้าใจง่าย เพื่อให้ผู้ใช้สามารถนำไปปรับใช้ในชีวิตประจำวันได้อย่างมีประสิทธิภาพ\n\nเราร่วมมือกับนักพยากรณ์ที่มีประสบการณ์และความเชี่ยวชาญในศาสตร์แขนงต่างๆ ทั้งโหราศาสตร์ไทย โหราศาสตร์ยุโรป ไพ่ทาโรต์ และศาสตร์แห่งการทำนายอื่นๆ เพื่อให้คุณได้รับคำทำนายที่หลากหลายและครอบคลุม',
+      style: TextStyle(
+        color: AppColors.lightText.withOpacity(0.7),
+        fontSize: 14,
+        height: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildPolicyItem(String title, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.darkSurface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.description_outlined,
+              color: AppColors.primary,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: AppColors.lightText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppColors.lightText.withOpacity(0.5),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContactInfo() {
+    return Column(
+      children: [
+        _buildContactItem(
+          icon: Icons.email_outlined,
+          title: 'อีเมล',
+          value: 'contact@astrologyapp.com',
+        ),
+        _buildContactItem(
+          icon: Icons.phone_outlined,
+          title: 'โทรศัพท์',
+          value: '02-123-4567',
+        ),
+        _buildContactItem(
+          icon: Icons.location_on_outlined,
+          title: 'ที่อยู่',
+          value: '123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactItem({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: AppColors.primary,
+            size: 24,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: AppColors.lightText,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: AppColors.lightText.withOpacity(0.7),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCopyright() {
+    return Text(
+      '© 2023 Astrology App. All rights reserved.',
+      style: TextStyle(
+        color: AppColors.lightText.withOpacity(0.5),
+        fontSize: 12,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+} 
