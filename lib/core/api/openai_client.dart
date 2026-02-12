@@ -17,7 +17,7 @@ class OpenAIClient {
     required this.apiKey,
     required this.prefs,
     http.Client? httpClient,
-  }) : this.httpClient = httpClient ?? http.Client();
+  }) : httpClient = httpClient ?? http.Client();
 
   /// ขอดวงชะตารายวันจาก OpenAI API
   Future<Map<String, dynamic>> getDailyHoroscope(String zodiacSign) async {
@@ -165,7 +165,7 @@ class OpenAIClient {
   /// สร้างคำขอสำหรับดวงชะตารายวัน
   String _createDailyHoroscopePrompt(String zodiacSign) {
     return '''
-    สร้างดวงชะตารายวันสำหรับราศี $zodiacSign ในวันนี้ โดยให้ครอบคลุมเรื่องต่อไปนี้:
+    สร้างดวงชะตารายวันสำหรับปีนักษัตรไทย "$zodiacSign" ในวันนี้ โดยให้ครอบคลุมเรื่องต่อไปนี้:
     1. คำทำนายทั่วไป (ประมาณ 3-4 ประโยค)
     2. คะแนนความรัก (1-5)
     3. คะแนนอาชีพ (1-5)
@@ -180,7 +180,7 @@ class OpenAIClient {
   /// สร้างคำขอสำหรับดวงชะตารายสัปดาห์
   String _createWeeklyHoroscopePrompt(String zodiacSign) {
     return '''
-    สร้างดวงชะตารายสัปดาห์สำหรับราศี $zodiacSign ในสัปดาห์นี้ โดยให้ครอบคลุมเรื่องต่อไปนี้:
+    สร้างดวงชะตารายสัปดาห์สำหรับปีนักษัตรไทย "$zodiacSign" ในสัปดาห์นี้ โดยให้ครอบคลุมเรื่องต่อไปนี้:
     1. คำทำนายทั่วไป (ประมาณ 4-5 ประโยค)
     2. ด้านความรัก (2-3 ประโยค พร้อมคะแนน 1-5)
     3. ด้านอาชีพ (2-3 ประโยค พร้อมคะแนน 1-5)
@@ -214,7 +214,7 @@ class OpenAIClient {
     final currentMonth = monthNames[today.month - 1];
 
     return '''
-    สร้างดวงชะตาประจำเดือน$currentMonth สำหรับราศี $zodiacSign โดยให้ครอบคลุมเรื่องต่อไปนี้:
+    สร้างดวงชะตาประจำเดือน$currentMonth สำหรับปีนักษัตรไทย "$zodiacSign" โดยให้ครอบคลุมเรื่องต่อไปนี้:
     1. คำทำนายทั่วไป (ประมาณ 5-6 ประโยค)
     2. ด้านความรัก (3-4 ประโยค พร้อมคะแนน 1-5)
     3. ด้านอาชีพ (3-4 ประโยค พร้อมคะแนน 1-5)
@@ -262,7 +262,7 @@ class OpenAIClient {
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\p{Thai}\s,]+)', unicode: true)
+        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;
@@ -325,14 +325,14 @@ class OpenAIClient {
     }
 
     final luckyDayMatch =
-        RegExp(r'วันนำโชค.*?[:]?([\p{Thai}\s,]+)', unicode: true)
+        RegExp(r'วันนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyDayMatch != null) {
       luckyDay = luckyDayMatch.group(1)?.trim() ?? luckyDay;
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\p{Thai}\s,]+)', unicode: true)
+        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;
@@ -413,7 +413,7 @@ class OpenAIClient {
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\p{Thai}\s,]+)', unicode: true)
+        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="numbers_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7E57C2"/>
+      <stop offset="100%" stop-color="#673AB7"/>
+    </linearGradient>
+    <linearGradient id="num_gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082"/>
+      <stop offset="100%" stop-color="#FFD54F"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#numbers_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <rect x="14" y="20" width="20" height="26" rx="4" fill="url(#num_gold)" stroke="#FFA000" stroke-width="2"/>
+  <text x="24" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#5D4037" text-anchor="middle">9</text>
+  <rect x="46" y="20" width="20" height="26" rx="4" fill="url(#num_gold)" stroke="#FFA000" stroke-width="2"/>
+  <text x="56" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#5D4037" text-anchor="middle">5</text>
+  <rect x="30" y="48" width="20" height="20" rx="4" fill="url(#num_gold)" stroke="#FFA000" stroke-width="2"/>
+  <text x="40" y="64" font-family="Arial" font-size="14" font-weight="bold" fill="#5D4037" text-anchor="middle">19</text>
+  <path d="M10 14 L12 18 L10 16 L8 18 Z" fill="#FFD54F"/>
+  <path d="M70 12 L72 16 L70 14 L68 16 Z" fill="#FFD54F"/>
+  <path d="M12 56 L14 60 L12 58 L10 60 Z" fill="#FFF"/>
+  <path d="M68 54 L70 58 L68 56 L66 58 Z" fill="#FFF"/>
+  <circle cx="24" cy="62" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="56" cy="60" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="40" cy="14" r="3" fill="#FFD54F"/>
+</svg>

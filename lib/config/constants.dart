@@ -1,13 +1,26 @@
 // API Endpoints
 class ApiConstants {
-  static const String baseUrl = 'https://api.astrology-app.com';
-  static const String authEndpoint = '$baseUrl/api/auth';
-  static const String usersEndpoint = '$baseUrl/api/users';
-  static const String horoscopesEndpoint = '$baseUrl/api/horoscopes';
-  static const String tarotEndpoint = '$baseUrl/api/tarot';
-  static const String chatEndpoint = '$baseUrl/api/chat';
-  static const String focusEndpoint = '$baseUrl/api/focus';
-  static const String subscriptionsEndpoint = '$baseUrl/api/subscriptions';
+  // สำหรับ Android Emulator ใช้ 10.0.2.2 แทน localhost
+  // สำหรับ iOS Simulator ใช้ localhost หรือ 127.0.0.1
+  // สำหรับ Production ใช้ domain จริง
+  // Development: 'http://10.0.2.2:8000/api' (Android Emulator)
+  // Development: 'http://127.0.0.1:8000/api' (iOS Simulator)
+  // Production:  'https://horora-admin-production.up.railway.app/api'
+  static const String baseUrl = 'https://horora-admin-production.up.railway.app/api';
+
+  // Auth endpoints
+  static const String authEndpoint = '$baseUrl/auth';
+  static const String loginEndpoint = '$authEndpoint/login';
+  static const String registerEndpoint = '$authEndpoint/register';
+  static const String logoutEndpoint = '$authEndpoint/logout';
+  static const String userEndpoint = '$authEndpoint/user';
+  static const String profileEndpoint = '$authEndpoint/profile';
+
+  // Feature endpoints
+  static const String horoscopesEndpoint = '$baseUrl/horoscope';
+  static const String tarotEndpoint = '$baseUrl/tarot';
+  static const String chatEndpoint = '$baseUrl/chat';
+  static const String meritEndpoint = '$baseUrl/merit';
 }
 
 // ค่าคงที่สำหรับการจัดเก็บข้อมูลในเครื่อง

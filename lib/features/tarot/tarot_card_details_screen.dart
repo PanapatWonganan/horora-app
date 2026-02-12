@@ -63,9 +63,11 @@ class _TarotCardDetailsScreenState extends State<TarotCardDetailsScreen> {
         _isSaved = !_isSaved;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ไม่สามารถ${_isSaved ? 'ยกเลิกการบันทึก' : 'บันทึก'}การอ่านไพ่ได้: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ไม่สามารถ${_isSaved ? 'ยกเลิกการบันทึก' : 'บันทึก'}การอ่านไพ่ได้: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -220,7 +222,7 @@ ${_reading!.interpretation}
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -254,7 +256,7 @@ ${_reading!.interpretation}
             'วันที่: $formattedDate',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -335,7 +337,7 @@ ${_reading!.interpretation}
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -456,10 +458,10 @@ ${_reading!.interpretation}
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               width: 1,
             ),
           ),

@@ -169,7 +169,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           'เราได้ส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปยังอีเมล ${_emailController.text} แล้ว กรุณาตรวจสอบอีเมลของคุณและทำตามคำแนะนำเพื่อรีเซ็ตรหัสผ่าน',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
             height: 1.5,
           ),
@@ -224,7 +224,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Text(
           'กรุณากรอกอีเมลที่ใช้ลงทะเบียน เราจะส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปให้คุณ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
             height: 1.5,
           ),
@@ -240,7 +240,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         Text(
           'จำรหัสผ่านได้แล้ว? ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 14,
           ),
         ),

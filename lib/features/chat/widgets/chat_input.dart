@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/app_icons.dart';
 
 class ChatInput extends StatefulWidget {
   final Function(String) onSendMessage;
@@ -46,7 +47,7 @@ class _ChatInputState extends State<ChatInput> {
         color: AppColors.darkSurface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, -2),
           ),
@@ -59,18 +60,18 @@ class _ChatInputState extends State<ChatInput> {
               controller: _controller,
               enabled: !widget.isTyping,
               decoration: InputDecoration(
-                hintText: widget.isTyping 
-                    ? 'นักพยากรณ์กำลังพิมพ์...' 
+                hintText: widget.isTyping
+                    ? 'นักพยากรณ์กำลังพิมพ์...'
                     : 'พิมพ์ข้อความ...',
                 hintStyle: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.withOpacity(0.1),
+                fillColor: Colors.grey.withValues(alpha: 0.1),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,
@@ -104,9 +105,12 @@ class _ChatInputState extends State<ChatInput> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(
-                    Icons.send,
-                    color: Colors.white,
+                  child: Center(
+                    child: SvgIcon(
+                      AppIcons.send,
+                      size: 22,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

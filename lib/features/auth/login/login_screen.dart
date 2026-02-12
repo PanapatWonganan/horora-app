@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/utils/app_icons.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
-import '../widgets/social_login_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -66,16 +64,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           }
-        }
-      } on AuthException catch (e) {
-        // Handle Supabase auth exceptions
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('เข้าสู่ระบบไม่สำเร็จ: ${e.message}'),
-              backgroundColor: AppColors.error,
-            ),
-          );
         }
       } catch (e) {
         // Show error message for other exceptions
@@ -237,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           'ยินดีต้อนรับกลับมา! กรุณาเข้าสู่ระบบเพื่อใช้งาน',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
           ),
         ),
@@ -253,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
           AuthTextField(
             controller: _emailController,
             hintText: 'อีเมล',
-            icon: Icons.email_outlined,
+            svgIconPath: AppIcons.email,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -270,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
           AuthTextField(
             controller: _passwordController,
             hintText: 'รหัสผ่าน',
-            icon: Icons.lock_outline,
+            svgIconPath: AppIcons.lock,
             obscureText: _obscurePassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -282,11 +270,12 @@ class _LoginScreenState extends State<LoginScreen> {
               return null;
             },
             suffixIcon: IconButton(
-              icon: Icon(
+              icon: SvgIcon(
                 _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppColors.lightText.withOpacity(0.7),
+                    ? AppIcons.visibility
+                    : AppIcons.visibilityOff,
+                size: 20,
+                color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _togglePasswordVisibility,
             ),
@@ -339,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Expanded(
               child: Divider(
-                color: AppColors.lightText.withOpacity(0.3),
+                color: AppColors.lightText.withValues(alpha: 0.3),
                 thickness: 1,
               ),
             ),
@@ -348,14 +337,14 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(
                 'หรือเข้าสู่ระบบด้วย',
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
             ),
             Expanded(
               child: Divider(
-                color: AppColors.lightText.withOpacity(0.3),
+                color: AppColors.lightText.withValues(alpha: 0.3),
                 thickness: 1,
               ),
             ),
@@ -405,7 +394,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           'ยังไม่มีบัญชี? ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 14,
           ),
         ),

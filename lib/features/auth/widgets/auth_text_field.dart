@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/utils/app_icons.dart';
 
 class AuthTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
-  final IconData icon;
+  final IconData? icon;
+  final String? svgIconPath;
   final bool obscureText;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
@@ -26,7 +28,8 @@ class AuthTextField extends StatelessWidget {
     Key? key,
     required this.controller,
     required this.hintText,
-    required this.icon,
+    this.icon,
+    this.svgIconPath,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -67,16 +70,27 @@ class AuthTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: AppColors.lightText.withOpacity(0.5),
+          color: AppColors.lightText.withValues(alpha: 0.5),
           fontSize: 16,
         ),
-        prefixIcon: Icon(
-          icon,
-          color: AppColors.lightText.withOpacity(0.7),
-        ),
+        prefixIcon: svgIconPath != null
+            ? Padding(
+                padding: const EdgeInsets.all(12),
+                child: SvgIcon(
+                  svgIconPath!,
+                  size: 20,
+                  color: AppColors.lightText.withValues(alpha: 0.7),
+                ),
+              )
+            : icon != null
+                ? Icon(
+                    icon,
+                    color: AppColors.lightText.withValues(alpha: 0.7),
+                  )
+                : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
+        fillColor: Colors.white.withValues(alpha: 0.1),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,

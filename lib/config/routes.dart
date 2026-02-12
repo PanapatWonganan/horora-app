@@ -6,7 +6,6 @@ import '../features/chat/chat_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/tarot/tarot_reading_screen.dart';
 import '../features/tarot/tarot_card_details_screen.dart';
-import '../features/horoscope/compatibility_check_screen.dart';
 
 // ชื่อเส้นทางของแอปพลิเคชัน
 class AppRoutes {
@@ -19,7 +18,6 @@ class AppRoutes {
   static const String tarotReading = '/tarot/reading';
   static const String horoscope = '/horoscope';
   static const String dailyHoroscope = '/horoscope/daily';
-  static const String compatibilityCheck = '/horoscope/compatibility';
   static const String focusSession = '/focus';
   static const String profile = '/profile';
   static const String settings = '/settings';
@@ -92,10 +90,6 @@ class AppRouter {
               child: Text('Daily Horoscope Screen'),
             ),
           ),
-        );
-      case AppRoutes.compatibilityCheck:
-        return MaterialPageRoute(
-          builder: (_) => const CompatibilityCheckScreen(),
         );
       case AppRoutes.focusSession:
         return MaterialPageRoute(

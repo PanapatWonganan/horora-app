@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="snake_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#66BB6A"/>
+    </linearGradient>
+    <linearGradient id="snake_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#26A69A"/>
+      <stop offset="100%" stop-color="#00897B"/>
+    </linearGradient>
+    <linearGradient id="snake_belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2F1"/>
+      <stop offset="100%" stop-color="#B2DFDB"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#snake_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#A5D6A7" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M20 60 Q12 56 14 48 Q16 40 24 38 Q32 36 38 42 Q44 48 52 46 Q60 44 64 50 Q68 56 64 62" stroke="url(#snake_body)" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M20 60 Q12 56 14 48 Q16 40 24 38 Q32 36 38 42 Q44 48 52 46 Q60 44 64 50 Q68 56 64 62" stroke="url(#snake_belly)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M20 60 L16 64 M20 60 L24 64" stroke="url(#snake_body)" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="40" cy="32" r="14" fill="url(#snake_body)"/>
+  <ellipse cx="40" cy="36" rx="10" ry="8" fill="url(#snake_belly)"/>
+  <circle cx="35" cy="30" r="4" fill="#FFF"/>
+  <circle cx="45" cy="30" r="4" fill="#FFF"/>
+  <circle cx="36" cy="30" r="2.5" fill="#212121"/>
+  <circle cx="46" cy="30" r="2.5" fill="#212121"/>
+  <circle cx="37" cy="29" r="1" fill="#FFF"/>
+  <circle cx="47" cy="29" r="1" fill="#FFF"/>
+  <circle cx="32" cy="34" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="48" cy="34" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <ellipse cx="40" cy="38" rx="2" ry="1" fill="#FF7043"/>
+  <path d="M40 40 L38 44 M40 40 L42 44" stroke="#FF7043" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M36 42 Q40 45 44 42" stroke="#00695C" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <circle cx="30" cy="24" r="2" fill="#FFD54F"/>
+  <circle cx="40" cy="20" r="2.5" fill="#FFD54F"/>
+  <circle cx="50" cy="24" r="2" fill="#FFD54F"/>
+  <circle cx="14" cy="14" r="4" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <rect x="12" y="12" width="4" height="4" fill="#FFA000"/>
+  <circle cx="66" cy="66" r="3" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+</svg>

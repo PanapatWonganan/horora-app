@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="family_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CE93D8"/>
+      <stop offset="100%" stop-color="#9C27B0"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="24" cy="24" r="22" fill="url(#family_bg)" opacity="0.2"/>
+  <!-- Parent 1 (left) -->
+  <circle cx="14" cy="16" r="5" fill="#CE93D8"/>
+  <path d="M14 22c-5 0-9 3-9 7v3h18v-3c0-4-4-7-9-7z" fill="#CE93D8"/>
+  <!-- Parent 2 (right) -->
+  <circle cx="34" cy="16" r="5" fill="#9C27B0"/>
+  <path d="M34 22c-5 0-9 3-9 7v3h18v-3c0-4-4-7-9-7z" fill="#9C27B0"/>
+  <!-- Child (center) -->
+  <circle cx="24" cy="26" r="4" fill="#E1BEE7"/>
+  <path d="M24 31c-4 0-7 2.5-7 5.5v2.5h14v-2.5c0-3-3-5.5-7-5.5z" fill="#E1BEE7"/>
+  <!-- Heart -->
+  <path d="M24 20c-1-2-3-3-5-3-3 0-5 2-5 5 0 4 5 7 10 11 5-4 10-7 10-11 0-3-2-5-5-5-2 0-4 1-5 3z" fill="#FF4081" opacity="0.6"/>
+</svg>

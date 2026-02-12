@@ -3,6 +3,7 @@ import '../../core/theme/theme.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/utils/app_icons.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -122,14 +123,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(
           'บัญชีผู้ใช้',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 12),
         _buildSettingItem(
-          icon: Icons.person_outline,
+          svgIconPath: AppIcons.person,
           title: 'โปรไฟล์ของฉัน',
           onTap: () {
             AppRouter.navigateTo(context, AppRoutes.profile);
@@ -160,7 +161,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(
           'แอปพลิเคชัน',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Text(
           'ความช่วยเหลือ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -219,7 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         ),
         _buildSettingItem(
-          icon: Icons.info_outline,
+          svgIconPath: AppIcons.info,
           title: 'เกี่ยวกับแอป',
           onTap: () {
             AppRouter.navigateTo(context, AppRoutes.about);
@@ -230,7 +231,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSettingItem({
-    required IconData icon,
+    String? svgIconPath,
+    IconData? icon,
     required String title,
     required VoidCallback onTap,
   }) {
@@ -250,13 +252,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primary,
-                size: 20,
+              child: Center(
+                child: svgIconPath != null
+                    ? SvgIcon(
+                        svgIconPath,
+                        size: 20,
+                        color: AppColors.primary,
+                      )
+                    : Icon(
+                        icon ?? Icons.circle,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
               ),
             ),
             const SizedBox(width: 16),
@@ -270,10 +280,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: AppColors.lightText.withOpacity(0.5),
+            SvgIcon(
+              AppIcons.arrowForward,
               size: 16,
+              color: AppColors.lightText.withValues(alpha: 0.5),
             ),
           ],
         ),
@@ -285,27 +295,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 16),
-      child: ElevatedButton.icon(
+      child: ElevatedButton(
         onPressed: _logout,
-        icon: const Icon(
-          Icons.logout,
-          color: Colors.white,
-          size: 20,
-        ),
-        label: const Text(
-          'ออกจากระบบ',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red.shade600,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.logout,
+              size: 20,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'ออกจากระบบ',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

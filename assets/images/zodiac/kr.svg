@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <clipPath id="flag_clip_kr">
+      <circle cx="40" cy="40" r="36"/>
+    </clipPath>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="#FAFAFA"/>
+  <g clip-path="url(#flag_clip_kr)">
+    <rect x="4" y="4" width="72" height="72" fill="#FAFAFA"/>
+    <circle cx="40" cy="40" r="14" fill="#EF5350"/>
+    <path d="M40 40 Q40 26 54 40 Q40 54 40 40" fill="#1A237E"/>
+    <rect x="12" y="16" width="3" height="16" fill="#212121" transform="rotate(-30 13.5 24)"/>
+    <rect x="18" y="12" width="3" height="16" fill="#212121" transform="rotate(-30 19.5 20)"/>
+    <rect x="60" y="52" width="3" height="16" fill="#212121" transform="rotate(-30 61.5 60)"/>
+    <rect x="66" y="48" width="3" height="16" fill="#212121" transform="rotate(-30 67.5 56)"/>
+    <rect x="60" y="12" width="3" height="16" fill="#212121" transform="rotate(30 61.5 20)"/>
+    <rect x="66" y="16" width="3" height="16" fill="#212121" transform="rotate(30 67.5 24)"/>
+    <rect x="12" y="48" width="3" height="16" fill="#212121" transform="rotate(30 13.5 56)"/>
+    <rect x="18" y="52" width="3" height="16" fill="#212121" transform="rotate(30 19.5 60)"/>
+  </g>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#E0E0E0" stroke-width="1"/>
+</svg>

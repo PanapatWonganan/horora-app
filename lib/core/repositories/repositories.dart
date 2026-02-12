@@ -13,9 +13,6 @@ export 'tarot_repository.dart';
 // Chat related repositories
 export 'chat_repository.dart';
 
-// Focus related repositories
-export 'focus_repository.dart';
-
 // Subscription related repositories
 export 'subscription_repository.dart';
 

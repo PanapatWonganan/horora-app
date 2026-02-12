@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../core/routes/app_routes.dart';
-import '../../core/routes/app_router.dart';
 import '../../core/theme/theme.dart';
 import '../../core/utils/zodiac_utils.dart';
-import '../../core/services/auth_service.dart';
 import '../../core/api/api_client.dart';
 import '../../core/repositories/horoscope_repository.dart';
 import '../../core/models/horoscope_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import '../chat/repositories/chat_repository.dart';
 import 'widgets/horoscope_category_card.dart';
-import 'widgets/zodiac_compatibility_card.dart';
 
 class HoroscopeScreen extends StatefulWidget {
   const HoroscopeScreen({Key? key}) : super(key: key);
@@ -25,7 +20,6 @@ class HoroscopeScreen extends StatefulWidget {
 class _HoroscopeScreenState extends State<HoroscopeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final _authService = AuthService.instance;
   final _chatRepository = ChatRepository();
   late HoroscopeRepository _horoscopeRepository;
   String _zodiacSign = "ไม่ทราบราศี";
@@ -38,10 +32,6 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
   Map<String, dynamic> _weeklyHoroscope = {};
   Map<String, dynamic> _monthlyHoroscope = {};
   Map<String, dynamic> _yearlyHoroscope = {};
-
-  // ข้อมูลความเข้ากัน
-  List<dynamic> _goodCompatibility = [];
-  List<dynamic> _badCompatibility = [];
 
   @override
   void initState() {
@@ -65,24 +55,21 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Future<void> _loadUserZodiacSign() async {
     try {
-      // Use the working method from ChatRepository
-      final zodiacSign = await _chatRepository.getUserZodiacSign();
+      // Use the working method from ChatRepository ที่คืน Thai animal name
+      final thaiAnimal = await _chatRepository.getUserZodiacSign();
 
-      if (zodiacSign != null && zodiacSign.isNotEmpty) {
+      if (thaiAnimal != null && thaiAnimal.isNotEmpty) {
         setState(() {
-          _zodiacSignEn = zodiacSign;
-          _zodiacSign = ZodiacUtils.getZodiacSignThai(
-            DateTime.now(),
-            zodiacSign: zodiacSign,
-          );
+          _zodiacSignEn = thaiAnimal; // เก็บ Thai animal name
+          _zodiacSign = 'ปี$thaiAnimal'; // แสดงเป็น "ปีมะเมีย"
           _isLoading = false;
         });
 
-        // ดึงข้อมูลดวงชะตาตามราศี
-        _loadHoroscopeData(zodiacSign);
+        // ดึงข้อมูลดวงชะตาตาม Thai animal
+        _loadHoroscopeData(thaiAnimal);
       } else {
         setState(() {
-          _zodiacSign = "ไม่ทราบราศี";
+          _zodiacSign = "ไม่ทราบปีนักษัตร";
           _zodiacSignEn = "unknown";
           _isLoading = false;
           _isHoroscopeLoading = false;
@@ -91,7 +78,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     } catch (e) {
       debugPrint('Error loading user zodiac sign: $e');
       setState(() {
-        _zodiacSign = "ไม่ทราบราศี";
+        _zodiacSign = "ไม่ทราบปีนักษัตร";
         _zodiacSignEn = "unknown";
         _isLoading = false;
         _isHoroscopeLoading = false;
@@ -99,217 +86,30 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     }
   }
 
-  Future<void> _loadHoroscopeData(String zodiacSign) async {
+  Future<void> _loadHoroscopeData(String thaiAnimal) async {
     try {
-      // ดึงข้อมูลดวงชะตารายวัน
+      debugPrint('_loadHoroscopeData called with: "$thaiAnimal"');
+      
+      // ดึงข้อมูลดวงชะตารายวันตาม Thai animal
       final dailyHoroscope =
-          await _horoscopeRepository.getDailyHoroscope(zodiacSign);
+          await _horoscopeRepository.getDailyHoroscope(thaiAnimal);
 
-      // ข้อมูลความเข้ากัน (ตัวอย่าง)
-      final goodZodiac = _getGoodCompatibility(zodiacSign);
-      final badZodiac = _getBadCompatibility(zodiacSign);
-
-      setState(() {
-        _dailyHoroscope = dailyHoroscope;
-        _goodCompatibility = goodZodiac;
-        _badCompatibility = badZodiac;
-        _weeklyHoroscope = _getMockWeeklyHoroscope(zodiacSign);
-        _monthlyHoroscope = _getMockMonthlyHoroscope(zodiacSign);
-        _yearlyHoroscope = _getMockYearlyHoroscope(zodiacSign);
-        _isHoroscopeLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _dailyHoroscope = dailyHoroscope;
+          _weeklyHoroscope = _getMockWeeklyHoroscope(thaiAnimal);
+          _monthlyHoroscope = _getMockMonthlyHoroscope(thaiAnimal);
+          _yearlyHoroscope = _getMockYearlyHoroscope(thaiAnimal);
+          _isHoroscopeLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('Error loading horoscope data: $e');
-      setState(() {
-        _isHoroscopeLoading = false;
-      });
-    }
-  }
-
-  // ตัวอย่างข้อมูลราศีที่เข้ากันได้ดี
-  List<dynamic> _getGoodCompatibility(String zodiacSign) {
-    switch (zodiacSign) {
-      case 'aries':
-        return [
-          {'name': 'ราศีสิงห์', 'imagePath': 'assets/images/zodiac/leo.png'},
-          {
-            'name': 'ราศีธนู',
-            'imagePath': 'assets/images/zodiac/sagittarius.png'
-          },
-        ];
-      case 'taurus':
-        return [
-          {'name': 'ราศีกันย์', 'imagePath': 'assets/images/zodiac/virgo.png'},
-          {
-            'name': 'ราศีมังกร',
-            'imagePath': 'assets/images/zodiac/capricorn.png'
-          },
-        ];
-      case 'gemini':
-        return [
-          {'name': 'ราศีตุลย์', 'imagePath': 'assets/images/zodiac/libra.png'},
-          {
-            'name': 'ราศีกุมภ์',
-            'imagePath': 'assets/images/zodiac/aquarius.png'
-          },
-        ];
-      case 'cancer':
-        return [
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-          {'name': 'ราศีมีน', 'imagePath': 'assets/images/zodiac/pisces.png'},
-        ];
-      case 'leo':
-        return [
-          {'name': 'ราศีเมษ', 'imagePath': 'assets/images/zodiac/aries.png'},
-          {
-            'name': 'ราศีธนู',
-            'imagePath': 'assets/images/zodiac/sagittarius.png'
-          },
-        ];
-      case 'virgo':
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {
-            'name': 'ราศีมังกร',
-            'imagePath': 'assets/images/zodiac/capricorn.png'
-          },
-        ];
-      case 'libra':
-        return [
-          {'name': 'ราศีเมถุน', 'imagePath': 'assets/images/zodiac/gemini.png'},
-          {
-            'name': 'ราศีกุมภ์',
-            'imagePath': 'assets/images/zodiac/aquarius.png'
-          },
-        ];
-      case 'scorpio':
-        return [
-          {'name': 'ราศีกรกฎ', 'imagePath': 'assets/images/zodiac/cancer.png'},
-          {'name': 'ราศีมีน', 'imagePath': 'assets/images/zodiac/pisces.png'},
-        ];
-      case 'sagittarius':
-        return [
-          {'name': 'ราศีเมษ', 'imagePath': 'assets/images/zodiac/aries.png'},
-          {'name': 'ราศีสิงห์', 'imagePath': 'assets/images/zodiac/leo.png'},
-        ];
-      case 'capricorn':
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {'name': 'ราศีกันย์', 'imagePath': 'assets/images/zodiac/virgo.png'},
-        ];
-      case 'aquarius':
-        return [
-          {'name': 'ราศีเมถุน', 'imagePath': 'assets/images/zodiac/gemini.png'},
-          {'name': 'ราศีตุลย์', 'imagePath': 'assets/images/zodiac/libra.png'},
-        ];
-      case 'pisces':
-        return [
-          {'name': 'ราศีกรกฎ', 'imagePath': 'assets/images/zodiac/cancer.png'},
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-        ];
-      default:
-        return [
-          {'name': 'ราศีกรกฎ', 'imagePath': 'assets/images/zodiac/cancer.png'},
-          {'name': 'ราศีมีน', 'imagePath': 'assets/images/zodiac/pisces.png'},
-        ];
-    }
-  }
-
-  // ตัวอย่างข้อมูลราศีที่เข้ากันได้ยาก
-  List<dynamic> _getBadCompatibility(String zodiacSign) {
-    switch (zodiacSign) {
-      case 'aries':
-        return [
-          {'name': 'ราศีกรกฎ', 'imagePath': 'assets/images/zodiac/cancer.png'},
-          {
-            'name': 'ราศีมังกร',
-            'imagePath': 'assets/images/zodiac/capricorn.png'
-          },
-        ];
-      case 'taurus':
-        return [
-          {'name': 'ราศีสิงห์', 'imagePath': 'assets/images/zodiac/leo.png'},
-          {
-            'name': 'ราศีกุมภ์',
-            'imagePath': 'assets/images/zodiac/aquarius.png'
-          },
-        ];
-      case 'gemini':
-        return [
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-          {'name': 'ราศีมีน', 'imagePath': 'assets/images/zodiac/pisces.png'},
-        ];
-      case 'cancer':
-        return [
-          {'name': 'ราศีเมษ', 'imagePath': 'assets/images/zodiac/aries.png'},
-          {'name': 'ราศีตุลย์', 'imagePath': 'assets/images/zodiac/libra.png'},
-        ];
-      case 'leo':
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-        ];
-      case 'virgo':
-        return [
-          {'name': 'ราศีเมถุน', 'imagePath': 'assets/images/zodiac/gemini.png'},
-          {'name': 'ราศีมีน', 'imagePath': 'assets/images/zodiac/pisces.png'},
-        ];
-      case 'libra':
-        return [
-          {'name': 'ราศีกรกฎ', 'imagePath': 'assets/images/zodiac/cancer.png'},
-          {
-            'name': 'ราศีมังกร',
-            'imagePath': 'assets/images/zodiac/capricorn.png'
-          },
-        ];
-      case 'scorpio':
-        return [
-          {'name': 'ราศีเมถุน', 'imagePath': 'assets/images/zodiac/gemini.png'},
-          {'name': 'ราศีสิงห์', 'imagePath': 'assets/images/zodiac/leo.png'},
-        ];
-      case 'sagittarius':
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-        ];
-      case 'capricorn':
-        return [
-          {'name': 'ราศีเมษ', 'imagePath': 'assets/images/zodiac/aries.png'},
-          {'name': 'ราศีตุลย์', 'imagePath': 'assets/images/zodiac/libra.png'},
-        ];
-      case 'aquarius':
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {
-            'name': 'ราศีพิจิก',
-            'imagePath': 'assets/images/zodiac/scorpio.png'
-          },
-        ];
-      case 'pisces':
-        return [
-          {'name': 'ราศีเมถุน', 'imagePath': 'assets/images/zodiac/gemini.png'},
-          {'name': 'ราศีกันย์', 'imagePath': 'assets/images/zodiac/virgo.png'},
-        ];
-      default:
-        return [
-          {'name': 'ราศีพฤษภ', 'imagePath': 'assets/images/zodiac/taurus.png'},
-          {'name': 'ราศีสิงห์', 'imagePath': 'assets/images/zodiac/leo.png'},
-        ];
+      if (mounted) {
+        setState(() {
+          _isHoroscopeLoading = false;
+        });
+      }
     }
   }
 
@@ -501,7 +301,6 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             : Column(
                 children: [
                   _buildHeader(),
-                  _buildActionButtons(),
                   _buildTabBar(),
                   Expanded(
                     child: TabBarView(
@@ -541,7 +340,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -557,31 +356,6 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: GradientButton(
-              text: 'ตรวจสอบความเข้ากัน',
-              onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.compatibilityCheck);
-              },
-              gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.secondary],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              height: 44,
-              borderRadius: 22,
             ),
           ),
         ],
@@ -621,8 +395,6 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
         children: [
           const SizedBox(height: 16),
           _buildHoroscopeCategories(),
-          const SizedBox(height: 32),
-          _buildCompatibility(),
           const SizedBox(height: 32),
           _buildLuckyElements(),
           const SizedBox(height: 32),
@@ -808,7 +580,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 Text(
                   monthlyData['overview'],
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.8),
+                    color: AppColors.lightText.withValues(alpha: 0.8),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -939,7 +711,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 Text(
                   yearlyData['overview'],
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.8),
+                    color: AppColors.lightText.withValues(alpha: 0.8),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -957,7 +729,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 Text(
                   yearlyData['advice'],
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.8),
+                    color: AppColors.lightText.withValues(alpha: 0.8),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -1046,7 +818,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -1063,7 +835,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               Text(
                 title,
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -1198,7 +970,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               Text(
                 _dailyHoroscope!.contentTh,
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.8),
+                  color: AppColors.lightText.withValues(alpha: 0.8),
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -1268,69 +1040,6 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCompatibility() {
-    // แปลง List<dynamic> เป็น List<Map<String, String>> สำหรับ ZodiacCompatibilityCard
-    final List<Map<String, String>> goodCompatibility = _goodCompatibility
-        .map((item) => Map<String, String>.from(item))
-        .toList();
-
-    final List<Map<String, String>> badCompatibility = _badCompatibility
-        .map((item) => Map<String, String>.from(item))
-        .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ความเข้ากันได้',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: ZodiacCompatibilityCard(
-                title: 'เข้ากันได้ดี',
-                zodiacSigns: goodCompatibility,
-                onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.compatibilityCheck);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ZodiacCompatibilityCard(
-                title: 'เข้ากันได้ยาก',
-                zodiacSigns: badCompatibility,
-                onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.compatibilityCheck);
-                },
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        GradientButton(
-          text: 'ตรวจสอบความเข้ากัน',
-          onPressed: () {
-            AppRouter.navigateTo(context, AppRoutes.compatibilityCheck);
-          },
-          gradient: LinearGradient(
-            colors: AppColors.primaryGradient,
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          width: double.infinity,
-          height: 48,
         ),
       ],
     );
@@ -1415,7 +1124,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -1432,7 +1141,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               Text(
                 title,
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),

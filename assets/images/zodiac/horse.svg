@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="horse_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFAB91"/>
+      <stop offset="100%" stop-color="#FF8A65"/>
+    </linearGradient>
+    <linearGradient id="horse_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8D6E63"/>
+      <stop offset="100%" stop-color="#6D4C41"/>
+    </linearGradient>
+    <linearGradient id="horse_mane" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5D4037"/>
+      <stop offset="100%" stop-color="#4E342E"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#horse_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#FFCCBC" stroke-width="2" stroke-dasharray="4 4"/>
+  <ellipse cx="40" cy="52" rx="18" ry="14" fill="url(#horse_body)"/>
+  <rect x="28" y="58" width="5" height="12" rx="2" fill="url(#horse_body)"/>
+  <rect x="36" y="60" width="4" height="10" rx="2" fill="url(#horse_body)"/>
+  <rect x="44" y="60" width="4" height="10" rx="2" fill="url(#horse_body)"/>
+  <rect x="52" y="58" width="5" height="12" rx="2" fill="url(#horse_body)"/>
+  <ellipse cx="30.5" cy="70" rx="3" ry="2" fill="#4E342E"/>
+  <ellipse cx="38" cy="70" rx="2.5" ry="2" fill="#4E342E"/>
+  <ellipse cx="46" cy="70" rx="2.5" ry="2" fill="#4E342E"/>
+  <ellipse cx="54.5" cy="70" rx="3" ry="2" fill="#4E342E"/>
+  <path d="M56 48 Q64 44 68 50 Q70 56 66 60" stroke="url(#horse_mane)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="36" cy="36" rx="14" ry="16" fill="url(#horse_body)"/>
+  <path d="M24 22 Q20 12 28 14 Q32 18 28 26" fill="url(#horse_body)"/>
+  <path d="M42 20 Q46 10 52 14 Q50 20 44 24" fill="url(#horse_body)"/>
+  <ellipse cx="24" cy="22" rx="2" ry="4" fill="#FFAB91"/>
+  <ellipse cx="44" cy="18" rx="2" ry="4" fill="#FFAB91"/>
+  <path d="M26 16 Q36 8 48 16 Q50 20 48 28 Q40 22 32 28 Q24 24 26 16" fill="url(#horse_mane)"/>
+  <ellipse cx="36" cy="42" rx="10" ry="8" fill="#BCAAA4"/>
+  <circle cx="30" cy="34" r="4" fill="#212121"/>
+  <circle cx="42" cy="34" r="4" fill="#212121"/>
+  <circle cx="31" cy="33" r="1.5" fill="#FFF"/>
+  <circle cx="43" cy="33" r="1.5" fill="#FFF"/>
+  <circle cx="32" cy="46" r="1.5" fill="#5D4037"/>
+  <circle cx="40" cy="46" r="1.5" fill="#5D4037"/>
+  <circle cx="24" cy="38" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="48" cy="38" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <path d="M32 50 Q36 54 40 50" stroke="#5D4037" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <circle cx="14" cy="14" r="4" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <rect x="12" y="12" width="4" height="4" fill="#FFA000"/>
+</svg>

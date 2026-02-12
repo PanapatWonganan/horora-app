@@ -30,7 +30,7 @@ class ZodiacSignCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -46,8 +46,8 @@ class ZodiacSignCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.2),
-                    AppColors.secondary.withOpacity(0.1),
+                    AppColors.primary.withValues(alpha: 0.2),
+                    AppColors.secondary.withValues(alpha: 0.1),
                   ],
                 ),
               ),
@@ -74,7 +74,7 @@ class ZodiacSignCard extends StatelessWidget {
               Text(
                 date!,
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 12,
                 ),
               ),

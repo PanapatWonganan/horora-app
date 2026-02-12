@@ -41,7 +41,7 @@ class ChatBubble extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -59,7 +59,7 @@ class ChatBubble extends StatelessWidget {
               Text(
                 _formatTime(timestamp),
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.5),
+                  color: AppColors.lightText.withValues(alpha: 0.5),
                   fontSize: 10,
                 ),
               ),
@@ -75,9 +75,9 @@ class ChatBubble extends StatelessWidget {
   Widget _buildAvatar() {
     return CircleAvatar(
       radius: 16,
-      backgroundColor: isUser 
-          ? AppColors.primary.withOpacity(0.2) 
-          : AppColors.secondary.withOpacity(0.2),
+      backgroundColor: isUser
+          ? AppColors.primary.withValues(alpha: 0.2)
+          : AppColors.secondary.withValues(alpha: 0.2),
       child: Icon(
         isUser ? Icons.person : Icons.auto_awesome,
         color: isUser ? AppColors.primary : AppColors.secondary,

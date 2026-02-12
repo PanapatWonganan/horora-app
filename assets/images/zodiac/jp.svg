@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <clipPath id="flag_clip_jp">
+      <circle cx="40" cy="40" r="36"/>
+    </clipPath>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="#FAFAFA"/>
+  <g clip-path="url(#flag_clip_jp)">
+    <rect x="4" y="4" width="72" height="72" fill="#FAFAFA"/>
+    <circle cx="40" cy="40" r="16" fill="#EF5350"/>
+  </g>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#E0E0E0" stroke-width="1"/>
+</svg>

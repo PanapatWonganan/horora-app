@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="scorpio_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7B68EE"/>
+      <stop offset="100%" stop-color="#6A5ACD"/>
+    </linearGradient>
+    <linearGradient id="scorpio_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E91E63"/>
+      <stop offset="100%" stop-color="#C2185B"/>
+    </linearGradient>
+    <linearGradient id="scorpio_belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCE4EC"/>
+      <stop offset="100%" stop-color="#F8BBD9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#scorpio_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  
+  <!-- Tail -->
+  <path d="M54 48 Q64 42 68 32 Q72 22 66 18 Q64 16 62 18" stroke="url(#scorpio_body)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Stinger -->
+  <path d="M62 18 L66 12 L70 18 L62 18" fill="#FFD93D"/>
+  
+  <!-- Body segments -->
+  <ellipse cx="36" cy="48" rx="18" ry="14" fill="url(#scorpio_body)"/>
+  
+  <!-- Belly pattern -->
+  <ellipse cx="36" cy="50" rx="12" ry="8" fill="url(#scorpio_belly)"/>
+  <path d="M28 46 L44 46" stroke="#E91E63" stroke-width="1"/>
+  <path d="M26 50 L46 50" stroke="#E91E63" stroke-width="1"/>
+  <path d="M28 54 L44 54" stroke="#E91E63" stroke-width="1"/>
+  
+  <!-- Claws -->
+  <!-- Left Claw -->
+  <ellipse cx="14" cy="38" rx="8" ry="5" fill="url(#scorpio_body)"/>
+  <ellipse cx="8" cy="34" rx="4" ry="6" fill="url(#scorpio_body)" transform="rotate(-30 8 34)"/>
+  <ellipse cx="8" cy="42" rx="4" ry="6" fill="url(#scorpio_body)" transform="rotate(30 8 42)"/>
+  
+  <!-- Right Claw -->
+  <ellipse cx="24" cy="32" rx="6" ry="4" fill="url(#scorpio_body)"/>
+  <ellipse cx="20" cy="28" rx="3" ry="5" fill="url(#scorpio_body)" transform="rotate(-30 20 28)"/>
+  <ellipse cx="20" cy="36" rx="3" ry="5" fill="url(#scorpio_body)" transform="rotate(30 20 36)"/>
+  
+  <!-- Head -->
+  <circle cx="36" cy="36" r="12" fill="url(#scorpio_body)"/>
+  
+  <!-- Eyes -->
+  <circle cx="32" cy="34" r="4" fill="#FFF"/>
+  <circle cx="40" cy="34" r="4" fill="#FFF"/>
+  <circle cx="32" cy="34" r="2.5" fill="#4A3728"/>
+  <circle cx="40" cy="34" r="2.5" fill="#4A3728"/>
+  <circle cx="33" cy="33" r="1" fill="#FFF"/>
+  <circle cx="41" cy="33" r="1" fill="#FFF"/>
+  
+  <!-- Blush -->
+  <circle cx="28" cy="38" r="3" fill="#FF8A80" fill-opacity="0.5"/>
+  <circle cx="44" cy="38" r="3" fill="#FF8A80" fill-opacity="0.5"/>
+  
+  <!-- Smile -->
+  <path d="M33 42 Q36 45 39 42" stroke="#880E4F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Legs -->
+  <ellipse cx="26" cy="58" rx="3" ry="5" fill="url(#scorpio_body)" transform="rotate(-15 26 58)"/>
+  <ellipse cx="34" cy="60" rx="2.5" ry="4" fill="url(#scorpio_body)"/>
+  <ellipse cx="42" cy="60" rx="2.5" ry="4" fill="url(#scorpio_body)"/>
+  <ellipse cx="50" cy="58" rx="3" ry="5" fill="url(#scorpio_body)" transform="rotate(15 50 58)"/>
+  
+  <!-- Stars -->
+  <circle cx="12" cy="14" r="2" fill="#FFD93D"/>
+  <circle cx="22" cy="18" r="1.5" fill="#FFF"/>
+  <circle cx="58" cy="62" r="1.5" fill="#FFF"/>
+  
+  <!-- Sparkle -->
+  <path d="M70 10 L72 14 L70 12 L68 14 Z" fill="#FFD93D"/>
+</svg>

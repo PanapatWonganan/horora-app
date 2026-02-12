@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_client.dart';
-import '../repositories/mock_tarot_repository.dart';
+import '../repositories/tarot_repository.dart';
 import '../repositories/horoscope_repository.dart';
 
 class AppProviders extends StatelessWidget {
@@ -41,9 +41,9 @@ class AppProviders extends StatelessWidget {
                     ApiClient(baseUrl: 'https://api.astrology-app.com/api'),
               ),
 
-              // Repositories
-              Provider<MockTarotRepository>(
-                create: (context) => MockTarotRepository(
+              // Tarot Repository
+              Provider<TarotRepository>(
+                create: (context) => TarotRepository(
                   apiClient: context.read<ApiClient>(),
                   prefs: sharedPreferences,
                 ),

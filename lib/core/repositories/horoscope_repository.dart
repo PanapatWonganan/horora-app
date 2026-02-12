@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
 import '../api/openai_client.dart';
 import '../models/models.dart';
 import '../models/compatibility_result.dart';
+import '../services/thai_zodiac_service.dart';
+import '../services/smart_horoscope_service.dart';
+import '../services/laravel_auth_service.dart';
 import '../../features/chat/repositories/chat_repository.dart';
 import '../utils/exceptions.dart' as ex;
 
@@ -29,65 +33,36 @@ class HoroscopeRepository {
         _openaiClient = openaiClient,
         _useOpenAI = useOpenAI;
 
-  // ดึงดวงชะตาประจำวันตามราศี
-  Future<DailyHoroscope> getDailyHoroscope(String zodiacSign) async {
+  // ดึงดวงชะตาประจำวันตามปีนักษัตรไทย
+  Future<DailyHoroscope> getDailyHoroscope(String thaiAnimal) async {
     try {
-      // ตรวจสอบว่าใช้ OpenAI หรือไม่
-      if (_useOpenAI && _openaiClient != null) {
-        return await _getOpenAIDailyHoroscope(zodiacSign);
-      }
-
-      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
-      final String cacheKey =
-          '${_dailyHoroscopeKey}_${zodiacSign}_${DateTime.now().toIso8601String().split('T')[0]}';
-      final String? cachedData = _prefs.getString(cacheKey);
-
-      if (cachedData != null) {
-        return DailyHoroscope.fromJson(jsonDecode(cachedData));
-      }
-
-      // ถ้าไม่มีข้อมูลในแคช ให้ดึงจาก API
-      try {
-        final response = await _apiClient.get('/horoscope/daily/$zodiacSign');
-        final horoscope = DailyHoroscope.fromJson(response);
-
-        // บันทึกข้อมูลลงในแคช
-        await _prefs.setString(cacheKey, jsonEncode(horoscope.toJson()));
-
-        return horoscope;
-      } catch (e) {
-        // ถ้าไม่สามารถดึงข้อมูลจาก API ได้
-        // ลองใช้ OpenAI หากมีการตั้งค่าไว้
-        if (_openaiClient != null) {
-          try {
-            return await _getOpenAIDailyHoroscope(zodiacSign);
-          } catch (openaiError) {
-            // ถ้า OpenAI ล้มเหลว ใช้ข้อมูลตัวอย่าง
-            return _getMockDailyHoroscope(zodiacSign);
-          }
-        } else {
-          // ถ้าไม่มี OpenAI ใช้ข้อมูลตัวอย่าง
-          return _getMockDailyHoroscope(zodiacSign);
-        }
-      }
+      final today = DateTime.now();
+      
+      // Debug: ล้าง cache เพื่อให้ได้ข้อมูลใหม่ทุกครั้ง (เพื่อทดสอบ)
+      await SmartHoroscopeService.clearAllCache();
+      
+      // ใช้ SmartHoroscopeService ที่จัดการ OpenAI + caching + templates
+      final horoscopeData = await SmartHoroscopeService.getDailyHoroscope(thaiAnimal, today);
+      
+      // แปลงเป็น DailyHoroscope model
+      return DailyHoroscope(
+        id: today.millisecondsSinceEpoch,
+        thaiAnimal: thaiAnimal,
+        date: today,
+        content: horoscopeData['content_th'] ?? 'คำทำนายสำหรับวันนี้',
+        contentTh: horoscopeData['content_th'] ?? 'คำทำนายสำหรับวันนี้',
+        loveRating: horoscopeData['love_rating'] ?? 3,
+        careerRating: horoscopeData['career_rating'] ?? 3,
+        healthRating: horoscopeData['health_rating'] ?? 3,
+        luckyNumber: horoscopeData['lucky_number'] ?? '7, 14, 21',
+        luckyColor: horoscopeData['lucky_color'] ?? 'น้ำเงิน',
+        createdAt: today,
+        updatedAt: today,
+      );
     } catch (e) {
-      // ในกรณีที่มีข้อผิดพลาด ให้ใช้ข้อมูลตัวอย่าง
-      return _getMockDailyHoroscope(zodiacSign);
-    }
-  }
-
-  // ดึงดวงชะตาประจำวันจาก OpenAI
-  Future<DailyHoroscope> _getOpenAIDailyHoroscope(String zodiacSign) async {
-    if (_openaiClient == null) {
-      throw ex.AppException('OpenAI client is not initialized');
-    }
-
-    try {
-      final openaiResponse = await _openaiClient!.getDailyHoroscope(zodiacSign);
-      return DailyHoroscope.fromJson(openaiResponse);
-    } catch (e) {
-      throw ex.DataException(
-          'Failed to get horoscope from OpenAI: ${e.toString()}');
+      debugPrint('Error getting daily horoscope: $e');
+      // Fallback to mock data
+      return _getMockDailyHoroscope(thaiAnimal);
     }
   }
 
@@ -169,54 +144,56 @@ class HoroscopeRepository {
   }
 
   // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับดวงชะตารายวัน
-  DailyHoroscope _getMockDailyHoroscope(String zodiacSign) {
+  DailyHoroscope _getMockDailyHoroscope(String thaiAnimal) {
+    final now = DateTime.now();
     final Map<String, dynamic> mockData = {
       'id': 1,
-      'zodiac_sign': zodiacSign,
-      'date': DateTime.now().toIso8601String(),
-      'content': 'This is a mock horoscope content for $zodiacSign.',
-      'content_th': _getMockContentThai(zodiacSign),
-      'love_rating': _getMockRating(zodiacSign, 'love'),
-      'career_rating': _getMockRating(zodiacSign, 'career'),
-      'health_rating': _getMockRating(zodiacSign, 'health'),
-      'lucky_number': _getMockLuckyNumber(zodiacSign),
-      'lucky_color': _getMockLuckyColor(zodiacSign),
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'thai_animal': thaiAnimal,
+      'date': now.toIso8601String(),
+      'content': 'This is a mock horoscope content for $thaiAnimal.',
+      'content_th': _getMockContentThaiAnimal(thaiAnimal),
+      'love_rating': _getMockRating(thaiAnimal, 'love'),
+      'career_rating': _getMockRating(thaiAnimal, 'career'),
+      'health_rating': _getMockRating(thaiAnimal, 'health'),
+      'lucky_number': _getMockLuckyNumber(thaiAnimal),
+      'lucky_color': _getMockLuckyColor(thaiAnimal),
+      'created_at': now.toIso8601String(),
+      'updated_at': now.toIso8601String(),
     };
 
     return DailyHoroscope.fromJson(mockData);
   }
 
-  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับคำทำนายภาษาไทย
-  String _getMockContentThai(String zodiacSign) {
-    switch (zodiacSign) {
-      case 'aries':
-        return 'วันนี้คุณจะมีพลังงานเต็มเปี่ยม เหมาะกับการเริ่มต้นโครงการใหม่ๆ ความกล้าหาญและความเป็นผู้นำของคุณจะโดดเด่น แต่ควรระวังความใจร้อนและความหุนหันพลันแล่น';
-      case 'taurus':
-        return 'วันนี้คุณจะรู้สึกมั่นคงและมีความอดทนสูง เป็นวันที่ดีสำหรับการจัดการเรื่องการเงินและการลงทุน แต่ควรระวังความดื้อรั้นที่อาจทำให้พลาดโอกาสดีๆ';
-      case 'gemini':
-        return 'วันนี้คุณจะมีความคิดสร้างสรรค์และมีพลังในการสื่อสาร เป็นวันที่ดีสำหรับการเข้าสังคมและแลกเปลี่ยนความคิดเห็น แต่ควรระวังความไม่แน่นอนและการตัดสินใจที่เปลี่ยนแปลงไปมา';
-      case 'cancer':
-        return 'วันนี้ความรู้สึกและอารมณ์ของคุณจะไหลลื่น เป็นวันที่ดีสำหรับการอยู่กับครอบครัวและคนที่คุณรัก แต่ควรระวังความอ่อนไหวและการยึดติดกับอดีต';
-      case 'leo':
-        return 'วันนี้คุณจะมีเสน่ห์และพลังที่โดดเด่น เป็นวันที่ดีสำหรับการแสดงความสามารถและการเป็นผู้นำ แต่ควรระวังความหยิ่งและการเรียกร้องความสนใจมากเกินไป';
-      case 'virgo':
-        return 'วันนี้คุณจะมีความละเอียดรอบคอบและมีเหตุผล เป็นวันที่ดีสำหรับการจัดระเบียบและวางแผน แต่ควรระวังการวิจารณ์และความวิตกกังวลที่มากเกินไป';
-      case 'libra':
-        return 'วันนี้คุณจะมีความสมดุลและความยุติธรรม เป็นวันที่ดีสำหรับการเจรจาและการประนีประนอม แต่ควรระวังการลังเลและการตัดสินใจที่ยากลำบาก';
-      case 'scorpio':
-        return 'วันนี้คุณจะมีพลังและความเข้มข้นในอารมณ์ เป็นวันที่ดีสำหรับการค้นคว้าและการวิจัยเชิงลึก แต่ควรระวังความหึงหวงและการแก้แค้น';
-      case 'sagittarius':
-        return 'วันนี้คุณจะมีอิสระและการผจญภัย เป็นวันที่ดีสำหรับการเดินทางและการศึกษา แต่ควรระวังการพูดตรงเกินไปและการสัญญาเกินจริง';
-      case 'capricorn':
-        return 'วันนี้คุณจะมีความรับผิดชอบและความมุ่งมั่น เป็นวันที่ดีสำหรับการทำงานและการวางแผนระยะยาว แต่ควรระวังความเคร่งเครียดและการทำงานหนักเกินไป';
-      case 'aquarius':
-        return 'วันนี้คุณจะมีความคิดที่เป็นอิสระและแปลกใหม่ เป็นวันที่ดีสำหรับนวัตกรรมและการทำงานเพื่อสังคม แต่ควรระวังความแปลกแยกและการไม่ยืดหยุ่น';
-      case 'pisces':
-        return 'วันนี้คุณจะมีความเมตตาและจินตนาการ เป็นวันที่ดีสำหรับงานศิลปะและการช่วยเหลือผู้อื่น แต่ควรระวังการหลบหนีความจริงและความสับสน';
+  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับคำทำนายภาษาไทยตามปีนักษัตรไทย
+  String _getMockContentThaiAnimal(String thaiAnimal) {
+    debugPrint('_getMockContentThaiAnimal received: "$thaiAnimal"');
+    switch (thaiAnimal) {
+      case 'ชวด':
+        return 'วันนี้ไหวพริบและความขยันของคุณจะเป็นกุญแจสำคัญ เหมาะกับการใช้ความรอบคอบในการตัดสินใจ ความสามารถในการประหยัดจะช่วยให้มีเงินเก็บ';
+      case 'ฉลู':
+        return 'ความมั่นคงและอดทนของคุณจะได้รับการตอบแทนวันนี้ เหมาะกับการวางแผนระยะยาวและการลงทุนที่มั่นคง ความจริงใจจะนำความสำเร็จมาให้';
+      case 'ขาล':
+        return 'ความกล้าหาญและการเป็นผู้นำของคุณจะโดดเด่นวันนี้ เหมาะกับการเริ่มโครงการใหม่และการแก้ปัญหาที่ท้าทาย แต่ควรระวังความหุนหันพลันแล่น';
+      case 'เถาะ':
+        return 'ความอ่อนโยนและมารยาทของคุณจะช่วยสร้างความสัมพันธ์ที่ดี วันนี้เหมาะกับการทำงานเป็นทีมและการประนีประนอม ความสงบจะนำสุขมาให้';
+      case 'มะโรง':
+        return 'พลังและความมั่นใจของคุณจะเปล่งประกายวันนี้ เหมาะกับการแสดงความสามารถและเป็นที่สนใจของผู้อื่น ความกล้าหาญจะนำโอกาสมาให้';
+      case 'มะเส็ง':
+        return 'ปัญญาและสัญชาตญาณของคุณจะช่วยในการตัดสินใจสำคัญวันนี้ เหมาะกับการเรียนรู้สิ่งใหม่และการวิจัย ความลึกซึ้งจะเป็นจุดแข็ง';
+      case 'มะเมีย':
+        return 'ความกระฉับกระเฉงและรักเสรีภาพของคุณจะนำพาผลลัพธ์ดีวันนี้ เหมาะกับการเดินทางและการผจญภัย ความตรงไปตรงมาจะได้รับการชื่นชม';
+      case 'มะแม':
+        return 'ความอ่อนโยนและจิตใจศิลปินของคุณจะได้รับการชื่นชมวันนี้ เหมาะกับงานสร้างสรรค์และการดูแลผู้อื่น ความงามจะอยู่รอบตัวคุณ';
+      case 'วอก':
+        return 'ความฉลาดและไหวพริบของคุณจะช่วยแก้ปัญหาได้ดีวันนี้ เหมาะกับการเจรจาและการปรับเปลี่ยน ความยืดหยุ่นจะเป็นประโยชน์';
+      case 'ระกา':
+        return 'ความตรงไปตรงมาและรักความสะอาดของคุณจะสร้างความน่าเชื่อถือวันนี้ เหมาะกับการจัดระเบียบและปรับปรุง ความสวยงามจะเข้ามาในชีวิต';
+      case 'จอ':
+        return 'ความซื่อสัตย์และความรับผิดชอบของคุณจะได้รับการยอมรับวันนี้ เหมาะกับการดูแลครอบครัวและงานที่ต้องใช้ความไว้วางใจ ความจริงใจจะได้รับรางวัล';
+      case 'กุน':
+        return 'ใจกว้างและความเอื้อเฟื้อของคุณจะนำพาความสุขมาให้วันนี้ เหมาะกับการช่วยเหลือผู้อื่นและการสร้างความสุขสบาย การให้จะได้รับกลับคืนมา';
       default:
-        return 'วันนี้เป็นวันที่ดีสำหรับการพักผ่อนและการทบทวนตัวเอง ควรใช้เวลาอย่างมีคุณค่าและวางแผนสำหรับอนาคต';
+        return 'วันนี้เป็นวันที่ดีสำหรับการใช้ลักษณะเฉพาะของปีนักษัตรของคุณ คุณจะได้พบกับโอกาสดีๆ ในการทำงานและความสัมพันธ์';
     }
   }
 
@@ -227,45 +204,44 @@ class HoroscopeRepository {
     return (seed % 5) + 1; // คะแนน 1-5
   }
 
-  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับเลขนำโชค
-  String _getMockLuckyNumber(String zodiacSign) {
-    final List<String> numbers = [
-      '1, 7, 13',
-      '2, 8, 16',
-      '3, 9, 21',
-      '4, 10, 22',
-      '5, 11, 23',
-      '6, 12, 24',
-      '7, 14, 28',
-      '8, 15, 29',
-      '9, 18, 27',
-      '10, 19, 30',
-      '11, 20, 33',
-      '12, 21, 36'
-    ];
-
-    final int index = zodiacSign.codeUnitAt(0) % numbers.length;
-    return numbers[index];
-  }
-
-  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับสีนำโชค
-  String _getMockLuckyColor(String zodiacSign) {
-    final Map<String, String> colors = {
-      'aries': 'แดง, ส้ม',
-      'taurus': 'เขียว, น้ำตาล',
-      'gemini': 'เหลือง, ฟ้า',
-      'cancer': 'เงิน, ขาว',
-      'leo': 'ทอง, ส้ม',
-      'virgo': 'น้ำตาล, เขียว',
-      'libra': 'ฟ้า, ชมพู',
-      'scorpio': 'แดงเข้ม, ดำ',
-      'sagittarius': 'ม่วง, น้ำเงิน',
-      'capricorn': 'เทา, น้ำตาลเข้ม',
-      'aquarius': 'ฟ้า, เงิน',
-      'pisces': 'เขียวอมฟ้า, ม่วง',
+  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับเลขนำโชคตามปีนักษัตรไทย
+  String _getMockLuckyNumber(String thaiAnimal) {
+    final Map<String, String> luckyNumbers = {
+      'ชวด': '1, 8, 12',
+      'ฉลู': '2, 6, 15',
+      'ขาล': '3, 9, 18',
+      'เถาะ': '4, 11, 20',
+      'มะโรง': '5, 14, 23',
+      'มะเส็ง': '6, 13, 24',
+      'มะเมีย': '7, 16, 25',
+      'มะแม': '8, 17, 26',
+      'วอก': '9, 18, 27',
+      'ระกา': '10, 19, 28',
+      'จอ': '11, 20, 29',
+      'กุน': '12, 21, 30',
     };
 
-    return colors[zodiacSign] ?? 'น้ำเงิน, ม่วง';
+    return luckyNumbers[thaiAnimal] ?? '7, 14, 21';
+  }
+
+  // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับสีนำโชคตามปีนักษัตรไทย
+  String _getMockLuckyColor(String thaiAnimal) {
+    final Map<String, String> colors = {
+      'ชวด': 'ทอง, เหลือง',
+      'ฉลู': 'เขียว, น้ำตาล',
+      'ขาล': 'แดง, ส้ม',
+      'เถาะ': 'เงิน, ขาว',
+      'มะโรง': 'เขียว, แดง',
+      'มะเส็ง': 'น้ำเงิน, ดำ',
+      'มะเมีย': 'ม่วง, แดง',
+      'มะแม': 'ชมพู, เงิน',
+      'วอก': 'เหลือง, ทอง',
+      'ระกา': 'ขาว, เงิน',
+      'จอ': 'น้ำตาล, ทอง',
+      'กุน': 'ดำ, น้ำเงิน',
+    };
+
+    return colors[thaiAnimal] ?? 'น้ำเงิน, ม่วง';
   }
 
   // ดึงดวงชะตาประจำวันสำหรับผู้ใช้ปัจจุบัน
@@ -289,71 +265,73 @@ class HoroscopeRepository {
     }
   }
 
-  // ดึงข้อมูลราศีทั้งหมด
-  Future<List<ZodiacSign>> getAllZodiacSigns() async {
+  // ดึงข้อมูลปีนักษัตรไทยทั้งหมด
+  Future<List<String>> getAllThaiZodiacAnimals() async {
     try {
       // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
       final String? cachedData = _prefs.getString(_zodiacSignsKey);
 
       if (cachedData != null) {
         final List<dynamic> decoded = jsonDecode(cachedData);
-        return decoded.map((item) => ZodiacSign.fromJson(item)).toList();
+        return List<String>.from(decoded);
       }
 
       // ถ้าไม่มีข้อมูลในแคช ให้ดึงจาก API
-      final response = await _apiClient.get('/horoscope/zodiac-signs');
+      // Note: API response is currently not used, returning hardcoded list instead
+      // TODO: Use API response when backend endpoint is ready
+      // final response = await _apiClient.get('/horoscope/zodiac-signs');
 
-      final List<ZodiacSign> zodiacSigns =
-          (response as List).map((item) => ZodiacSign.fromJson(item)).toList();
+      final List<String> thaiAnimals = ['ชวด', 'ฉลู', 'ขาล', 'เถาะ', 'มะโรง', 'มะเส็ง', 'มะเมีย', 'มะแม', 'วอก', 'ระกา', 'จอ', 'กุน'];
 
       // บันทึกข้อมูลลงในแคช
-      await _prefs.setString(_zodiacSignsKey,
-          jsonEncode(zodiacSigns.map((sign) => sign.toJson()).toList()));
+      await _prefs.setString(_zodiacSignsKey, jsonEncode(thaiAnimals));
 
-      return zodiacSigns;
+      return thaiAnimals;
     } catch (e) {
       throw ex.DataException('Failed to get zodiac signs: ${e.toString()}');
     }
   }
 
-  // ดึงข้อมูลราศีตามชื่อ
-  Future<ZodiacSign> getZodiacSignByName(String name) async {
+  // ดึงข้อมูลปีนักษัตรตามชื่อ
+  Future<String> getThaiAnimalByName(String name) async {
     try {
-      final List<ZodiacSign> allSigns = await getAllZodiacSigns();
+      final List<String> allAnimals = await getAllThaiZodiacAnimals();
 
-      final ZodiacSign sign = allSigns.firstWhere(
-        (sign) =>
-            sign.name.toLowerCase() == name.toLowerCase() ||
-            sign.nameEn.toLowerCase() == name.toLowerCase(),
-        orElse: () => throw ex.DataException('Zodiac sign not found: $name'),
+      final String animal = allAnimals.firstWhere(
+        (animal) => animal.toLowerCase() == name.toLowerCase(),
+        orElse: () => throw ex.DataException('Thai animal not found: $name'),
       );
 
-      return sign;
+      return animal;
     } catch (e) {
       throw ex.DataException('Failed to get zodiac sign: ${e.toString()}');
     }
   }
 
-  // คำนวณราศีจากวันเกิด
-  Future<ZodiacSign> calculateZodiacSign(DateTime birthDate) async {
+  // คำนวณปีนักษัตรจากวันเกิด
+  Future<String> calculateThaiAnimal(DateTime birthDate) async {
     try {
-      final List<ZodiacSign> allSigns = await getAllZodiacSigns();
-
-      // ใช้เมธอด static ของ ZodiacSign เพื่อคำนวณราศี
-      final String signName = ZodiacSign.calculateZodiacSign(birthDate);
-
-      final ZodiacSign sign = allSigns.firstWhere(
-        (sign) =>
-            sign.name.toLowerCase() == signName.toLowerCase() ||
-            sign.nameEn.toLowerCase() == signName.toLowerCase(),
-        orElse: () => throw ex.DataException(
-            'Zodiac sign not found for birth date: $birthDate'),
-      );
-
-      return sign;
+      // ใช้ Thai Zodiac Service
+      final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(birthDate);
+      return thaiZodiac.animalName;
     } catch (e) {
-      throw ex.DataException(
-          'Failed to calculate zodiac sign: ${e.toString()}');
+      throw ex.DataException('Failed to calculate Thai animal: ${e.toString()}');
+    }
+  }
+
+  // ดึง Thai Zodiac สำหรับใช้ใน UI
+  Future<ThaiZodiac?> getUserThaiZodiac() async {
+    try {
+      final user = LaravelAuthService.instance.currentUser;
+      if (user == null) return null;
+
+      if (user.birthDate != null) {
+        return ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
+      }
+
+      return null;
+    } catch (e) {
+      throw ex.DataException('Failed to get user Thai zodiac: ${e.toString()}');
     }
   }
 
@@ -413,9 +391,123 @@ class HoroscopeRepository {
 
       return await getZodiacCompatibility(userSign, otherSign);
     } catch (e) {
-      print('Error in getCurrentUserCompatibility: $e');
+      debugPrint('Error in getCurrentUserCompatibility: $e');
       throw Exception('ไม่สามารถตรวจสอบความเข้ากันได้: ${e.toString()}');
     }
+  }
+
+  // ตรวจสอบความเข้ากันระหว่างปีนักษัตรไทย
+  Future<CompatibilityResult> getThaiZodiacCompatibility(
+      String animal1, String animal2) async {
+    try {
+      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
+      final String cacheKey = 'thai_zodiac_compatibility_${animal1}_$animal2';
+      final String? cachedData = _prefs.getString(cacheKey);
+
+      if (cachedData != null) {
+        return CompatibilityResult.fromJson(jsonDecode(cachedData));
+      }
+
+      // สร้างข้อมูลความเข้ากันตามปีนักษัตรไทย
+      final result = _getThaiZodiacCompatibilityData(animal1, animal2);
+
+      // บันทึกข้อมูลลงในแคช
+      await _prefs.setString(cacheKey, jsonEncode(result.toJson()));
+
+      return result;
+    } catch (e) {
+      debugPrint('Error in getThaiZodiacCompatibility: $e');
+      return _getThaiZodiacCompatibilityData(animal1, animal2);
+    }
+  }
+
+  // สร้างข้อมูลความเข้ากันตามปีนักษัตรไทย
+  CompatibilityResult _getThaiZodiacCompatibilityData(String animal1, String animal2) {
+    // ตารางความเข้ากันตามปีนักษัตรไทย (อิงจากความเชื่อดั้งเดิม)
+    // สามเหลี่ยมเป็นกันเอง: ชวด-มะโรง-วอก, ฉลู-มะเส็ง-ระกา, ขาล-มะเมีย-จอ, เถาะ-มะแม-กุน
+    final Map<String, List<String>> compatibleGroups = {
+      'ชวด': ['มะโรง', 'วอก'],
+      'มะโรง': ['ชวด', 'วอก'],
+      'วอก': ['ชวด', 'มะโรง'],
+      'ฉลู': ['มะเส็ง', 'ระกา'],
+      'มะเส็ง': ['ฉลู', 'ระกา'],
+      'ระกา': ['ฉลู', 'มะเส็ง'],
+      'ขาล': ['มะเมีย', 'จอ'],
+      'มะเมีย': ['ขาล', 'จอ'],
+      'จอ': ['ขาล', 'มะเมีย'],
+      'เถาะ': ['มะแม', 'กุน'],
+      'มะแม': ['เถาะ', 'กุน'],
+      'กุน': ['เถาะ', 'มะแม'],
+    };
+
+    // ปีที่ขัดแย้ง (ตรงข้าม 6 ปี)
+    final Map<String, String> conflictingPairs = {
+      'ชวด': 'มะเมีย', 'มะเมีย': 'ชวด',
+      'ฉลู': 'มะแม', 'มะแม': 'ฉลู',
+      'ขาล': 'วอก', 'วอก': 'ขาล',
+      'เถาะ': 'ระกา', 'ระกา': 'เถาะ',
+      'มะโรง': 'จอ', 'จอ': 'มะโรง',
+      'มะเส็ง': 'กุน', 'กุน': 'มะเส็ง',
+    };
+
+    int overallScore;
+    int loveScore;
+    int workScore;
+    String description;
+    String loveCompatibility;
+    String workCompatibility;
+    String advice;
+
+    // ตรวจสอบความสัมพันธ์
+    if (animal1 == animal2) {
+      // ปีเดียวกัน
+      overallScore = 75;
+      loveScore = 80;
+      workScore = 70;
+      description = 'ปี$animal1 ทั้งคู่ มีความเข้าใจกันดีเพราะมีลักษณะนิสัยคล้ายกัน แต่อาจมีความขัดแย้งในบางเรื่องเพราะไม่ยอมกัน';
+      loveCompatibility = 'ความรักระหว่างปีเดียวกันมักจะเข้าใจกันดี แต่ควรระวังการชิงดีชิงเด่น';
+      workCompatibility = 'ทำงานร่วมกันได้ดีเพราะคิดเหมือนกัน แต่ควรมีคนตัดสินใจหลัก';
+      advice = 'ควรยอมรับความแตกต่างเล็กน้อยที่มี และหาจุดร่วมในการตัดสินใจ';
+    } else if (compatibleGroups[animal1]?.contains(animal2) ?? false) {
+      // อยู่ในกลุ่มสามเหลี่ยมเป็นกันเอง
+      overallScore = 90 + Random().nextInt(11);
+      loveScore = 85 + Random().nextInt(16);
+      workScore = 88 + Random().nextInt(13);
+      description = 'ปี$animal1 และ ปี$animal2 เป็นคู่ที่เข้ากันได้ดีมาก! อยู่ในกลุ่มสามเหลี่ยมเป็นกันเอง มีพลังส่งเสริมกัน';
+      loveCompatibility = 'ความรักระหว่างกันมีความราบรื่นมาก เข้าใจกันโดยธรรมชาติ มีโอกาสสร้างครอบครัวที่อบอุ่น';
+      workCompatibility = 'ทำงานร่วมกันได้อย่างลงตัว ช่วยเหลือเกื้อกูลกัน สามารถสร้างความสำเร็จร่วมกันได้';
+      advice = 'ความสัมพันธ์นี้ดีอยู่แล้ว ควรรักษาความเข้าใจกันไว้และสนับสนุนซึ่งกันและกัน';
+    } else if (conflictingPairs[animal1] == animal2) {
+      // ปีที่ขัดแย้ง (ตรงข้าม)
+      overallScore = 30 + Random().nextInt(21);
+      loveScore = 35 + Random().nextInt(26);
+      workScore = 40 + Random().nextInt(21);
+      description = 'ปี$animal1 และ ปี$animal2 เป็นปีที่ตรงข้ามกัน อาจมีความท้าทายในการอยู่ร่วมกัน แต่หากเข้าใจกันก็สามารถเติมเต็มข้อบกพร่องของกันได้';
+      loveCompatibility = 'ความรักอาจต้องใช้ความพยายามมากกว่าปกติ ควรฝึกการสื่อสารและเข้าใจมุมมองของอีกฝ่าย';
+      workCompatibility = 'การทำงานร่วมกันอาจมีความเห็นต่าง ควรแบ่งหน้าที่ชัดเจนและเคารพความเชี่ยวชาญของกัน';
+      advice = 'ความสัมพันธ์นี้ต้องการความอดทนและความเข้าใจ หากผ่านความท้าทายได้ จะกลายเป็นคู่ที่แข็งแกร่ง';
+    } else {
+      // ความสัมพันธ์ทั่วไป
+      overallScore = 60 + Random().nextInt(21);
+      loveScore = 55 + Random().nextInt(26);
+      workScore = 60 + Random().nextInt(21);
+      description = 'ปี$animal1 และ ปี$animal2 มีความเข้ากันในระดับปานกลาง สามารถสร้างความสัมพันธ์ที่ดีได้หากทั้งสองฝ่ายพยายาม';
+      loveCompatibility = 'ความรักมีโอกาสพัฒนาได้ดีหากทั้งสองฝ่ายเปิดใจและยอมรับความแตกต่าง';
+      workCompatibility = 'ทำงานร่วมกันได้ แต่ควรกำหนดบทบาทและหน้าที่ให้ชัดเจน';
+      advice = 'ควรสื่อสารกันอย่างเปิดเผยและหาจุดร่วมที่ทั้งสองฝ่ายสนใจ';
+    }
+
+    return CompatibilityResult(
+      sign1: 'ปี$animal1',
+      sign2: 'ปี$animal2',
+      overallScore: overallScore,
+      loveScore: loveScore,
+      workScore: workScore,
+      description: description,
+      loveCompatibility: loveCompatibility,
+      workCompatibility: workCompatibility,
+      advice: advice,
+    );
   }
 
   // สร้างข้อมูลตัวอย่างสำหรับความเข้ากันระหว่างราศี
@@ -663,24 +755,5 @@ class HoroscopeRepository {
     final List<int> dates = List.generate(28, (index) => index + 1);
     dates.shuffle();
     return dates.take(3).toList()..sort();
-  }
-
-  // Helper method to get cached data
-  Future<T?> _getCachedData<T>(String key) async {
-    final cachedDataStr = _prefs.getString(key);
-    if (cachedDataStr != null) {
-      try {
-        final data = jsonDecode(cachedDataStr);
-        return data as T;
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  // Helper method to cache data
-  Future<void> _cacheData(String key, dynamic data) async {
-    await _prefs.setString(key, jsonEncode(data));
   }
 }

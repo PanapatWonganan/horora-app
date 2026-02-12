@@ -1,90 +1,90 @@
 import 'package:flutter/foundation.dart';
 import '../../../core/services/openai_service.dart';
-import '../../../core/services/supabase_service.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/utils/zodiac_utils.dart';
+import '../../../core/services/laravel_auth_service.dart';
+import '../../../core/services/thai_zodiac_service.dart';
+import '../../../core/api/api_client.dart';
+import '../../../config/constants.dart';
 import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 
 class ChatRepository {
   final OpenAIService _openaiService = OpenAIService.instance;
-  final SupabaseService _supabaseService = SupabaseService.instance;
   final AuthService _authService = AuthService.instance;
+  final ApiClient _apiClient = LaravelAuthService.instance.apiClient;
 
-  // Get chat history from Supabase
+  // Get chat history from Laravel API
   Future<List<ChatSession>> getChatHistory() async {
     try {
-      final response = await _supabaseService.getChatHistory();
-
-      return response.map((data) => ChatSession.fromJson(data)).toList();
+      final response = await _apiClient.get('/chat/sessions');
+      final List<dynamic> data = response as List;
+      return data.map((json) => ChatSession.fromJson(json)).toList();
     } catch (e) {
       debugPrint('Error getting chat history: $e');
       return [];
     }
   }
 
-  // Save chat session to Supabase
+  // Save chat session to Laravel API
   Future<void> saveChatSession(ChatSession session) async {
     try {
-      await _supabaseService.saveChatSession(session.toJson());
+      await _apiClient.post('/chat/sessions', data: session.toJson());
     } catch (e) {
       debugPrint('Error saving chat session: $e');
       throw Exception('Failed to save chat session');
     }
   }
 
-  // Get user's zodiac sign from profile
+  // Get user's Thai zodiac animal from profile
   Future<String?> getUserZodiacSign() async {
     try {
-      // ดึงข้อมูลผู้ใช้ปัจจุบันจาก Supabase Auth
+      // ดึงข้อมูลผู้ใช้ปัจจุบันจาก Laravel Auth
       final currentUser = _authService.currentUser;
 
       debugPrint(
           "ChatRepository.getUserZodiacSign: current user = ${currentUser?.id}");
 
       if (currentUser != null) {
-        // ดึงข้อมูลราศีจาก user_metadata โดยตรง
-        if (currentUser.userMetadata?['zodiac_sign'] != null) {
-          final sign = currentUser.userMetadata!['zodiac_sign'] as String;
-          debugPrint("ChatRepository: found zodiac_sign in metadata: $sign");
-          return sign;
+        // ลองดึงข้อมูล thai_animal จาก user data
+        if (currentUser.thaiAnimal != null) {
+          final animal = currentUser.thaiAnimal;
+          debugPrint("ChatRepository: found thai_animal: $animal");
+          return animal;
         }
 
-        // ถ้าไม่มีราศีแต่มีวันเกิด ให้คำนวณราศีจากวันเกิด
-        if (currentUser.userMetadata?['birth_date'] != null) {
-          final birthDate =
-              DateTime.parse(currentUser.userMetadata!['birth_date'] as String);
-          final sign = ZodiacUtils.getZodiacSign(birthDate);
+        // ถ้าไม่มี thai_animal แต่มี birthDate ให้คำนวณจากวันเกิด
+        if (currentUser.birthDate != null) {
+          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(currentUser.birthDate!);
           debugPrint(
-              "ChatRepository: calculated zodiac from birth_date: $sign");
-          return sign;
+              "ChatRepository: calculated Thai zodiac from birth_date: ${thaiZodiac.animalName}");
+          return thaiZodiac.animalName;
         }
       }
 
-      // ถ้าไม่มีข้อมูลใน user_metadata ให้ลองดึงจาก profiles table (วิธีเดิม)
+      // ถ้าไม่มีข้อมูลใน currentUser ให้ลองดึงจาก API
       final profile = await _authService.getUserProfile();
 
       debugPrint("ChatRepository: profile = $profile");
 
       if (profile != null) {
-        // ถ้ามีข้อมูลราศีในโปรไฟล์
-        if (profile['zodiac_sign'] != null) {
-          final sign = profile['zodiac_sign'];
-          debugPrint("ChatRepository: found zodiac_sign in profile: $sign");
-          return sign;
+        // ลองหา thai_animal ในโปรไฟล์ก่อน
+        if (profile['thai_animal'] != null) {
+          final animal = profile['thai_animal'];
+          debugPrint("ChatRepository: found thai_animal in profile: $animal");
+          return animal;
         }
 
-        // ถ้าไม่มีราศีแต่มีวันเกิด ให้คำนวณราศีจากวันเกิด
+        // ถ้าไม่มี thai_animal แต่มี birth_date ให้คำนวณจากวันเกิด
         if (profile['birth_date'] != null) {
           final birthDate = DateTime.parse(profile['birth_date']);
-          final sign = ZodiacUtils.getZodiacSign(birthDate);
+          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(birthDate);
           debugPrint(
-              "ChatRepository: calculated zodiac from profile birth_date: $sign");
-          return sign;
+              "ChatRepository: calculated Thai zodiac from profile birth_date: ${thaiZodiac.animalName}");
+          return thaiZodiac.animalName;
         }
       }
 
-      debugPrint("ChatRepository: no zodiac sign found");
+      debugPrint("ChatRepository: no Thai zodiac animal found");
       return null;
     } catch (e) {
       debugPrint('Error getting user zodiac sign: $e');
@@ -107,30 +107,35 @@ class ChatRepository {
               })
           .toList();
 
-      // Get user's zodiac sign
-      final userZodiacSign = await getUserZodiacSign();
-      final zodiacInfo = userZodiacSign != null
-          ? 'ผู้ใช้เกิดราศี: ${ZodiacUtils.getZodiacSignThai(DateTime(2000, 1, 1), zodiacSign: userZodiacSign)}'
-          : 'ไม่ทราบราศีของผู้ใช้';
+      // Get user's Thai zodiac sign
+      final userThaiAnimal = await getUserZodiacSign();
+      final zodiacInfo = userThaiAnimal != null
+          ? 'ผู้ใช้เกิดปี$userThaiAnimal'
+          : 'ไม่ทราบปีนักษัตรของผู้ใช้';
 
-      // Create system prompt with astrology context and user's zodiac sign
+      // Create system prompt with Thai astrology context and user's zodiac sign
       final systemPrompt = '''
-      คุณเป็นนักพยากรณ์ดวงชะตาที่มีความเชี่ยวชาญในด้านโหราศาสตร์ ไพ่ทาโร่ และศาสตร์แห่งดวงดาว
-      
+      คุณเป็นนักพยากรณ์ดวงชะตาไทยที่มีความเชี่ยวชาญในด้านปีนักษัตรไทย 12 ปี ไพ่ทาโร่ และโหราศาสตร์ไทย
+
       ข้อมูลผู้ใช้:
       $zodiacInfo
-      
+
       หัวข้อการสนทนา: $topic
-      
+
+      ความรู้เกี่ยวกับปีนักษัตรไทย:
+      - 12 ปี ได้แก่: ชวด, ฉลู, ขาล, เถาะ, มะโรง, มะเส็ง, มะเมีย, มะแม, วอก, ระกา, จอ, กุน
+      - 5 ธาตุ ได้แก่: ทอง, น้ำ, ไม้, ไฟ, ดิน
+
       กฎในการตอบ:
       1. ตอบด้วยภาษาไทยเสมอ
-      2. ให้คำแนะนำที่เป็นประโยชน์และเชิงบวก
-      3. อธิบายเหตุผลทางโหราศาสตร์ประกอบคำทำนาย
-      4. ไม่ให้คำทำนายที่เป็นลางร้ายหรือทำให้ผู้ใช้กังวล
-      5. ไม่แนะนำให้ผู้ใช้ตัดสินใจทางการเงินหรือสุขภาพโดยอิงจากคำทำนายเพียงอย่างเดียว
-      6. ใช้ข้อมูลราศีของผู้ใช้ในการให้คำแนะนำที่เฉพาะเจาะจงมากขึ้น
-      
-      ตอบคำถามต่อไปนี้โดยใช้ความรู้ด้านโหราศาสตร์และไพ่ทาโร่:
+      2. ใช้ความรู้เกี่ยวกับปีนักษัตรไทยในการทำนาย
+      3. ให้คำแนะนำที่เป็นประโยชน์และเชิงบวก
+      4. อธิบายเหตุผลทางโหราศาสตร์ไทยประกอบคำทำนาย
+      5. ไม่ให้คำทำนายที่เป็นลางร้ายหรือทำให้ผู้ใช้กังวล
+      6. ไม่แนะนำให้ผู้ใช้ตัดสินใจทางการเงินหรือสุขภาพโดยอิงจากคำทำนายเพียงอย่างเดียว
+      7. ใช้ข้อมูลปีนักษัตรของผู้ใช้ในการให้คำแนะนำที่เฉพาะเจาะจงมากขึ้น
+
+      ตอบคำถามต่อไปนี้โดยใช้ความรู้ด้านโหราศาสตร์ไทยและไพ่ทาโร่:
       ''';
 
       // Combine system prompt with user message

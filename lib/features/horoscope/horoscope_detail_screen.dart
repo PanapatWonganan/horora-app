@@ -4,8 +4,10 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/theme/theme.dart';
 import '../../core/models/horoscope_model.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/loading_indicator.dart';
 import '../shared/widgets/gradient_background.dart';
+import '../report/report_dialog.dart';
 
 class HoroscopeDetailScreen extends StatefulWidget {
   final DailyHoroscope horoscope;
@@ -32,10 +34,10 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   void initState() {
     super.initState();
     // แสดงข้อมูลเพื่อการดีบัก
-    print('HoroscopeDetailScreen - initState');
-    print('Horoscope: ${widget.horoscope.zodiacSign}');
-    print('ZodiacSignThai: ${widget.zodiacSignThai}');
-    print('ZodiacSignEn: ${widget.zodiacSignEn}');
+    debugPrint('HoroscopeDetailScreen - initState');
+    debugPrint('Horoscope: ${widget.horoscope.thaiAnimal}');
+    debugPrint('ZodiacSignThai: ${widget.zodiacSignThai}');
+    debugPrint('ZodiacSignEn: ${widget.zodiacSignEn}');
     // ตรวจสอบข้อมูลที่ได้รับ
     _validateData();
   }
@@ -173,7 +175,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         const Text(
@@ -184,9 +186,18 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        IconButton(
-          icon: const Icon(Icons.share, color: Colors.white),
-          onPressed: _shareHoroscope,
+        Row(
+          children: [
+            IconButton(
+              icon: SvgIcon(AppIcons.flag, size: 20, color: Colors.white),
+              onPressed: () => _reportContent(),
+              tooltip: 'รายงานเนื้อหา',
+            ),
+            IconButton(
+              icon: SvgIcon(AppIcons.share, size: 20, color: Colors.white),
+              onPressed: _shareHoroscope,
+            ),
+          ],
         ),
       ],
     );
@@ -203,7 +214,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -225,7 +236,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
         Text(
           widget.zodiacSignEn,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 16,
             fontStyle: FontStyle.italic,
           ),
@@ -234,7 +245,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withOpacity(0.3),
+            color: AppColors.secondary.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -250,54 +261,9 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _getZodiacIcon() {
-    final zodiacSign = widget.zodiacSignEn.toLowerCase();
-    
-    IconData iconData;
-    switch (zodiacSign) {
-      case 'aries':
-        iconData = Icons.pets;
-        break;
-      case 'taurus':
-        iconData = Icons.agriculture;
-        break;
-      case 'gemini':
-        iconData = Icons.people;
-        break;
-      case 'cancer':
-        iconData = Icons.water;
-        break;
-      case 'leo':
-        iconData = Icons.face;
-        break;
-      case 'virgo':
-        iconData = Icons.person;
-        break;
-      case 'libra':
-        iconData = Icons.balance;
-        break;
-      case 'scorpio':
-        iconData = Icons.bug_report;
-        break;
-      case 'sagittarius':
-        iconData = Icons.arrow_forward;
-        break;
-      case 'capricorn':
-        iconData = Icons.terrain;
-        break;
-      case 'aquarius':
-        iconData = Icons.waves;
-        break;
-      case 'pisces':
-        iconData = Icons.water_drop;
-        break;
-      default:
-        iconData = Icons.star;
-    }
-    
-    return Icon(
-      iconData,
-      color: Colors.white,
-      size: 40,
+    return WesternZodiacIcon(
+      sign: widget.zodiacSignEn,
+      size: 50,
     );
   }
 
@@ -305,10 +271,10 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -334,9 +300,9 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
                   });
                 },
                 activeColor: AppColors.tertiary,
-                activeTrackColor: AppColors.tertiary.withOpacity(0.5),
+                activeTrackColor: AppColors.tertiary.withValues(alpha: 0.5),
                 inactiveThumbColor: Colors.white,
-                inactiveTrackColor: Colors.white.withOpacity(0.3),
+                inactiveTrackColor: Colors.white.withValues(alpha: 0.3),
               ),
             ],
           ),
@@ -354,7 +320,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           Text(
             _showEnglishContent ? 'Switch to Thai' : 'Switch to English',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 12,
             ),
           ),
@@ -392,7 +358,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -412,10 +378,13 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
               Row(
                 children: List.generate(
                   5,
-                  (index) => Icon(
-                    index < rating ? Icons.star : Icons.star_border,
-                    color: Colors.amber,
-                    size: 20,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: SvgIcon(
+                      index < rating ? AppIcons.starFilled : AppIcons.starOutline,
+                      size: 18,
+                      color: Colors.amber,
+                    ),
                   ),
                 ),
               ),
@@ -425,7 +394,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           Text(
             description,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -450,18 +419,18 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
         Row(
           children: [
             Expanded(
-              child: _buildLuckyItem(
+              child: _buildLuckyItemSvg(
                 'เลขนำโชค',
                 widget.horoscope.luckyNumber,
-                Icons.format_list_numbered,
+                AppIcons.numbers,
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: _buildLuckyItem(
+              child: _buildLuckyItemSvg(
                 'สีมงคล',
                 widget.horoscope.luckyColor,
-                Icons.color_lens,
+                AppIcons.palette,
               ),
             ),
           ],
@@ -470,18 +439,17 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     );
   }
 
-  Widget _buildLuckyItem(String label, String value, IconData icon) {
+  Widget _buildLuckyItemSvg(String label, String value, String svgPath) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: Colors.amber,
+          SvgIcon(
+            svgPath,
             size: 32,
           ),
           const SizedBox(height: 8),
@@ -510,10 +478,10 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.tertiary.withOpacity(0.2),
+        color: AppColors.tertiary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.tertiary.withOpacity(0.3),
+          color: AppColors.tertiary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -556,7 +524,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Center(
       child: ElevatedButton.icon(
         onPressed: _shareHoroscope,
-        icon: const Icon(Icons.share),
+        icon: SvgIcon(AppIcons.share, size: 18, color: Colors.white),
         label: const Text('แชร์ดวงของคุณ'),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.tertiary,
@@ -642,5 +610,14 @@ $content
     ''';
     
     Share.share(shareText);
+  }
+
+  void _reportContent() async {
+    await showReportDialog(
+      context,
+      contentId: widget.horoscope.id.toString(),
+      contentType: 'horoscope',
+      contentSnapshot: widget.horoscope.contentTh.substring(0, widget.horoscope.contentTh.length > 200 ? 200 : widget.horoscope.contentTh.length),
+    );
   }
 } 

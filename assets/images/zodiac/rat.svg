@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="rat_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#FFC107"/>
+    </linearGradient>
+    <linearGradient id="rat_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#9E9E9E"/>
+      <stop offset="100%" stop-color="#757575"/>
+    </linearGradient>
+    <linearGradient id="rat_belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FAFAFA"/>
+      <stop offset="100%" stop-color="#EEEEEE"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#rat_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  
+  <!-- Chinese pattern decoration -->
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#FFE082" stroke-width="2" stroke-dasharray="4 4"/>
+  
+  <!-- Tail -->
+  <path d="M58 54 Q68 50 72 40 Q74 34 70 32" stroke="#9E9E9E" stroke-width="4" stroke-linecap="round" fill="none"/>
+  
+  <!-- Body -->
+  <ellipse cx="40" cy="50" rx="20" ry="16" fill="url(#rat_body)"/>
+  
+  <!-- Belly -->
+  <ellipse cx="40" cy="52" rx="14" ry="10" fill="url(#rat_belly)"/>
+  
+  <!-- Head -->
+  <ellipse cx="40" cy="36" rx="16" ry="14" fill="url(#rat_body)"/>
+  
+  <!-- Ears -->
+  <circle cx="26" cy="26" r="8" fill="#9E9E9E"/>
+  <circle cx="54" cy="26" r="8" fill="#9E9E9E"/>
+  <circle cx="26" cy="26" r="5" fill="#FFB7B7"/>
+  <circle cx="54" cy="26" r="5" fill="#FFB7B7"/>
+  
+  <!-- Face white area -->
+  <ellipse cx="40" cy="40" rx="10" ry="8" fill="url(#rat_belly)"/>
+  
+  <!-- Eyes -->
+  <circle cx="34" cy="36" r="4" fill="#212121"/>
+  <circle cx="46" cy="36" r="4" fill="#212121"/>
+  <circle cx="35" cy="35" r="1.5" fill="#FFF"/>
+  <circle cx="47" cy="35" r="1.5" fill="#FFF"/>
+  
+  <!-- Nose -->
+  <ellipse cx="40" cy="42" rx="3" ry="2" fill="#FFB7B7"/>
+  
+  <!-- Whiskers -->
+  <line x1="28" y1="40" x2="18" y2="38" stroke="#757575" stroke-width="1"/>
+  <line x1="28" y1="42" x2="18" y2="42" stroke="#757575" stroke-width="1"/>
+  <line x1="28" y1="44" x2="18" y2="46" stroke="#757575" stroke-width="1"/>
+  <line x1="52" y1="40" x2="62" y2="38" stroke="#757575" stroke-width="1"/>
+  <line x1="52" y1="42" x2="62" y2="42" stroke="#757575" stroke-width="1"/>
+  <line x1="52" y1="44" x2="62" y2="46" stroke="#757575" stroke-width="1"/>
+  
+  <!-- Blush -->
+  <circle cx="28" cy="42" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  <circle cx="52" cy="42" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  
+  <!-- Smile -->
+  <path d="M36 46 Q40 50 44 46" stroke="#424242" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Teeth -->
+  <rect x="38" y="46" width="4" height="3" rx="1" fill="#FFF"/>
+  
+  <!-- Front paws -->
+  <ellipse cx="30" cy="58" rx="5" ry="4" fill="url(#rat_body)"/>
+  <ellipse cx="50" cy="58" rx="5" ry="4" fill="url(#rat_body)"/>
+  
+  <!-- Holding cheese -->
+  <path d="M34 56 L38 52 L46 52 L42 56 Z" fill="#FFE082"/>
+  <circle cx="36" cy="54" r="1" fill="#FFC107"/>
+  <circle cx="42" cy="53" r="1" fill="#FFC107"/>
+  
+  <!-- Lucky coins -->
+  <circle cx="14" cy="14" r="4" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <rect x="12" y="12" width="4" height="4" fill="#FFA000"/>
+  <circle cx="66" cy="66" r="3" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="goat_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CE93D8"/>
+      <stop offset="100%" stop-color="#BA68C8"/>
+    </linearGradient>
+    <linearGradient id="goat_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FAFAFA"/>
+      <stop offset="100%" stop-color="#EEEEEE"/>
+    </linearGradient>
+    <linearGradient id="goat_horn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082"/>
+      <stop offset="100%" stop-color="#FFD54F"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#goat_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#E1BEE7" stroke-width="2" stroke-dasharray="4 4"/>
+  <ellipse cx="40" cy="52" rx="20" ry="16" fill="url(#goat_body)"/>
+  <circle cx="32" cy="54" r="4" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="40" cy="56" r="4" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="48" cy="54" r="4" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="40" cy="38" r="16" fill="url(#goat_body)"/>
+  <path d="M24 28 Q18 20 16 12 Q14 8 18 10 Q24 14 26 24" fill="url(#goat_horn)"/>
+  <path d="M56 28 Q62 20 64 12 Q66 8 62 10 Q56 14 54 24" fill="url(#goat_horn)"/>
+  <ellipse cx="24" cy="34" rx="5" ry="7" fill="url(#goat_body)"/>
+  <ellipse cx="56" cy="34" rx="5" ry="7" fill="url(#goat_body)"/>
+  <ellipse cx="24" cy="34" rx="2.5" ry="4" fill="#FFAB91" fill-opacity="0.5"/>
+  <ellipse cx="56" cy="34" rx="2.5" ry="4" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="34" cy="36" r="4" fill="#212121"/>
+  <circle cx="46" cy="36" r="4" fill="#212121"/>
+  <circle cx="35" cy="35" r="1.5" fill="#FFF"/>
+  <circle cx="47" cy="35" r="1.5" fill="#FFF"/>
+  <ellipse cx="40" cy="44" rx="6" ry="4" fill="#FFAB91"/>
+  <circle cx="37" cy="43" r="1" fill="#FFF"/>
+  <circle cx="28" cy="40" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="52" cy="40" r="3" fill="#FFAB91" fill-opacity="0.5"/>
+  <path d="M36 48 Q40 52 44 48" stroke="#9E9E9E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <path d="M40 52 Q38 58 40 62" stroke="#9E9E9E" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <rect x="28" y="60" width="4" height="10" rx="2" fill="url(#goat_body)"/>
+  <rect x="48" y="60" width="4" height="10" rx="2" fill="url(#goat_body)"/>
+  <ellipse cx="30" cy="70" rx="3" ry="2" fill="#9E9E9E"/>
+  <ellipse cx="50" cy="70" rx="3" ry="2" fill="#9E9E9E"/>
+  <circle cx="14" cy="14" r="4" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <rect x="12" y="12" width="4" height="4" fill="#FFA000"/>
+  <circle cx="66" cy="66" r="3" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+</svg>

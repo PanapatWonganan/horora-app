@@ -60,7 +60,7 @@ class AppColors {
   // Misc Colors
   static Color divider = const Color(0xFFE0E0E0);
   static Color disabled = const Color(0xFF9E9E9E);
-  static Color overlay = Colors.black.withOpacity(0.5);
+  static Color overlay = Colors.black.withValues(alpha: 0.5);
 
   // Dashboard Feature Colors
   static Color zodiacFire = const Color(0xFFFF5722); // Zodiac feature

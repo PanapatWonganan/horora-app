@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 
 class LanguageScreen extends StatefulWidget {
@@ -18,31 +19,31 @@ class _LanguageScreenState extends State<LanguageScreen> {
     {
       'code': 'th',
       'name': 'ไทย',
-      'flag': '🇹🇭',
+      'flagSvg': AppIcons.flagTh,
       'native_name': 'ภาษาไทย',
     },
     {
       'code': 'en',
       'name': 'English',
-      'flag': '🇬🇧',
+      'flagSvg': AppIcons.flagGb,
       'native_name': 'English',
     },
     {
       'code': 'zh',
       'name': 'Chinese',
-      'flag': '🇨🇳',
+      'flagSvg': AppIcons.flagCn,
       'native_name': '中文',
     },
     {
       'code': 'ja',
       'name': 'Japanese',
-      'flag': '🇯🇵',
+      'flagSvg': AppIcons.flagJp,
       'native_name': '日本語',
     },
     {
       'code': 'ko',
       'name': 'Korean',
-      'flag': '🇰🇷',
+      'flagSvg': AppIcons.flagKr,
       'native_name': '한국어',
     },
   ];
@@ -99,7 +100,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                       Text(
                         'เลือกภาษาที่คุณต้องการใช้ในแอปพลิเคชัน',
                         style: TextStyle(
-                          color: AppColors.lightText.withOpacity(0.7),
+                          color: AppColors.lightText.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -142,7 +143,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withOpacity(0.1) : AppColors.darkSurface,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.darkSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.transparent,
@@ -155,10 +156,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
               width: 40,
               height: 40,
               alignment: Alignment.center,
-              child: Text(
-                language['flag'],
-                style: const TextStyle(
-                  fontSize: 24,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SvgIcon(
+                  language['flagSvg'],
+                  size: 28,
                 ),
               ),
             ),
@@ -179,7 +181,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   Text(
                     language['name'],
                     style: TextStyle(
-                      color: AppColors.lightText.withOpacity(0.7),
+                      color: AppColors.lightText.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -187,10 +189,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
             ),
             if (isSelected)
-              Icon(
-                Icons.check_circle,
+              SvgIcon(
+                AppIcons.check,
+                size: 20,
                 color: AppColors.primary,
-                size: 24,
               ),
           ],
         ),

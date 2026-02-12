@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/theme.dart';
-import '../../core/services/auth_service.dart';
-import '../../core/services/supabase_service.dart';
 import '../../core/utils/zodiac_utils.dart';
 import '../shared/widgets/gradient_button.dart';
 
@@ -15,9 +13,6 @@ class HoroscopeHistoryScreen extends StatefulWidget {
 }
 
 class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
-  final _supabaseService = SupabaseService.instance;
-  final _authService = AuthService.instance;
-  
   bool _isLoading = true;
   List<Map<String, dynamic>> _horoscopeHistory = [];
   String? _errorMessage;
@@ -35,17 +30,13 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
     });
 
     try {
-      // ในแอปจริง ควรดึงข้อมูลจาก repository หรือ service
-      // ตัวอย่างเช่น:
-      // final history = await _supabaseService.getHoroscopeHistory();
-      
-      // สำหรับตัวอย่าง เราจะใช้ข้อมูลจำลอง
-      await Future.delayed(const Duration(seconds: 1)); // จำลองการโหลดข้อมูล
-      
-      final mockHistory = _generateMockData();
-      
+      // TODO: ดึงข้อมูลจาก API เมื่อ backend พร้อม
+      // final history = await _horoscopeRepository.getHoroscopeHistory();
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
       setState(() {
-        _horoscopeHistory = mockHistory;
+        _horoscopeHistory = []; // ส่งคืนรายการว่างจนกว่า API จะพร้อม
         _isLoading = false;
       });
     } catch (e) {
@@ -54,41 +45,6 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  List<Map<String, dynamic>> _generateMockData() {
-    final List<Map<String, dynamic>> mockData = [];
-    final zodiacSigns = [
-      'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
-      'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
-    ];
-    
-    final predictions = [
-      'วันนี้คุณจะพบกับโอกาสใหม่ๆ ในการทำงาน ความรักอาจมีอุปสรรคเล็กน้อย แต่จะผ่านไปได้ด้วยดี การเงินมีเกณฑ์ดี มีโชคลาภจากคนรอบข้าง',
-      'ช่วงนี้การงานของคุณกำลังไปได้ดี มีโอกาสได้รับการสนับสนุนจากผู้ใหญ่ ด้านความรักคู่ครองจะให้การสนับสนุนคุณเป็นอย่างดี การเงินมีเข้ามาอย่างต่อเนื่อง',
-      'ระยะนี้คุณอาจรู้สึกเหนื่อยล้ากับการทำงาน ควรพักผ่อนให้เพียงพอ ความรักอาจมีเรื่องให้ต้องปรับความเข้าใจกัน การเงินควรระมัดระวังการใช้จ่าย',
-      'ช่วงนี้การงานมีการเปลี่ยนแปลงในทางที่ดี อาจได้รับมอบหมายงานสำคัญ ด้านความรักคนโสดมีเกณฑ์ได้พบคนถูกใจ การเงินมีโชคลาภจากการเสี่ยงดวง',
-      'วันนี้คุณจะได้รับข่าวดีเกี่ยวกับการงาน อาจมีโอกาสได้เลื่อนตำแหน่ง ความรักราบรื่น มีความสุขดี การเงินมีรายได้พิเศษเข้ามา',
-    ];
-    
-    for (int i = 0; i < 10; i++) {
-      final date = DateTime.now().subtract(Duration(days: i));
-      final zodiacSign = zodiacSigns[i % zodiacSigns.length];
-      final prediction = predictions[i % predictions.length];
-      
-      mockData.add({
-        'id': 'history_$i',
-        'date': date.toIso8601String(),
-        'zodiac_sign': zodiacSign,
-        'prediction': prediction,
-        'love_rating': (i % 5) + 1,
-        'career_rating': ((i + 2) % 5) + 1,
-        'health_rating': ((i + 1) % 5) + 1,
-        'finance_rating': ((i + 3) % 5) + 1,
-      });
-    }
-    
-    return mockData;
   }
 
   @override
@@ -202,7 +158,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
           children: [
             Icon(
               Icons.history,
-              color: AppColors.primary.withOpacity(0.5),
+              color: AppColors.primary.withValues(alpha: 0.5),
               size: 64,
             ),
             const SizedBox(height: 16),
@@ -219,7 +175,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             Text(
               'เมื่อคุณดูดวงจากราศี ประวัติจะปรากฏที่นี่',
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -299,7 +255,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
                 Text(
                   formattedDate,
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.7),
+                    color: AppColors.lightText.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -325,7 +281,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             ),
             const SizedBox(height: 16),
             Divider(
-              color: AppColors.lightText.withOpacity(0.1),
+              color: AppColors.lightText.withValues(alpha: 0.1),
               thickness: 1,
             ),
             const SizedBox(height: 12),
@@ -352,7 +308,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
           ),
         ),
         const SizedBox(height: 4),

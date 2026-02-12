@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="star_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7E57C2"/>
+      <stop offset="100%" stop-color="#673AB7"/>
+    </linearGradient>
+    <linearGradient id="star_gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082"/>
+      <stop offset="100%" stop-color="#FFD54F"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#star_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <path d="M40 12 L46 28 L64 28 L50 40 L56 58 L40 48 L24 58 L30 40 L16 28 L34 28 Z" fill="url(#star_gold)" stroke="#FFA000" stroke-width="2"/>
+  <path d="M40 18 L44 30 L34 30 Z" fill="#FFF" fill-opacity="0.4"/>
+  <circle cx="40" cy="36" r="6" fill="#FFA000" fill-opacity="0.3"/>
+  <path d="M14 16 L16 20 L14 18 L12 20 Z" fill="#FFD54F"/>
+  <path d="M66 14 L68 18 L66 16 L64 18 Z" fill="#FFD54F"/>
+  <path d="M10 50 L12 54 L10 52 L8 54 Z" fill="#FFF"/>
+  <path d="M70 48 L72 52 L70 50 L68 52 Z" fill="#FFF"/>
+  <circle cx="22" cy="64" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="58" cy="62" r="2" fill="#FFF" fill-opacity="0.6"/>
+</svg>

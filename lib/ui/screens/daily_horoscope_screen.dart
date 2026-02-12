@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/models/models.dart';
 import '../../core/repositories/horoscope_repository.dart';
+import '../../core/services/rating_service.dart';
 import '../constants/app_colors.dart';
 
 class DailyHoroscopeScreen extends StatefulWidget {
-  final String? zodiacSign;
+  final String? thaiAnimal;
 
-  const DailyHoroscopeScreen({Key? key, this.zodiacSign}) : super(key: key);
+  const DailyHoroscopeScreen({Key? key, this.thaiAnimal}) : super(key: key);
 
   @override
   State<DailyHoroscopeScreen> createState() => _DailyHoroscopeScreenState();
@@ -26,8 +27,8 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
   }
 
   void _loadHoroscope() {
-    final String sign = widget.zodiacSign ?? 'aries';
-    _horoscopeFuture = _horoscopeRepository.getDailyHoroscope(sign);
+    final String animal = widget.thaiAnimal ?? 'ชวด';
+    _horoscopeFuture = _horoscopeRepository.getDailyHoroscope(animal);
   }
 
   void _refreshHoroscope() {
@@ -84,6 +85,8 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
             );
           } else if (snapshot.hasData) {
             final horoscope = snapshot.data!;
+            // บันทึก action สำเร็จ และเช็คว่าควรขอ rating หรือไม่
+            RatingService.instance.onSuccessfulAction();
             return _buildHoroscopeContent(context, horoscope, textTheme);
           } else {
             return Center(
@@ -117,7 +120,8 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
 
   Widget _buildHoroscopeContent(
       BuildContext context, DailyHoroscope horoscope, TextTheme textTheme) {
-    const bool isThaiContent = true; // ควรมาจาก settings หรือ locale
+    // TODO: Should come from settings or locale in the future
+    // For now, always use Thai content
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -138,7 +142,7 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            isThaiContent ? horoscope.contentTh : horoscope.content,
+            horoscope.contentTh,
             style: textTheme.bodyLarge,
           ),
 
@@ -186,7 +190,7 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
 
   Widget _buildHeaderSection(DailyHoroscope horoscope, TextTheme textTheme) {
     // แปลงชื่อราศีภาษาอังกฤษเป็นภาษาไทย
-    final String zodiacThaiName = _getThaiZodiacName(horoscope.zodiacSign);
+    final String zodiacThaiName = 'ปี${horoscope.thaiAnimal}'; // ปีชวด, ปีฉลู...
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,12 +200,12 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppColors.secondaryColor.withOpacity(0.1),
+            color: AppColors.secondaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(40),
           ),
           child: Center(
             child: Image.asset(
-              'assets/images/zodiac/${horoscope.zodiacSign}.png',
+              'assets/images/zodiac/${horoscope.thaiAnimal}.png',
               width: 60,
               height: 60,
               errorBuilder: (context, error, stackTrace) => const Icon(
@@ -226,7 +230,7 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                '(${horoscope.zodiacSign.toUpperCase()})',
+                '(ปี${horoscope.thaiAnimal})',
                 style: textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[600],
                 ),
@@ -346,9 +350,9 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         children: [
@@ -369,26 +373,6 @@ class _DailyHoroscopeScreenState extends State<DailyHoroscopeScreen> {
         ],
       ),
     );
-  }
-
-  // แปลงชื่อราศีภาษาอังกฤษเป็นภาษาไทย
-  String _getThaiZodiacName(String englishName) {
-    final Map<String, String> zodiacNames = {
-      'aries': 'ราศีเมษ',
-      'taurus': 'ราศีพฤษภ',
-      'gemini': 'ราศีเมถุน',
-      'cancer': 'ราศีกรกฎ',
-      'leo': 'ราศีสิงห์',
-      'virgo': 'ราศีกันย์',
-      'libra': 'ราศีตุลย์',
-      'scorpio': 'ราศีพิจิก',
-      'sagittarius': 'ราศีธนู',
-      'capricorn': 'ราศีมังกร',
-      'aquarius': 'ราศีกุมภ์',
-      'pisces': 'ราศีมีน',
-    };
-
-    return zodiacNames[englishName.toLowerCase()] ?? englishName;
   }
 
   // จัดรูปแบบวันที่

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="pray_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB74D"/>
+      <stop offset="100%" stop-color="#FFA726"/>
+    </linearGradient>
+    <linearGradient id="hands" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFCCBC"/>
+      <stop offset="100%" stop-color="#FFAB91"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#pray_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <path d="M40 20 L42 28 L50 28 L44 34 L46 42 L40 38 L34 42 L36 34 L30 28 L38 28 Z" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <path d="M32 44 Q28 48 30 54 L30 64 Q32 66 34 64 L34 54 Q34 50 38 48 L40 46" fill="url(#hands)"/>
+  <path d="M48 44 Q52 48 50 54 L50 64 Q48 66 46 64 L46 54 Q46 50 42 48 L40 46" fill="url(#hands)"/>
+  <ellipse cx="40" cy="48" rx="4" ry="6" fill="url(#hands)"/>
+  <path d="M36 50 L40 46 L44 50" stroke="#FFAB91" stroke-width="1" fill="none"/>
+  <path d="M38 52 L40 48 L42 52" stroke="#FFAB91" stroke-width="1" fill="none"/>
+  <circle cx="32" cy="58" r="1" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="48" cy="58" r="1" fill="#FFF" fill-opacity="0.6"/>
+  <path d="M20 24 L22 28 L20 26 L18 28 Z" fill="#FFF"/>
+  <path d="M60 22 L62 26 L60 24 L58 26 Z" fill="#FFF"/>
+  <circle cx="16" cy="50" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="64" cy="48" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <path d="M28 14 Q32 10 36 14" stroke="#FFD54F" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M44 14 Q48 10 52 14" stroke="#FFD54F" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>

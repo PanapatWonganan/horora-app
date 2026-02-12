@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/app_icons.dart';
 
 class TopicSelectionDialog extends StatefulWidget {
   final Function(String) onTopicSelected;
@@ -21,32 +22,32 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
   final List<Map<String, dynamic>> _predefinedTopics = [
     {
       'title': 'ดวงความรัก',
-      'icon': Icons.favorite,
+      'svgIcon': AppIcons.love,
       'color': Colors.pink,
     },
     {
       'title': 'ดวงการงาน',
-      'icon': Icons.work,
+      'svgIcon': AppIcons.career,
       'color': Colors.blue,
     },
     {
       'title': 'ดวงการเงิน',
-      'icon': Icons.attach_money,
+      'svgIcon': AppIcons.finance,
       'color': Colors.green,
     },
     {
       'title': 'ดวงสุขภาพ',
-      'icon': Icons.favorite_border,
+      'svgIcon': AppIcons.health,
       'color': Colors.orange,
     },
     {
       'title': 'ดวงครอบครัว',
-      'icon': Icons.family_restroom,
+      'svgIcon': AppIcons.family,
       'color': Colors.purple,
     },
     {
       'title': 'ดวงการศึกษา',
-      'icon': Icons.school,
+      'svgIcon': AppIcons.education,
       'color': Colors.teal,
     },
   ];
@@ -126,13 +127,13 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected 
-                          ? topic['color'].withOpacity(0.2) 
-                          : Colors.grey.withOpacity(0.1),
+                      color: isSelected
+                          ? topic['color'].withValues(alpha: 0.2)
+                          : Colors.grey.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected 
-                            ? topic['color'] 
+                        color: isSelected
+                            ? topic['color']
                             : Colors.transparent,
                         width: 2,
                       ),
@@ -140,9 +141,8 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          topic['icon'],
-                          color: isSelected ? topic['color'] : Colors.grey,
+                        SvgIcon(
+                          topic['svgIcon'],
                           size: 28,
                         ),
                         const SizedBox(height: 8),
@@ -166,13 +166,13 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _isCustomTopic 
-                      ? AppColors.primary.withOpacity(0.2) 
-                      : Colors.grey.withOpacity(0.1),
+                  color: _isCustomTopic
+                      ? AppColors.primary.withValues(alpha: 0.2)
+                      : Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _isCustomTopic 
-                        ? AppColors.primary 
+                    color: _isCustomTopic
+                        ? AppColors.primary
                         : Colors.transparent,
                     width: 2,
                   ),
@@ -202,7 +202,7 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                 decoration: InputDecoration(
                   hintText: 'ระบุหัวข้อที่ต้องการสนทนา',
                   hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),

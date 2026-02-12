@@ -58,15 +58,15 @@ class AboutAppScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildPolicyItem(
                   'นโยบายความเป็นส่วนตัว',
-                  () => _launchURL('https://astrologyapp.com/privacy-policy'),
+                  () => _launchURL('https://horora.app/privacy-policy'),
                 ),
                 _buildPolicyItem(
                   'ข้อตกลงการใช้งาน',
-                  () => _launchURL('https://astrologyapp.com/terms-of-service'),
+                  () => _launchURL('https://horora.app/terms-of-service'),
                 ),
                 _buildPolicyItem(
                   'นโยบายการคืนเงิน',
-                  () => _launchURL('https://astrologyapp.com/refund-policy'),
+                  () => _launchURL('https://horora.app/refund-policy'),
                 ),
                 const SizedBox(height: 24),
                 _buildDivider(),
@@ -91,7 +91,7 @@ class AboutAppScreen extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -102,7 +102,7 @@ class AboutAppScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'Astrology App',
+          'Horora',
           style: TextStyle(
             color: AppColors.lightText,
             fontSize: 24,
@@ -113,7 +113,7 @@ class AboutAppScreen extends StatelessWidget {
         Text(
           'เวอร์ชัน 1.0.0',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
           ),
         ),
@@ -123,9 +123,9 @@ class AboutAppScreen extends StatelessWidget {
 
   Widget _buildAppInfo() {
     return Text(
-      'แอปพลิเคชันดูดวงและทำนายชะตาชีวิตที่ครบวงจร ทั้งดูดวงจากราศี อ่านไพ่ทาโรต์ และสนทนากับนักพยากรณ์ ให้คุณได้รับคำทำนายที่แม่นยำและเข้าใจชีวิตได้ดียิ่งขึ้น',
+      'แอปพลิเคชันฝากมูออนไลน์ที่ครบวงจร บริการรับฝากทำบุญ ไหว้พระ สักการะสิ่งศักดิ์สิทธิ์ ณ สถานที่มงคลทั่วประเทศ พร้อมดูดวง อ่านไพ่ทาโรต์ และสนทนากับผู้เชี่ยวชาญด้านโหราศาสตร์',
       style: TextStyle(
-        color: AppColors.lightText.withOpacity(0.7),
+        color: AppColors.lightText.withValues(alpha: 0.7),
         fontSize: 16,
         height: 1.5,
       ),
@@ -136,7 +136,7 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildDivider() {
     return Container(
       height: 1,
-      color: AppColors.lightText.withOpacity(0.1),
+      color: AppColors.lightText.withValues(alpha: 0.1),
     );
   }
 
@@ -153,9 +153,9 @@ class AboutAppScreen extends StatelessWidget {
 
   Widget _buildAboutUs() {
     return Text(
-      'Astrology App เป็นแอปพลิเคชันที่พัฒนาโดยทีมงานผู้เชี่ยวชาญด้านโหราศาสตร์และการพัฒนาซอฟต์แวร์ เรามุ่งมั่นที่จะนำเสนอคำทำนายที่แม่นยำและเข้าใจง่าย เพื่อให้ผู้ใช้สามารถนำไปปรับใช้ในชีวิตประจำวันได้อย่างมีประสิทธิภาพ\n\nเราร่วมมือกับนักพยากรณ์ที่มีประสบการณ์และความเชี่ยวชาญในศาสตร์แขนงต่างๆ ทั้งโหราศาสตร์ไทย โหราศาสตร์ยุโรป ไพ่ทาโรต์ และศาสตร์แห่งการทำนายอื่นๆ เพื่อให้คุณได้รับคำทำนายที่หลากหลายและครอบคลุม',
+      'Horora คือแพลตฟอร์มฝากมูออนไลน์ที่เชื่อมต่อคุณกับสถานที่ศักดิ์สิทธิ์ทั่วประเทศไทย เราให้บริการรับฝากทำบุญ ไหว้พระ ถวายสังฆทาน บูชาสิ่งศักดิ์สิทธิ์ และพิธีกรรมมงคลต่างๆ ณ วัดและศาลเจ้าที่มีชื่อเสียง\n\nไม่ว่าคุณจะอยู่ที่ไหน ก็สามารถทำบุญเสริมดวงได้อย่างสะดวกสบาย เรามีทีมงานที่พร้อมเดินทางไปทำบุญแทนคุณ พร้อมส่งหลักฐานการทำบุญและรายงานผลให้ทราบทุกขั้นตอน\n\nสถานที่มงคลที่ให้บริการ:\n• ศาลพระพรหม เอราวัณ - ขอพรทุกด้าน\n• วัดระฆังโฆสิตาราม - โชคลาภ การเงิน\n• พระพิฆเนศ เซ็นทรัลเวิลด์ - การศึกษา ศิลปะ\n• วัดโสธรวรารามฯ - สุขภาพ ความปลอดภัย\n• และสถานที่ศักดิ์สิทธิ์อื่นๆ อีกมากมาย',
       style: TextStyle(
-        color: AppColors.lightText.withOpacity(0.7),
+        color: AppColors.lightText.withValues(alpha: 0.7),
         fontSize: 14,
         height: 1.5,
       ),
@@ -193,7 +193,7 @@ class AboutAppScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.lightText.withOpacity(0.5),
+              color: AppColors.lightText.withValues(alpha: 0.5),
               size: 16,
             ),
           ],
@@ -208,7 +208,7 @@ class AboutAppScreen extends StatelessWidget {
         _buildContactItem(
           icon: Icons.email_outlined,
           title: 'อีเมล',
-          value: 'contact@astrologyapp.com',
+          value: 'contact@horora.app',
         ),
         _buildContactItem(
           icon: Icons.phone_outlined,
@@ -256,7 +256,7 @@ class AboutAppScreen extends StatelessWidget {
                 Text(
                   value,
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.7),
+                    color: AppColors.lightText.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -270,9 +270,9 @@ class AboutAppScreen extends StatelessWidget {
 
   Widget _buildCopyright() {
     return Text(
-      '© 2023 Astrology App. All rights reserved.',
+      '© 2025 Horora. All rights reserved.',
       style: TextStyle(
-        color: AppColors.lightText.withOpacity(0.5),
+        color: AppColors.lightText.withValues(alpha: 0.5),
         fontSize: 12,
       ),
       textAlign: TextAlign.center,

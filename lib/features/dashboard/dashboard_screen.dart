@@ -62,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 expandedHeight: 120.0,
                 floating: false,
                 pinned: true,
-                backgroundColor: AppColors.darkSurface.withOpacity(_showAppBarTitle ? 1.0 : 0.0),
+                backgroundColor: AppColors.darkSurface.withValues(alpha: _showAppBarTitle ? 1.0 : 0.0),
                 elevation: _showAppBarTitle ? 4.0 : 0.0,
                 title: AnimatedOpacity(
                   opacity: _showAppBarTitle ? 1.0 : 0.0,
@@ -90,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Text(
                             'ยินดีต้อนรับกลับมา',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 16.0,
                             ),
                           ),
@@ -127,7 +127,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       zodiacSign: 'ราศีเมษ',
                       element: 'ไฟ',
                       planet: 'ดาวอังคาร',
-                      compatibility: 'ราศีพิจิก, ราศีสิงห์, ราศีธนู',
                     ),
                     
                     const SizedBox(height: 24.0),
@@ -195,15 +194,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: AppColors.chatBubble,
                           onTap: () {
                             Navigator.pushNamed(context, AppRoutes.chat);
-                          },
-                        ),
-                        FeatureCard(
-                          title: 'โหมดสมาธิ',
-                          description: 'นั่งสมาธิเพื่อเชื่อมต่อกับจักรวาล',
-                          icon: Icons.self_improvement,
-                          color: AppColors.focusMeditation,
-                          onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.focusSession);
                           },
                         ),
                       ],

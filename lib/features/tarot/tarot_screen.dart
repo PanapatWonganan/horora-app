@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
+import '../../core/services/ad_service.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/tarot_spread_card.dart';
@@ -72,20 +74,15 @@ class _TarotScreenState extends State<TarotScreen> {
             Text(
               'ค้นพบความลึกลับของชีวิต',
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
             ),
           ],
         ),
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: AppColors.primary.withOpacity(0.2),
-          child: Icon(
-            Icons.auto_awesome,
-            color: AppColors.primary,
-            size: 30,
-          ),
+        SvgIcon(
+          AppIcons.divination,
+          size: 48,
         ),
       ],
     );
@@ -99,7 +96,7 @@ class _TarotScreenState extends State<TarotScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -111,9 +108,8 @@ class _TarotScreenState extends State<TarotScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.auto_awesome,
-                color: AppColors.primary,
+              SvgIcon(
+                AppIcons.divination,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -131,7 +127,7 @@ class _TarotScreenState extends State<TarotScreen> {
           Text(
             'ไพ่ทาโรต์เป็นเครื่องมือในการทำนายและให้คำแนะนำที่มีประวัติศาสตร์ยาวนาน ช่วยให้คุณเข้าใจตัวเองและสถานการณ์ในชีวิตได้ลึกซึ้งยิ่งขึ้น',
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
               fontSize: 14,
               height: 1.5,
             ),
@@ -140,17 +136,17 @@ class _TarotScreenState extends State<TarotScreen> {
           GradientButton(
             text: 'เริ่มการอ่านไพ่',
             onPressed: () {
-              AppRouter.navigateTo(context, AppRoutes.tarotReading);
+              context.navigateWithAd(AppRoutes.tarotReading);
             },
             gradient: LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            icon: const Icon(
-              Icons.play_arrow,
-              color: Colors.white,
+            icon: SvgIcon(
+              AppIcons.arrowForward,
               size: 20,
+              color: Colors.white,
             ),
           ),
         ],
@@ -177,9 +173,9 @@ class _TarotScreenState extends State<TarotScreen> {
               child: TarotSpreadCard(
                 title: 'ไพ่ 1 ใบ',
                 description: 'คำตอบรวดเร็วสำหรับคำถามเฉพาะเจาะจง',
-                imagePath: 'assets/images/tarot/spread_single.png',
+                imagePath: 'assets/images/tarot/spread_single.webp',
                 onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.tarotReading,
+                  context.navigateWithAd(AppRoutes.tarotReading,
                       arguments: {'spreadType': 'single'});
                 },
               ),
@@ -189,9 +185,9 @@ class _TarotScreenState extends State<TarotScreen> {
               child: TarotSpreadCard(
                 title: 'ไพ่ 3 ใบ',
                 description: 'อดีต ปัจจุบัน และอนาคต',
-                imagePath: 'assets/images/tarot/spread_three.png',
+                imagePath: 'assets/images/tarot/spread_three.webp',
                 onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.tarotReading,
+                  context.navigateWithAd(AppRoutes.tarotReading,
                       arguments: {'spreadType': 'three'});
                 },
               ),
@@ -205,9 +201,9 @@ class _TarotScreenState extends State<TarotScreen> {
               child: TarotSpreadCard(
                 title: 'ไพ่กางเขน',
                 description: 'การวิเคราะห์สถานการณ์อย่างละเอียด',
-                imagePath: 'assets/images/tarot/spread_cross.png',
+                imagePath: 'assets/images/tarot/spread_cross.webp',
                 onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.tarotReading,
+                  context.navigateWithAd(AppRoutes.tarotReading,
                       arguments: {'spreadType': 'cross'});
                 },
               ),
@@ -217,9 +213,9 @@ class _TarotScreenState extends State<TarotScreen> {
               child: TarotSpreadCard(
                 title: 'ไพ่เซลติก',
                 description: 'การอ่านไพ่แบบครอบคลุมทุกด้าน',
-                imagePath: 'assets/images/tarot/spread_celtic.png',
+                imagePath: 'assets/images/tarot/spread_celtic.webp',
                 onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.tarotReading,
+                  context.navigateWithAd(AppRoutes.tarotReading,
                       arguments: {'spreadType': 'celtic'});
                 },
               ),
@@ -232,7 +228,7 @@ class _TarotScreenState extends State<TarotScreen> {
 
   Widget _buildSavedReadings() {
     // TODO: Replace with actual saved readings from repository
-    const hasSavedReadings = false;
+    // When implementing, replace this with actual data check
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,26 +242,23 @@ class _TarotScreenState extends State<TarotScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        if (hasSavedReadings)
-          // TODO: Implement saved readings list
-          Container()
-        else
-          Container(
+        // TODO: Implement saved readings list when data is available
+        Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.darkSurface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: Column(
               children: [
-                Icon(
-                  Icons.bookmark_border,
-                  color: AppColors.lightText.withOpacity(0.5),
+                SvgIcon(
+                  AppIcons.bookmarkOutline,
                   size: 48,
+                  color: AppColors.lightText.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -281,7 +274,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 Text(
                   'เมื่อคุณบันทึกการอ่านไพ่ คุณจะสามารถกลับมาดูได้ที่นี่',
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.7),
+                    color: AppColors.lightText.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
@@ -290,16 +283,15 @@ class _TarotScreenState extends State<TarotScreen> {
                 OutlinedGradientButton(
                   text: 'เริ่มการอ่านไพ่ใหม่',
                   onPressed: () {
-                    AppRouter.navigateTo(context, AppRoutes.tarotReading);
+                    context.navigateWithAd(AppRoutes.tarotReading);
                   },
                   gradient: LinearGradient(
                     colors: AppColors.primaryGradient,
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  icon: Icon(
-                    Icons.add,
-                    color: AppColors.primary,
+                  icon: SvgIcon(
+                    AppIcons.divination,
                     size: 20,
                   ),
                 ),

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="div_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9575CD"/>
+      <stop offset="100%" stop-color="#7E57C2"/>
+    </linearGradient>
+    <linearGradient id="crystal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E1BEE7"/>
+      <stop offset="100%" stop-color="#CE93D8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#div_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <ellipse cx="40" cy="58" rx="16" ry="6" fill="#5D4037"/>
+  <ellipse cx="40" cy="56" rx="14" ry="4" fill="#8D6E63"/>
+  <circle cx="40" cy="38" r="18" fill="url(#crystal)"/>
+  <circle cx="40" cy="38" r="15" fill="none" stroke="#FFF" stroke-width="1" fill-opacity="0.3"/>
+  <circle cx="40" cy="38" r="12" fill="none" stroke="#FFF" stroke-width="0.5" fill-opacity="0.2"/>
+  <circle cx="34" cy="32" r="4" fill="#FFF" fill-opacity="0.4"/>
+  <circle cx="32" cy="30" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <path d="M40 28 L42 34 L48 34 L43 38 L45 44 L40 40 L35 44 L37 38 L32 34 L38 34 Z" fill="#FFD54F" fill-opacity="0.8"/>
+  <circle cx="46" cy="42" r="3" fill="#FFF" fill-opacity="0.3"/>
+  <path d="M14 18 L16 22 L14 20 L12 22 Z" fill="#FFD54F"/>
+  <path d="M66 16 L68 20 L66 18 L64 20 Z" fill="#FFD54F"/>
+  <path d="M18 52 L20 56 L18 54 L16 56 Z" fill="#FFF"/>
+  <path d="M62 50 L64 54 L62 52 L60 54 Z" fill="#FFF"/>
+  <circle cx="24" cy="32" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="56" cy="30" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="40" cy="14" r="3" fill="#CE93D8"/>
+</svg>

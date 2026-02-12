@@ -20,15 +20,6 @@ class ChatRepository {
   // ดึงข้อมูลการสนทนาทั้งหมดของผู้ใช้
   Future<List<ChatConversation>> getUserConversations() async {
     try {
-      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
-      final String? cachedData = _prefs.getString(_conversationsKey);
-      List<ChatConversation>? cachedConversations;
-      
-      if (cachedData != null) {
-        final List<dynamic> decoded = jsonDecode(cachedData);
-        cachedConversations = decoded.map((item) => ChatConversation.fromJson(item)).toList();
-      }
-      
       // ดึงข้อมูลจาก API
       final response = await _apiClient.get('/chat/conversations');
       
@@ -141,17 +132,8 @@ class ChatRepository {
   // ดึงข้อความในการสนทนา
   Future<List<ChatMessage>> getConversationMessages(int conversationId) async {
     try {
-      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
-      final String cacheKey = '$_messagesKeyPrefix$conversationId';
-      final String? cachedData = _prefs.getString(cacheKey);
-      List<ChatMessage>? cachedMessages;
-      
-      if (cachedData != null) {
-        final List<dynamic> decoded = jsonDecode(cachedData);
-        cachedMessages = decoded.map((item) => ChatMessage.fromJson(item)).toList();
-      }
-      
       // ดึงข้อมูลจาก API
+      final String cacheKey = '$_messagesKeyPrefix$conversationId';
       final response = await _apiClient.get('/chat/conversations/$conversationId/messages');
       
       final List<ChatMessage> messages = (response as List)

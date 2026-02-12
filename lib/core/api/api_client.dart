@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../utils/exceptions.dart' as ex;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import '../../config/constants.dart';
 
 class ApiClient {
   final String baseUrl;
@@ -10,12 +12,13 @@ class ApiClient {
   final Map<String, String> _defaultHeaders;
 
   ApiClient({
-    required this.baseUrl,
+    String? baseUrl,
     http.Client? httpClient,
     Map<String, String>? defaultHeaders,
-  })  : _httpClient = httpClient ?? http.Client(),
+  })  : baseUrl = baseUrl ?? ApiConstants.baseUrl,
+        _httpClient = httpClient ?? http.Client(),
         _defaultHeaders =
-            defaultHeaders ?? {'Content-Type': 'application/json'};
+            defaultHeaders ?? {'Content-Type': 'application/json', 'Accept': 'application/json'};
 
   // เพิ่ม token สำหรับการยืนยันตัวตน
   void setAuthToken(String token) {
@@ -31,7 +34,7 @@ class ApiClient {
   Future<bool> _checkConnectivity() async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
-      return connectivityResult != ConnectivityResult.none;
+      return !connectivityResult.contains(ConnectivityResult.none);
     } catch (e) {
       return false;
     }
@@ -46,26 +49,114 @@ class ApiClient {
 
   // ส่งคำขอ POST
   Future<dynamic> post(String endpoint,
-      {Map<String, dynamic>? body, Map<String, String>? headers}) async {
-    return _sendRequest('POST', endpoint, body: body, headers: headers);
+      {Map<String, dynamic>? body, Map<String, dynamic>? data, Map<String, String>? headers}) async {
+    return _sendRequest('POST', endpoint, body: data ?? body, headers: headers);
   }
 
   // ส่งคำขอ PUT
   Future<dynamic> put(String endpoint,
-      {Map<String, dynamic>? body, Map<String, String>? headers}) async {
-    return _sendRequest('PUT', endpoint, body: body, headers: headers);
+      {Map<String, dynamic>? body, Map<String, dynamic>? data, Map<String, String>? headers}) async {
+    return _sendRequest('PUT', endpoint, body: data ?? body, headers: headers);
   }
 
   // ส่งคำขอ PATCH
   Future<dynamic> patch(String endpoint,
-      {Map<String, dynamic>? body, Map<String, String>? headers}) async {
-    return _sendRequest('PATCH', endpoint, body: body, headers: headers);
+      {Map<String, dynamic>? body, Map<String, dynamic>? data, Map<String, String>? headers}) async {
+    return _sendRequest('PATCH', endpoint, body: data ?? body, headers: headers);
   }
 
   // ส่งคำขอ DELETE
   Future<dynamic> delete(String endpoint,
-      {Map<String, dynamic>? body, Map<String, String>? headers}) async {
-    return _sendRequest('DELETE', endpoint, body: body, headers: headers);
+      {Map<String, dynamic>? body, Map<String, dynamic>? data, Map<String, String>? headers}) async {
+    return _sendRequest('DELETE', endpoint, body: data ?? body, headers: headers);
+  }
+
+  // สร้าง MultipartFile จากไฟล์
+  Future<http.MultipartFile> createMultipartFile(String filePath, {String fieldName = 'file'}) async {
+    final file = File(filePath);
+    final fileName = file.path.split('/').last;
+    final extension = fileName.split('.').last.toLowerCase();
+
+    // กำหนด content type ตามนามสกุลไฟล์
+    MediaType? contentType;
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        contentType = MediaType('image', 'jpeg');
+        break;
+      case 'png':
+        contentType = MediaType('image', 'png');
+        break;
+      case 'gif':
+        contentType = MediaType('image', 'gif');
+        break;
+      case 'pdf':
+        contentType = MediaType('application', 'pdf');
+        break;
+      default:
+        contentType = MediaType('application', 'octet-stream');
+    }
+
+    return http.MultipartFile.fromPath(
+      fieldName,
+      filePath,
+      filename: fileName,
+      contentType: contentType,
+    );
+  }
+
+  // ส่งคำขอ POST แบบ Multipart (สำหรับอัปโหลดไฟล์)
+  Future<dynamic> postMultipart(String endpoint, {
+    Map<String, dynamic>? formData,
+    Map<String, String>? headers,
+  }) async {
+    final hasConnectivity = await _checkConnectivity();
+    if (!hasConnectivity) {
+      throw ex.NoInternetException();
+    }
+
+    try {
+      final Uri uri = Uri.parse('$baseUrl$endpoint');
+      final request = http.MultipartRequest('POST', uri);
+
+      // เพิ่ม headers
+      final Map<String, String> requestHeaders = {..._defaultHeaders};
+      requestHeaders.remove('Content-Type'); // ให้ http package จัดการ Content-Type เอง
+      if (headers != null) {
+        requestHeaders.addAll(headers);
+      }
+      request.headers.addAll(requestHeaders);
+
+      // เพิ่มข้อมูลใน form
+      if (formData != null) {
+        for (final entry in formData.entries) {
+          if (entry.value is http.MultipartFile) {
+            request.files.add(entry.value as http.MultipartFile);
+          } else if (entry.value != null) {
+            request.fields[entry.key] = entry.value.toString();
+          }
+        }
+      }
+
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 60),
+        onTimeout: () => throw ex.TimeoutException(),
+      );
+
+      final response = await http.Response.fromStream(streamedResponse);
+      return _handleResponse(response);
+    } on SocketException {
+      throw ex.NetworkException('Network error occurred');
+    } on HttpException {
+      throw ex.NetworkException('HTTP error occurred');
+    } on FormatException {
+      throw ex.FormatException();
+    } catch (e) {
+      if (e is ex.AppException) {
+        rethrow;
+      }
+      throw ex.AppException('An unexpected error occurred: ${e.toString()}');
+    }
   }
 
   // เมธอดหลักสำหรับส่งคำขอ
@@ -195,52 +286,4 @@ class ApiClient {
   void dispose() {
     _httpClient.close();
   }
-}
-
-// Custom exceptions
-class ApiException implements Exception {
-  final String message;
-
-  ApiException(this.message);
-
-  @override
-  String toString() => message;
-}
-
-class TimeoutException extends ApiException {
-  TimeoutException(String message) : super(message);
-}
-
-class UnauthorizedException extends ApiException {
-  UnauthorizedException(String message) : super(message);
-}
-
-class ForbiddenException extends ApiException {
-  ForbiddenException(String message) : super(message);
-}
-
-class NotFoundException extends ApiException {
-  NotFoundException(String message) : super(message);
-}
-
-class ValidationException extends ApiException {
-  final dynamic errors;
-
-  ValidationException(String message, this.errors) : super(message);
-}
-
-class ServerException extends ApiException {
-  ServerException(String message) : super(message);
-}
-
-class RequestCancelledException extends ApiException {
-  RequestCancelledException(String message) : super(message);
-}
-
-class NetworkException extends ApiException {
-  NetworkException(String message) : super(message);
-}
-
-class UnknownException extends ApiException {
-  UnknownException(String message) : super(message);
 }

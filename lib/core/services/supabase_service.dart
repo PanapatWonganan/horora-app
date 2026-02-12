@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -52,7 +53,7 @@ class SupabaseService {
           password: password,
         );
       } catch (e) {
-        print('Auto login failed after signup: $e');
+        debugPrint('Auto login failed after signup: $e');
       }
     }
 
@@ -80,7 +81,7 @@ class SupabaseService {
     if (userId == null) return null;
 
     final response =
-        await _client.from('profiles').select().eq('user_id', userId).single();
+        await _client.from('profiles').select().eq('id', userId).single();
 
     return response;
   }
@@ -89,7 +90,10 @@ class SupabaseService {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw Exception('User not authenticated');
 
-    await _client.from('profiles').update(data).eq('user_id', userId);
+    // อัปเดต user metadata แทนตาราง profiles
+    await _client.auth.updateUser(
+      UserAttributes(data: data),
+    );
   }
 
   // Horoscope Methods

@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/models/horoscope_model.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/utils/zodiac_utils.dart';
+import '../../../core/services/thai_zodiac_service.dart';
+import '../../../core/utils/thai_zodiac_emoji.dart';
 import '../../shared/widgets/loading_indicator.dart';
 
 class DailyHoroscopeCard extends StatefulWidget {
@@ -25,7 +26,6 @@ class DailyHoroscopeCard extends StatefulWidget {
 
 class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
   final AuthService _authService = AuthService.instance;
-  late Future<DailyHoroscope> _horoscopeFuture;
   bool _isLoading = true;
   DailyHoroscope? _horoscope;
   String? _userZodiacSign;
@@ -40,17 +40,19 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
   
   Future<void> _loadUserZodiacSign() async {
     final user = _authService.currentUser;
-    if (user != null && user.userMetadata != null) {
-      if (user.userMetadata!['zodiac_sign'] != null) {
+    if (user != null) {
+      // ใช้ข้อมูล thai_animal จาก Laravel user ก่อน
+      if (user.thaiAnimal != null) {
         setState(() {
-          _userZodiacSign = user.userMetadata!['zodiac_sign'] as String;
-          _userZodiacSignThai = ZodiacUtils.getZodiacSignThai(DateTime(2000, 1, 1), zodiacSign: _userZodiacSign);
+          _userZodiacSign = user.thaiAnimal!;
+          _userZodiacSignThai = 'ปี${user.thaiAnimal}';
         });
-      } else if (user.userMetadata!['birth_date'] != null) {
-        final birthDate = DateTime.parse(user.userMetadata!['birth_date'] as String);
+      } else if (user.birthDate != null) {
+        // ถ้าไม่มี thai_animal ให้คำนวณจากวันเกิด
         setState(() {
-          _userZodiacSign = ZodiacUtils.getZodiacSign(birthDate);
-          _userZodiacSignThai = ZodiacUtils.getZodiacSignThai(birthDate);
+          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
+          _userZodiacSign = thaiZodiac.animalName;
+          _userZodiacSignThai = thaiZodiac.thaiName;
         });
       }
     }
@@ -78,12 +80,12 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     }
   }
   
-  // สร้างข้อมูลดวงประจำวันจำลอง
+  // สร้างข้อมูลดวงประจำวันจำลองสำหรับปีนักษัตรไทย
   DailyHoroscope _getMockHoroscope() {
     final now = DateTime.now();
-    final zodiacSign = _userZodiacSign ?? widget.zodiacSign;
+    final thaiAnimal = _userZodiacSign ?? 'มะเมีย'; // ใช้ Thai animal name
     
-    // ข้อความคำทำนายที่แตกต่างกันตามราศี
+    // ข้อความคำทำนายที่แตกต่างกันตามปีนักษัตรไทย
     String content = '';
     String contentTh = '';
     int loveRating = 3;
@@ -92,118 +94,118 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     String luckyNumber = '7';
     String luckyColor = 'ฟ้า';
     
-    switch (zodiacSign.toLowerCase()) {
-      case 'aries':
-        contentTh = 'วันนี้คุณจะมีพลังงานเต็มเปี่ยม เหมาะกับการเริ่มต้นโปรเจกต์ใหม่ๆ ความกล้าหาญของคุณจะนำพาโอกาสดีๆ มาให้';
-        content = 'Today you will be full of energy, perfect for starting new projects. Your courage will bring good opportunities.';
+    switch (thaiAnimal.toLowerCase()) {
+      case 'ชวด':
+        contentTh = 'วันนี้คุณจะมีโอกาสใช้ไหวพริบและความขยันหนักของคุณ การเก็บออมจะได้ผลดี งานที่ต้องใช้ความรอบคอบจะเหมาะกับคุณ';
+        content = 'Today you will have the opportunity to use your wit and hard work. Saving will yield good results. Work requiring thoroughness suits you.';
         loveRating = 4;
         careerRating = 5;
         healthRating = 4;
-        luckyNumber = '9, 18, 27';
-        luckyColor = 'แดง';
-        break;
-      case 'taurus':
-        contentTh = 'ความมั่นคงทางการเงินจะเข้ามาในชีวิตคุณ วันนี้เหมาะกับการวางแผนระยะยาว ความอดทนของคุณจะได้รับการตอบแทน';
-        content = 'Financial stability will come into your life. Today is suitable for long-term planning. Your patience will be rewarded.';
-        loveRating = 3;
-        careerRating = 4;
-        healthRating = 5;
-        luckyNumber = '6, 15, 24';
-        luckyColor = 'เขียว';
-        break;
-      case 'gemini':
-        contentTh = 'การสื่อสารของคุณจะโดดเด่นในวันนี้ เป็นโอกาสดีในการเจรจาต่อรองหรือนำเสนองาน ความคิดสร้างสรรค์ของคุณจะได้รับการยอมรับ';
-        content = 'Your communication will stand out today. It\'s a good opportunity for negotiation or presentation. Your creativity will be recognized.';
-        loveRating = 5;
-        careerRating = 4;
-        healthRating = 3;
-        luckyNumber = '5, 14, 23';
-        luckyColor = 'เหลือง';
-        break;
-      case 'cancer':
-        contentTh = 'ความรู้สึกไวของคุณจะช่วยให้เข้าใจคนรอบข้างได้ดีขึ้น วันนี้เหมาะกับการดูแลตัวเองและคนที่คุณรัก ครอบครัวจะนำความสุขมาให้';
-        content = 'Your sensitivity will help you understand those around you better. Today is suitable for taking care of yourself and your loved ones. Family will bring happiness.';
-        loveRating = 5;
-        careerRating = 3;
-        healthRating = 4;
-        luckyNumber = '2, 11, 20';
-        luckyColor = 'เงิน';
-        break;
-      case 'leo':
-        contentTh = 'ความเป็นผู้นำของคุณจะโดดเด่นในวันนี้ เป็นโอกาสดีในการแสดงความสามารถ ความมั่นใจของคุณจะสร้างแรงบันดาลใจให้ผู้อื่น';
-        content = 'Your leadership will stand out today. It\'s a good opportunity to showcase your abilities. Your confidence will inspire others.';
-        loveRating = 4;
-        careerRating = 5;
-        healthRating = 4;
-        luckyNumber = '1, 10, 19';
+        luckyNumber = '1, 8, 12';
         luckyColor = 'ทอง';
         break;
-      case 'virgo':
-        contentTh = 'ความละเอียดรอบคอบของคุณจะช่วยแก้ปัญหาที่ซับซ้อนได้ วันนี้เหมาะกับการจัดระเบียบและวางแผน การวิเคราะห์ของคุณจะนำไปสู่ความสำเร็จ';
-        content = 'Your attention to detail will help solve complex problems. Today is suitable for organizing and planning. Your analysis will lead to success.';
-        loveRating = 3;
-        careerRating = 5;
-        healthRating = 4;
-        luckyNumber = '3, 12, 21';
-        luckyColor = 'น้ำตาล';
-        break;
-      case 'libra':
-        contentTh = 'ความสมดุลในชีวิตจะเป็นกุญแจสำคัญในวันนี้ เหมาะกับการสร้างความสัมพันธ์ใหม่ๆ ความยุติธรรมของคุณจะได้รับการยกย่อง';
-        content = 'Balance in life will be the key today. It\'s suitable for building new relationships. Your fairness will be appreciated.';
-        loveRating = 5;
-        careerRating = 4;
-        healthRating = 4;
-        luckyNumber = '7, 16, 25';
-        luckyColor = 'ฟ้า';
-        break;
-      case 'scorpio':
-        contentTh = 'พลังแห่งการเปลี่ยนแปลงจะอยู่กับคุณในวันนี้ เป็นโอกาสดีในการเริ่มต้นใหม่ ความเข้มแข็งภายในของคุณจะช่วยให้ผ่านพ้นอุปสรรค';
-        content = 'The power of transformation will be with you today. It\'s a good opportunity for a new beginning. Your inner strength will help you overcome obstacles.';
+      case 'ฉลู':
+        contentTh = 'ความมั่นคงและอดทนของคุณจะได้รับการตอบแทนวันนี้ เหมาะกับการวางแผนระยะยาวและการลงทุนที่มั่นคง';
+        content = 'Your stability and patience will be rewarded today. Suitable for long-term planning and stable investments.';
         loveRating = 4;
         careerRating = 4;
         healthRating = 5;
-        luckyNumber = '8, 17, 26';
-        luckyColor = 'แดงเข้ม';
+        luckyNumber = '2, 6, 15';
+        luckyColor = 'เหลือง';
         break;
-      case 'sagittarius':
-        contentTh = 'การผจญภัยและโอกาสใหม่ๆ จะเข้ามาในชีวิตคุณ วันนี้เหมาะกับการเรียนรู้และขยายขอบเขต ความกระตือรือร้นของคุณจะนำพาความสำเร็จ';
-        content = 'Adventure and new opportunities will come into your life. Today is suitable for learning and expanding your horizons. Your enthusiasm will bring success.';
-        loveRating = 4;
+      case 'ขาล':
+        contentTh = 'ความกล้าหาญและการเป็นผู้นำของคุณจะโดดเด่นวันนี้ เหมาะกับการเริ่มโครงการใหม่ และการแก้ปัญหาที่ท้าทาย';
+        content = 'Your courage and leadership will stand out today. Perfect for starting new projects and solving challenging problems.';
+        loveRating = 5;
+        careerRating = 5;
+        healthRating = 3;
+        luckyNumber = '3, 9, 18';
+        luckyColor = 'แดง';
+        break;
+      case 'เถาะ':
+        contentTh = 'ความอ่อนโยนและมารยาทของคุณจะช่วยสร้างความสัมพันธ์ที่ดี วันนี้เหมาะกับการทำงานเป็นทีมและการประนีประนอม';
+        content = 'Your gentleness and politeness will help build good relationships. Today is suitable for teamwork and compromise.';
+        loveRating = 5;
         careerRating = 4;
         healthRating = 4;
-        luckyNumber = '3, 12, 21';
-        luckyColor = 'ม่วง';
+        luckyNumber = '4, 11, 20';
+        luckyColor = 'เงิน';
         break;
-      case 'capricorn':
-        contentTh = 'ความมุ่งมั่นของคุณจะได้รับการตอบแทนในวันนี้ เหมาะกับการทำงานหนักเพื่อเป้าหมายระยะยาว ความรับผิดชอบของคุณจะได้รับการยอมรับ';
-        content = 'Your determination will be rewarded today. It\'s suitable for working hard towards long-term goals. Your responsibility will be recognized.';
+      case 'มะโรง':
+        contentTh = 'พลังและความมั่นใจของคุณจะเปล่งประกายวันนี้ เหมาะกับการแสดงความสามารถและเป็นที่สนใจของผู้อื่น';
+        content = 'Your energy and confidence will shine today. Perfect for showcasing your abilities and being the center of attention.';
+        loveRating = 4;
+        careerRating = 5;
+        healthRating = 4;
+        luckyNumber = '5, 14, 23';
+        luckyColor = 'เขียว';
+        break;
+      case 'มะเส็ง':
+        contentTh = 'ปัญญาและสัญชาตญาณของคุณจะช่วยในการตัดสินใจสำคัญวันนี้ เหมาะกับการเรียนรู้สิ่งใหม่และการวิจัย';
+        content = 'Your wisdom and intuition will help in making important decisions today. Suitable for learning new things and research.';
         loveRating = 3;
         careerRating = 5;
         healthRating = 4;
-        luckyNumber = '4, 13, 22';
-        luckyColor = 'ดำ';
-        break;
-      case 'aquarius':
-        contentTh = 'ความคิดสร้างสรรค์และนวัตกรรมจะเฟื่องฟูในวันนี้ เป็นโอกาสดีในการแสดงความเป็นตัวของตัวเอง ความเป็นอิสระของคุณจะนำพาความสุข';
-        content = 'Creativity and innovation will flourish today. It\'s a good opportunity to express your individuality. Your independence will bring happiness.';
-        loveRating = 4;
-        careerRating = 4;
-        healthRating = 3;
-        luckyNumber = '4, 13, 22';
+        luckyNumber = '6, 13, 24';
         luckyColor = 'น้ำเงิน';
         break;
-      case 'pisces':
-        contentTh = 'ความเข้าอกเข้าใจและความเมตตาของคุณจะโดดเด่นในวันนี้ เหมาะกับการช่วยเหลือผู้อื่น จินตนาการของคุณจะนำพาแรงบันดาลใจ';
-        content = 'Your empathy and compassion will stand out today. It\'s suitable for helping others. Your imagination will bring inspiration.';
+      case 'มะเมีย':
+        contentTh = 'ความกระฉับกระเฉงและรักเสรีภาพของคุณจะนำพาผลลัพธ์ดีวันนี้ เหมาะกับการเดินทางและการผจญภัย';
+        content = 'Your agility and love of freedom will bring good results today. Suitable for travel and adventure.';
+        loveRating = 4;
+        careerRating = 4;
+        healthRating = 5;
+        luckyNumber = '7, 16, 25';
+        luckyColor = 'ไฟ';
+        break;
+      case 'มะแม':
+        contentTh = 'ความอ่อนโยนและจิตใจศิลปินของคุณจะได้รับการชื่นชมวันนี้ เหมาะกับงานสร้างสรรค์และการดูแลผู้อื่น';
+        content = 'Your gentleness and artistic soul will be appreciated today. Suitable for creative work and caring for others.';
         loveRating = 5;
         careerRating = 3;
         healthRating = 4;
-        luckyNumber = '7, 16, 25';
-        luckyColor = 'เขียวน้ำทะเล';
+        luckyNumber = '8, 17, 26';
+        luckyColor = 'ชมพู';
+        break;
+      case 'วอก':
+        contentTh = 'ความฉลาดและไหวพริบของคุณจะช่วยแก้ปัญหาได้ดีวันนี้ เหมาะกับการเจรจาและการปรับเปลี่ยน';
+        content = 'Your intelligence and wit will help solve problems well today. Suitable for negotiation and adaptation.';
+        loveRating = 4;
+        careerRating = 4;
+        healthRating = 3;
+        luckyNumber = '9, 18, 27';
+        luckyColor = 'ม่วง';
+        break;
+      case 'ระกา':
+        contentTh = 'ความตรงไปตรงมาและรักความสะอาดของคุณจะสร้างความน่าเชื่อถือวันนี้ เหมาะกับการจัดระเบียบและปรับปรุง';
+        content = 'Your honesty and love of cleanliness will create trustworthiness today. Suitable for organizing and improving.';
+        loveRating = 3;
+        careerRating = 4;
+        healthRating = 5;
+        luckyNumber = '10, 19, 28';
+        luckyColor = 'ขาว';
+        break;
+      case 'จอ':
+        contentTh = 'ความซื่อสัตย์และความรับผิดชอบของคุณจะได้รับการยอมรับวันนี้ เหมาะกับการดูแลครอบครัวและงานที่ต้องใช้ความไว้วางใจ';
+        content = 'Your honesty and responsibility will be recognized today. Suitable for family care and work requiring trust.';
+        loveRating = 5;
+        careerRating = 4;
+        healthRating = 4;
+        luckyNumber = '11, 20, 29';
+        luckyColor = 'น้ำตาล';
+        break;
+      case 'กุน':
+        contentTh = 'ใจกว้างและความเอื้อเฟื้อของคุณจะนำพาความสุขมาให้วันนี้ เหมาะกับการช่วยเหลือผู้อื่นและการสร้างความสุขสบาย';
+        content = 'Your generosity and kindness will bring happiness today. Suitable for helping others and creating comfort.';
+        loveRating = 4;
+        careerRating = 3;
+        healthRating = 5;
+        luckyNumber = '12, 21, 30';
+        luckyColor = 'ดำ';
         break;
       default:
-        contentTh = 'วันนี้เป็นวันที่ดีสำหรับการเริ่มต้นสิ่งใหม่ๆ คุณจะได้พบกับโอกาสดีๆ ในการทำงาน และความสัมพันธ์กับคนรอบข้างจะราบรื่น';
-        content = 'Today is a good day for new beginnings. You will find good opportunities at work, and relationships with those around you will be smooth.';
+        contentTh = 'วันนี้เป็นวันที่ดีสำหรับการใช้ลักษณะเฉพาะของคุณ คุณจะได้พบกับโอกาสดีๆ ในการทำงานและความสัมพันธ์';
+        content = 'Today is a good day for using your unique characteristics. You will find good opportunities in work and relationships.';
         loveRating = 4;
         careerRating = 4;
         healthRating = 4;
@@ -213,7 +215,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     
     return DailyHoroscope(
       id: 1,
-      zodiacSign: zodiacSign,
+      thaiAnimal: thaiAnimal,
       date: now,
       content: content,
       contentTh: contentTh,
@@ -269,8 +271,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withOpacity(0.8),
-            AppColors.secondary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
+            AppColors.secondary.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -278,7 +280,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -297,8 +299,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primary.withOpacity(0.1),
-                      AppColors.secondary.withOpacity(0.05),
+                      AppColors.primary.withValues(alpha: 0.1),
+                      AppColors.secondary.withValues(alpha: 0.05),
                     ],
                   ),
                 ),
@@ -328,7 +330,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                           Text(
                             DateFormat('d MMMM yyyy', 'th_TH').format(horoscope.date),
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -338,21 +340,13 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
-                          child: Image.asset(
-                            _getZodiacImagePath(),
-                            width: 30,
-                            height: 30,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(
-                                Icons.star,
-                                color: Colors.white,
-                                size: 30,
-                              );
-                            },
+                          child: Text(
+                            _getZodiacEmoji(),
+                            style: const TextStyle(fontSize: 26),
                           ),
                         ),
                       ),
@@ -473,7 +467,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),
@@ -498,7 +492,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
             fontSize: 12,
           ),
         ),
@@ -515,36 +509,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     );
   }
 
-  String _getZodiacImagePath() {
-    final zodiacSign = _userZodiacSign?.toLowerCase() ?? widget.zodiacSign.toLowerCase();
-    
-    switch (zodiacSign) {
-      case 'aries':
-        return 'assets/images/zodiac/aries.png';
-      case 'taurus':
-        return 'assets/images/zodiac/taurus.png';
-      case 'gemini':
-        return 'assets/images/zodiac/gemini.png';
-      case 'cancer':
-        return 'assets/images/zodiac/cancer.png';
-      case 'leo':
-        return 'assets/images/zodiac/leo.png';
-      case 'virgo':
-        return 'assets/images/zodiac/virgo.png';
-      case 'libra':
-        return 'assets/images/zodiac/libra.png';
-      case 'scorpio':
-        return 'assets/images/zodiac/scorpio.png';
-      case 'sagittarius':
-        return 'assets/images/zodiac/sagittarius.png';
-      case 'capricorn':
-        return 'assets/images/zodiac/capricorn.png';
-      case 'aquarius':
-        return 'assets/images/zodiac/aquarius.png';
-      case 'pisces':
-        return 'assets/images/zodiac/pisces.png';
-      default:
-        return 'assets/images/zodiac/scorpio.png';
-    }
+  String _getZodiacEmoji() {
+    final thaiAnimal = _userZodiacSign ?? 'มะเมีย';
+    return ThaiZodiacEmoji.getEmoji(thaiAnimal);
   }
 } 

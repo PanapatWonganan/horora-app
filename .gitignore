@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive files
+.env
+assets/.env
+android/app/google-services.json
+flutter.pid
+
+# Backend (separate repo)
+backend/

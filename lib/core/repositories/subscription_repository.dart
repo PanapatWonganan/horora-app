@@ -193,15 +193,6 @@ class SubscriptionRepository {
   // ดึงประวัติการชำระเงิน
   Future<List<Payment>> getPaymentHistory() async {
     try {
-      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
-      final String? cachedData = _prefs.getString(_paymentHistoryKey);
-      List<Payment>? cachedPayments;
-      
-      if (cachedData != null) {
-        final List<dynamic> decoded = jsonDecode(cachedData);
-        cachedPayments = decoded.map((item) => Payment.fromJson(item)).toList();
-      }
-      
       // ดึงข้อมูลจาก API
       final response = await _apiClient.get('/subscriptions/payments');
       

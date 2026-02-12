@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../report/report_dialog.dart';
 
 class ChatMessageItem extends StatelessWidget {
   final String message;
   final bool isUser;
   final bool isTyping;
   final bool isSystemMessage;
+  final String? messageId;
 
   const ChatMessageItem({
     Key? key,
@@ -13,6 +15,7 @@ class ChatMessageItem extends StatelessWidget {
     required this.isUser,
     required this.isTyping,
     this.isSystemMessage = false,
+    this.messageId,
   }) : super(key: key);
 
   @override
@@ -30,14 +33,14 @@ class ChatMessageItem extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isUser 
-              ? AppColors.primary.withOpacity(0.2) 
+          color: isUser
+              ? AppColors.primary.withValues(alpha: 0.2)
               : AppColors.darkSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isUser 
-                ? AppColors.primary.withOpacity(0.3) 
-                : Colors.grey.withOpacity(0.3),
+            color: isUser
+                ? AppColors.primary.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -48,25 +51,39 @@ class ChatMessageItem extends StatelessWidget {
             children: [
               if (!isUser) ...[
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: AppColors.primary.withOpacity(0.2),
-                      child: Icon(
-                        Icons.auto_awesome,
-                        color: AppColors.primary,
-                        size: 12,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                          child: Icon(
+                            Icons.auto_awesome,
+                            color: AppColors.primary,
+                            size: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'นักพยากรณ์',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'นักพยากรณ์',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                    if (!isTyping)
+                      GestureDetector(
+                        onTap: () => _showReportDialog(context),
+                        child: Icon(
+                          Icons.flag_outlined,
+                          size: 16,
+                          color: Colors.grey.withValues(alpha: 0.6),
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -138,19 +155,19 @@ class ChatMessageItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: isZodiacMessage 
-            ? (element != null ? elementColor.withOpacity(0.15) : AppColors.primary.withOpacity(0.15))
-            : AppColors.darkSurface.withOpacity(0.7),
+        color: isZodiacMessage
+            ? (element != null ? elementColor.withValues(alpha: 0.15) : AppColors.primary.withValues(alpha: 0.15))
+            : AppColors.darkSurface.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isZodiacMessage 
-              ? (element != null ? elementColor.withOpacity(0.3) : AppColors.primary.withOpacity(0.3))
-              : AppColors.primary.withOpacity(0.1),
+          color: isZodiacMessage
+              ? (element != null ? elementColor.withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.3))
+              : AppColors.primary.withValues(alpha: 0.1),
           width: 1,
         ),
         boxShadow: isZodiacMessage ? [
           BoxShadow(
-            color: element != null ? elementColor.withOpacity(0.1) : AppColors.primary.withOpacity(0.1),
+            color: element != null ? elementColor.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
             blurRadius: 8,
             spreadRadius: 0,
             offset: const Offset(0, 2),
@@ -167,7 +184,7 @@ class ChatMessageItem extends StatelessWidget {
                 size: 18,
                 color: isZodiacMessage 
                     ? (element != null ? elementColor : AppColors.primary)
-                    : AppColors.lightText.withOpacity(0.7),
+                    : AppColors.lightText.withValues(alpha: 0.7),
               ),
               const SizedBox(width: 8),
               Text(
@@ -185,7 +202,7 @@ class ChatMessageItem extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: elementColor.withOpacity(0.2),
+                    color: elementColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -204,7 +221,7 @@ class ChatMessageItem extends StatelessWidget {
           Text(
             message,
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.9),
+              color: AppColors.lightText.withValues(alpha: 0.9),
               fontSize: 13,
               height: 1.5,
             ),
@@ -235,12 +252,21 @@ class ChatMessageItem extends StatelessWidget {
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.6),
+              color: AppColors.primary.withValues(alpha: 0.6),
               shape: BoxShape.circle,
             ),
           );
         },
       ),
+    );
+  }
+
+  void _showReportDialog(BuildContext context) async {
+    await showReportDialog(
+      context,
+      contentId: messageId ?? 'chat_${DateTime.now().millisecondsSinceEpoch}',
+      contentType: 'chat_message',
+      contentSnapshot: message.length > 200 ? message.substring(0, 200) : message,
     );
   }
 } 

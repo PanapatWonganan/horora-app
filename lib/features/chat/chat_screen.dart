@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/routes/routes.dart';
+import '../../core/services/ad_service.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'viewmodels/chat_viewmodel.dart';
 import 'widgets/chat_message_item.dart';
 import 'widgets/chat_input.dart';
 import 'widgets/topic_selection_dialog.dart';
+import '../report/report_dialog.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -69,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+              context.navigateReplacementWithAd(AppRoutes.home);
             },
           ),
           title: Consumer<ChatViewModel>(
@@ -115,13 +117,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           Icon(
                             Icons.chat_bubble_outline,
                             size: 64,
-                            color: AppColors.primary.withOpacity(0.5),
+                            color: AppColors.primary.withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'เริ่มสนทนากับนักพยากรณ์',
                             style: TextStyle(
-                              color: AppColors.lightText.withOpacity(0.7),
+                              color: AppColors.lightText.withValues(alpha: 0.7),
                               fontSize: 16,
                             ),
                           ),
@@ -155,6 +157,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         isUser: message.isUser,
                         isTyping: false,
                         isSystemMessage: message.isSystemMessage,
+                        messageId: message.id,
                       );
                     },
                   );
@@ -206,8 +209,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 title: const Text('ประวัติการสนทนา'),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushReplacementNamed(
-                      context, AppRoutes.historyChat);
+                  context.navigateReplacementWithAd(AppRoutes.historyChat);
                 },
               ),
               ListTile(
@@ -216,6 +218,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   _showHelpDialog();
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: Icon(Icons.flag, color: Colors.red.shade400),
+                title: const Text('รายงานเนื้อหา'),
+                subtitle: const Text('รายงาน AI content ที่ไม่เหมาะสม'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showReportOptions();
                 },
               ),
             ],
@@ -258,6 +270,75 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showReportOptions() {
+    if (_viewModel.messages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('ยังไม่มีข้อความที่จะรายงาน'),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.flag, color: Colors.red.shade700),
+            const SizedBox(width: 8),
+            const Text('รายงานเนื้อหา AI'),
+          ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'คุณต้องการรายงานข้อความใด?',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text('• กดไอคอนธงในข้อความ AI ที่ต้องการรายงาน'),
+            SizedBox(height: 8),
+            Text('• หรือรายงานการสนทนาทั้งหมด'),
+            SizedBox(height: 16),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ยกเลิก'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // รายงานข้อความล่าสุดของ AI
+              final aiMessages = _viewModel.messages.where((m) => !m.isUser).toList();
+              if (aiMessages.isNotEmpty) {
+                final lastAiMessage = aiMessages.last;
+                showReportDialog(
+                  context,
+                  contentId: 'chat_${lastAiMessage.id}',
+                  contentType: 'chat_message',
+                  contentSnapshot: lastAiMessage.content.substring(
+                    0, 
+                    lastAiMessage.content.length > 200 ? 200 : lastAiMessage.content.length
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('รายงานข้อความล่าสุด'),
+          ),
+        ],
+      ),
     );
   }
 

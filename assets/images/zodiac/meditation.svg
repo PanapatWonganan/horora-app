@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="med_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#80DEEA"/>
+      <stop offset="100%" stop-color="#4DD0E1"/>
+    </linearGradient>
+    <linearGradient id="person" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFCCBC"/>
+      <stop offset="100%" stop-color="#FFAB91"/>
+    </linearGradient>
+    <linearGradient id="aura" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E1BEE7"/>
+      <stop offset="100%" stop-color="#CE93D8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#med_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <ellipse cx="40" cy="40" rx="28" ry="28" fill="none" stroke="url(#aura)" stroke-width="2" stroke-opacity="0.3"/>
+  <ellipse cx="40" cy="40" rx="24" ry="24" fill="none" stroke="url(#aura)" stroke-width="2" stroke-opacity="0.4"/>
+  <ellipse cx="40" cy="40" rx="20" ry="20" fill="none" stroke="url(#aura)" stroke-width="2" stroke-opacity="0.5"/>
+  <circle cx="40" cy="30" r="10" fill="url(#person)"/>
+  <ellipse cx="40" cy="50" rx="14" ry="12" fill="#9575CD"/>
+  <path d="M26 48 Q22 52 26 56 L30 54 Q28 50 30 48" fill="url(#person)"/>
+  <path d="M54 48 Q58 52 54 56 L50 54 Q52 50 50 48" fill="url(#person)"/>
+  <circle cx="26" cy="56" r="3" fill="url(#person)"/>
+  <circle cx="54" cy="56" r="3" fill="url(#person)"/>
+  <ellipse cx="40" cy="56" rx="10" ry="6" fill="#7E57C2"/>
+  <circle cx="37" cy="29" r="2" fill="#5D4037"/>
+  <circle cx="43" cy="29" r="2" fill="#5D4037"/>
+  <path d="M37 34 Q40 36 43 34" stroke="#5D4037" stroke-width="1" stroke-linecap="round" fill="none"/>
+  <circle cx="33" cy="32" r="2" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="47" cy="32" r="2" fill="#FFAB91" fill-opacity="0.5"/>
+  <ellipse cx="40" cy="22" rx="8" ry="4" fill="#5D4037"/>
+  <circle cx="36" cy="20" r="2" fill="#5D4037"/>
+  <circle cx="44" cy="20" r="2" fill="#5D4037"/>
+  <circle cx="40" cy="14" r="4" fill="#FFD54F"/>
+  <circle cx="40" cy="14" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <path d="M16 22 L18 26 L16 24 L14 26 Z" fill="#FFD54F"/>
+  <path d="M64 20 L66 24 L64 22 L62 24 Z" fill="#FFD54F"/>
+  <circle cx="20" cy="50" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="60" cy="48" r="2" fill="#FFF" fill-opacity="0.6"/>
+</svg>

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/services/auth_service.dart';
 import '../welcome/welcome_screen.dart';
@@ -21,7 +20,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   void initState() {
     super.initState();
     _checkAuthState();
-    _listenToAuthChanges();
   }
 
   Future<void> _checkAuthState() async {
@@ -41,20 +39,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
         });
       }
     }
-  }
-
-  void _listenToAuthChanges() {
-    _authService.onAuthStateChange().listen((data) {
-      final AuthChangeEvent event = data.event;
-      final Session? session = data.session;
-
-      if (mounted) {
-        setState(() {
-          _isAuthenticated = session != null;
-          _isLoading = false;
-        });
-      }
-    });
   }
 
   @override

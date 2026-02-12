@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="aqua_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4FC3F7"/>
+      <stop offset="100%" stop-color="#0288D1"/>
+    </linearGradient>
+    <linearGradient id="aqua_skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE4D6"/>
+      <stop offset="100%" stop-color="#FFCDB2"/>
+    </linearGradient>
+    <linearGradient id="aqua_hair" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#81D4FA"/>
+      <stop offset="100%" stop-color="#4FC3F7"/>
+    </linearGradient>
+    <linearGradient id="aqua_dress" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E1F5FE"/>
+      <stop offset="100%" stop-color="#B3E5FC"/>
+    </linearGradient>
+    <linearGradient id="aqua_pot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFAB91"/>
+      <stop offset="100%" stop-color="#FF7043"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#aqua_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  
+  <!-- Water flowing -->
+  <path d="M56 40 Q62 44 60 52 Q58 60 64 66 Q66 70 62 72" stroke="#E1F5FE" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M58 42 Q64 46 62 54 Q60 62 66 68" stroke="#B3E5FC" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Water drops -->
+  <ellipse cx="66" cy="74" rx="3" ry="4" fill="#E1F5FE"/>
+  <ellipse cx="60" cy="70" rx="2" ry="3" fill="#B3E5FC"/>
+  <ellipse cx="68" cy="68" rx="2" ry="2.5" fill="#E1F5FE"/>
+  
+  <!-- Body/Dress -->
+  <ellipse cx="34" cy="58" rx="14" ry="14" fill="url(#aqua_dress)"/>
+  <path d="M24 50 Q34 44 44 50 L48 66 Q34 72 20 66 Z" fill="url(#aqua_dress)"/>
+  
+  <!-- Dress pattern -->
+  <path d="M26 58 Q34 54 42 58" stroke="#81D4FA" stroke-width="1" fill="none"/>
+  <path d="M24 64 Q34 60 44 64" stroke="#81D4FA" stroke-width="1" fill="none"/>
+  
+  <!-- Arm holding pot -->
+  <path d="M42 46 Q50 42 54 38" stroke="url(#aqua_skin)" stroke-width="6" stroke-linecap="round" fill="none"/>
+  
+  <!-- Water pot -->
+  <ellipse cx="58" cy="36" rx="8" ry="6" fill="url(#aqua_pot)"/>
+  <ellipse cx="58" cy="34" rx="6" ry="3" fill="#FFCCBC"/>
+  <path d="M50 36 L50 40 Q50 42 52 42" stroke="url(#aqua_pot)" stroke-width="3" fill="none"/>
+  
+  <!-- Head -->
+  <circle cx="34" cy="32" r="14" fill="url(#aqua_skin)"/>
+  
+  <!-- Hair -->
+  <ellipse cx="34" cy="24" rx="14" ry="10" fill="url(#aqua_hair)"/>
+  <circle cx="22" cy="28" r="5" fill="url(#aqua_hair)"/>
+  <circle cx="46" cy="28" r="5" fill="url(#aqua_hair)"/>
+  <circle cx="28" cy="18" r="4" fill="url(#aqua_hair)"/>
+  <circle cx="40" cy="18" r="4" fill="url(#aqua_hair)"/>
+  
+  <!-- Wavy hair strands -->
+  <path d="M20 32 Q16 38 20 44" stroke="url(#aqua_hair)" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M48 32 Q52 38 48 44" stroke="url(#aqua_hair)" stroke-width="3" stroke-linecap="round" fill="none"/>
+  
+  <!-- Eyes -->
+  <circle cx="30" cy="32" r="3.5" fill="#4A3728"/>
+  <circle cx="40" cy="32" r="3.5" fill="#4A3728"/>
+  <circle cx="31" cy="31" r="1.2" fill="#FFF"/>
+  <circle cx="41" cy="31" r="1.2" fill="#FFF"/>
+  
+  <!-- Blush -->
+  <circle cx="25" cy="36" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  <circle cx="45" cy="36" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  
+  <!-- Smile -->
+  <path d="M31 40 Q35 44 39 40" stroke="#4A3728" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Stars -->
+  <circle cx="10" cy="16" r="2" fill="#FFF"/>
+  <circle cx="18" cy="10" r="1.5" fill="#FFD93D"/>
+  <circle cx="8" cy="50" r="1.5" fill="#E1F5FE"/>
+  
+  <!-- Bubbles -->
+  <circle cx="70" cy="54" r="2" fill="#FFF" fill-opacity="0.6"/>
+  <circle cx="66" cy="60" r="1.5" fill="#FFF" fill-opacity="0.6"/>
+</svg>

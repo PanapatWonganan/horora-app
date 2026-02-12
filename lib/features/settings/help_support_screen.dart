@@ -125,14 +125,14 @@ class HelpSupportScreen extends StatelessWidget {
           ),
         ),
         iconColor: AppColors.primary,
-        collapsedIconColor: AppColors.lightText.withOpacity(0.7),
+        collapsedIconColor: AppColors.lightText.withValues(alpha: 0.7),
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Text(
               answer,
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -165,7 +165,7 @@ class HelpSupportScreen extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -191,7 +191,7 @@ class HelpSupportScreen extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: AppColors.lightText.withOpacity(0.7),
+                      color: AppColors.lightText.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -200,7 +200,7 @@ class HelpSupportScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.lightText.withOpacity(0.5),
+              color: AppColors.lightText.withValues(alpha: 0.5),
               size: 16,
             ),
           ],
@@ -249,7 +249,7 @@ class HelpSupportScreen extends StatelessWidget {
         width: 60,
         height: 60,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(

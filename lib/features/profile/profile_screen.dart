@@ -3,10 +3,15 @@ import 'package:intl/intl.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
-import '../../core/utils/zodiac_utils.dart';
+import '../../core/services/thai_zodiac_service.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/ad_service.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
+import '../affiliate/services/affiliate_service.dart';
+import '../affiliate/screens/affiliate_dashboard_screen.dart';
+import '../affiliate/screens/affiliate_register_screen.dart';
 import 'widgets/profile_menu_item.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -27,7 +32,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'full_name': 'ผู้ใช้งาน',
     'email': 'user@example.com',
     'birth_date': null,
-    'zodiac_sign': null,
+    'thai_animal': null,
+    'thai_year_name': null,
+    'thai_element': null,
+    'thai_element_full': null,
     'is_premium': false,
   };
 
@@ -50,7 +58,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'full_name': 'สมชาย ใจดี',
         'email': 'somchai@example.com',
         'birth_date': '1990-05-15',
-        'zodiac_sign': 'taurus',
+        'thai_animal': 'มะเมีย',
+        'thai_year_name': 'ปีมะเมีย',
+        'thai_element': 'ทอง',
+        'thai_element_full': 'ธาตุทอง',
         'is_premium': true,
         'profile_image_url': '',
       };
@@ -59,36 +70,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final currentUser = _authService.currentUser;
 
       if (currentUser != null) {
-        // ดึงข้อมูลจาก user metadata ของ auth
-        final userMetadata = currentUser.userMetadata;
-        debugPrint('User metadata: $userMetadata');
-
-        // ดึงข้อมูลอีเมลจาก auth
-        final email = currentUser.email;
-        debugPrint('User email: $email');
+        debugPrint('User: ${currentUser.name}, ${currentUser.email}');
 
         // อัปเดตข้อมูลเบื้องต้นจาก auth
         setState(() {
-          _userData['email'] = email ?? 'user@example.com';
+          _userData['email'] = currentUser.email;
 
-          if (userMetadata != null) {
-            // ดึงชื่อจาก metadata ถ้ามี
-            if (userMetadata.containsKey('full_name')) {
-              _userData['full_name'] = userMetadata['full_name'];
-            }
+          // ดึงชื่อจาก user
+          if (currentUser.name.isNotEmpty) {
+            _userData['full_name'] = currentUser.name;
+          }
 
-            // ดึงวันเกิดจาก metadata ถ้ามี
-            if (userMetadata.containsKey('birth_date')) {
-              _userData['birth_date'] = userMetadata['birth_date'];
+          // ดึงวันเกิดและคำนวณปีนักษัตรไทย
+          if (currentUser.birthDate != null) {
+            _userData['birth_date'] = currentUser.birthDate!.toIso8601String().split('T')[0];
 
-              // คำนวณราศีจากวันเกิด
-              try {
-                final birthDate = DateTime.parse(userMetadata['birth_date']);
-                _userData['zodiac_sign'] = ZodiacUtils.getZodiacSign(birthDate);
-              } catch (e) {
-                debugPrint('Error parsing birth date from metadata: $e');
-              }
-            }
+            // คำนวณปีนักษัตรไทยจากวันเกิดใหม่ทุกครั้ง
+            final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(currentUser.birthDate!);
+            _userData['thai_animal'] = thaiZodiac.animalName;
+            _userData['thai_year_name'] = thaiZodiac.thaiName;
+            _userData['thai_element'] = thaiZodiac.element;
+            _userData['thai_element_full'] = thaiZodiac.elementThai;
+
+            debugPrint('Calculated Thai Zodiac from birth date:');
+            debugPrint('Animal: ${thaiZodiac.animalName}, Thai Name: ${thaiZodiac.thaiName}');
+            debugPrint('Element: ${thaiZodiac.element}, Element Thai: ${thaiZodiac.elementThai}');
+          } else if (currentUser.thaiAnimal != null) {
+            // ใช้ค่าที่เก็บไว้ใน database
+            _userData['thai_animal'] = currentUser.thaiAnimal;
+            _userData['thai_year_name'] = currentUser.thaiYearName ?? 'ปี${currentUser.thaiAnimal}';
+            _userData['thai_element'] = currentUser.thaiElement ?? '';
+            _userData['thai_element_full'] = currentUser.thaiElementFull ?? '';
           }
         });
       }
@@ -105,14 +117,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ...profile,
             };
 
-            // คำนวณราศีจากวันเกิด ถ้ายังไม่มี
-            if ((_userData['zodiac_sign'] == null ||
-                    _userData['zodiac_sign'].isEmpty) &&
-                _userData['birth_date'] != null &&
-                _userData['birth_date'].isNotEmpty) {
+            // คำนวณปีนักษัตรไทยจากวันเกิดใหม่ทุกครั้ง (เขียนทับข้อมูลเก่า)
+            if (_userData['birth_date'] != null && _userData['birth_date'].isNotEmpty) {
               try {
                 final birthDate = DateTime.parse(_userData['birth_date']);
-                _userData['zodiac_sign'] = ZodiacUtils.getZodiacSign(birthDate);
+                final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(birthDate);
+                _userData['thai_animal'] = thaiZodiac.animalName;
+                _userData['thai_year_name'] = thaiZodiac.thaiName;
+                _userData['thai_element'] = thaiZodiac.element;
+                _userData['thai_element_full'] = thaiZodiac.elementThai;
+                
+                debugPrint('Updated Thai Zodiac from database birth date ${_userData['birth_date']}:');
+                debugPrint('Animal: ${thaiZodiac.animalName}, Thai Name: ${thaiZodiac.thaiName}');
+                debugPrint('Element: ${thaiZodiac.element}, Element Thai: ${thaiZodiac.elementThai}');
               } catch (e) {
                 debugPrint('Error parsing birth date from profile: $e');
               }
@@ -151,7 +168,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'full_name': 'สมชาย ใจดี',
           'email': 'somchai@example.com',
           'birth_date': '1990-05-15',
-          'zodiac_sign': 'taurus',
+          'thai_animal': 'มะเมีย',
+          'thai_year_name': 'ปีมะเมีย',
+          'thai_element': 'ทอง',
+          'thai_element_full': 'ธาตุทอง',
           'is_premium': true,
           'profile_image_url': '',
         };
@@ -231,7 +251,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _buildSubscriptionCard(),
                             const SizedBox(height: 32),
                             _buildMenuItems(),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 24),
+                            // Native Ad
+                            const NativeAdWidget(height: 280),
+                            const SizedBox(height: 24),
                             _buildLogoutButton(),
                             const SizedBox(height: 32),
                           ],
@@ -251,9 +274,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: AppColors.error,
+            SvgIcon(
+              AppIcons.error,
               size: 64,
             ),
             const SizedBox(height: 16),
@@ -297,13 +319,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         IconButton(
-          icon: Icon(
-            Icons.settings_outlined,
-            color: AppColors.lightText,
+          icon: SvgIcon(
+            AppIcons.settings,
             size: 24,
+            color: AppColors.lightText,
           ),
           onPressed: () {
-            AppRouter.navigateTo(context, AppRoutes.settings);
+            context.navigateWithAd(AppRoutes.settings);
           },
         ),
       ],
@@ -340,20 +362,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(40),
             child: CircleAvatar(
               radius: 40,
-              backgroundColor: AppColors.primary.withOpacity(0.2),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
               child: _userData['profile_image_url'] != null &&
                       _userData['profile_image_url'].isNotEmpty
                   ? Image.network(
                       _userData['profile_image_url'],
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.person,
+                      errorBuilder: (context, error, stackTrace) => SvgIcon(
+                        AppIcons.personFilled,
                         size: 40,
                         color: AppColors.primary,
                       ),
                     )
-                  : Icon(
-                      Icons.person,
+                  : SvgIcon(
+                      AppIcons.personFilled,
                       size: 40,
                       color: AppColors.primary,
                     ),
@@ -377,7 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 _userData['email'] ?? '',
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -385,41 +407,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 'วันเกิด: $birthDateText',
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  // แสดงราศีถ้ามีข้อมูล zodiac_sign แม้ว่าจะไม่มีวันเกิด
-                  if (_userData['zodiac_sign'] != null) ...[
+                  // แสดงปีนักษัตรไทยถ้ามีวันเกิด (คำนวณจากวันเกิด)
+                  if (birthDate != null) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: AppColors.primary.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          Icon(
-                            ZodiacUtils.getZodiacIcon(_userData['zodiac_sign']),
+                          ThaiZodiacIcon(
+                            animal: () {
+                              try {
+                                if (birthDate != null) {
+                                  final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(birthDate);
+                                  return thaiZodiac.animalName;
+                                }
+                                return 'มะโรง';
+                              } catch (e) {
+                                return 'มะโรง';
+                              }
+                            }(),
                             size: 16,
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            // ถ้ามีวันเกิด ใช้ฟังก์ชัน getZodiacSignThai ที่รับวันเกิด
-                            // ถ้าไม่มีวันเกิด ใช้ชื่อราศีภาษาไทยจากชื่อราศีภาษาอังกฤษ
-                            birthDate != null
-                                ? ZodiacUtils.getZodiacSignThai(
-                                    birthDate,
-                                    zodiacSign: _userData['zodiac_sign'],
-                                  )
-                                : _getThaiZodiacName(_userData['zodiac_sign']),
+                            () {
+                              try {
+                                if (birthDate != null) {
+                                  final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(birthDate);
+                                  return thaiZodiac.thaiName;
+                                }
+                                return 'ไม่ทราบปีนักษัตร';
+                              } catch (e) {
+                                return 'ไม่ทราบปีนักษัตร';
+                              }
+                            }(),
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 12,
@@ -448,15 +483,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
-                            Icons.star,
-                            color: Colors.white,
+                          SvgIcon(
+                            AppIcons.starFilled,
                             size: 12,
+                            color: Colors.white,
                           ),
-                          SizedBox(width: 4),
-                          Text(
+                          const SizedBox(width: 4),
+                          const Text(
                             'พรีเมียม',
                             style: TextStyle(
                               color: Colors.white,
@@ -473,55 +508,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         IconButton(
-          icon: Icon(
-            Icons.edit,
-            color: AppColors.primary,
+          icon: SvgIcon(
+            AppIcons.edit,
             size: 20,
+            color: Colors.amber,
           ),
-          onPressed: () async {
-            final result =
-                await AppRouter.navigateTo(context, AppRoutes.editProfile);
-            if (result == true) {
-              // Reload profile if edit was successful
-              _loadUserProfile();
-            }
+          onPressed: () {
+            context.executeWithAd(() async {
+              final result =
+                  await AppRouter.navigateTo(context, AppRoutes.editProfile);
+              if (result == true) {
+                // Reload profile if edit was successful
+                _loadUserProfile();
+              }
+            });
           },
         ),
       ],
     );
   }
 
-  // ฟังก์ชันสำหรับแปลงชื่อราศีภาษาอังกฤษเป็นภาษาไทย
-  String _getThaiZodiacName(String englishName) {
-    switch (englishName.toLowerCase()) {
-      case 'aries':
-        return 'ราศีเมษ';
-      case 'taurus':
-        return 'ราศีพฤษภ';
-      case 'gemini':
-        return 'ราศีเมถุน';
-      case 'cancer':
-        return 'ราศีกรกฎ';
-      case 'leo':
-        return 'ราศีสิงห์';
-      case 'virgo':
-        return 'ราศีกันย์';
-      case 'libra':
-        return 'ราศีตุลย์';
-      case 'scorpio':
-        return 'ราศีพิจิก';
-      case 'sagittarius':
-        return 'ราศีธนู';
-      case 'capricorn':
-        return 'ราศีมังกร';
-      case 'aquarius':
-        return 'ราศีกุมภ์';
-      case 'pisces':
-        return 'ราศีมีน';
-      default:
-        return 'ไม่ทราบราศี';
-    }
-  }
 
   Widget _buildSubscriptionCard() {
     // ถ้าเป็นผู้ใช้พรีเมียมแล้ว แสดงการ์ดแบบพรีเมียม
@@ -543,7 +549,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -555,10 +561,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.star,
-                color: Colors.amber,
+              SvgIcon(
+                AppIcons.starFilled,
                 size: 24,
+                color: Colors.amber,
               ),
               const SizedBox(width: 12),
               Text(
@@ -575,7 +581,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             'รับสิทธิประโยชน์เพิ่มเติมและปลดล็อกฟีเจอร์ทั้งหมด',
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
               fontSize: 14,
               height: 1.5,
             ),
@@ -602,7 +608,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     title: Row(
                       children: [
-                        Icon(Icons.info_outline, color: AppColors.primary),
+                        SvgIcon(AppIcons.info, size: 24, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Text(
                           'แจ้งให้ทราบ',
@@ -644,10 +650,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            icon: const Icon(
-              Icons.star,
-              color: Colors.white,
+            icon: SvgIcon(
+              AppIcons.starFilled,
               size: 20,
+              color: Colors.white,
             ),
           ),
         ],
@@ -670,7 +676,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -680,15 +686,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
-                Icons.workspace_premium,
-                color: Colors.white,
+              SvgIcon(
+                AppIcons.diamond,
                 size: 24,
+                color: Colors.white,
               ),
-              SizedBox(width: 12),
-              Text(
+              const SizedBox(width: 12),
+              const Text(
                 'สมาชิกพรีเมียม',
                 style: TextStyle(
                   color: Colors.white,
@@ -702,7 +708,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             'ขอบคุณที่เป็นสมาชิกพรีเมียม คุณสามารถใช้งานฟีเจอร์ทั้งหมดได้ไม่จำกัด',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
               height: 1.5,
             ),
@@ -719,19 +725,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: Colors.white,
+                SvgIcon(
+                  AppIcons.calendar,
                   size: 16,
+                  color: Colors.white,
                 ),
-                SizedBox(width: 8),
-                Text(
+                const SizedBox(width: 8),
+                const Text(
                   'สมาชิกภาพของคุณจะหมดอายุในวันที่ 31/12/2024',
                   style: TextStyle(
                     color: Colors.white,
@@ -751,9 +757,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Expanded(
       child: Row(
         children: [
-          const Icon(
-            Icons.check_circle,
-            color: Colors.green,
+          SvgIcon(
+            AppIcons.checkCircle,
             size: 16,
           ),
           const SizedBox(width: 4),
@@ -776,10 +781,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Expanded(
       child: Row(
         children: [
-          const Icon(
-            Icons.check_circle,
-            color: Colors.white,
+          SvgIcon(
+            AppIcons.checkCircle,
             size: 16,
+            color: Colors.white,
           ),
           const SizedBox(width: 4),
           Flexible(
@@ -840,21 +845,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //   },
         // ),
         ProfileMenuItem(
-          icon: Icons.help_outline,
-          title: 'ช่วยเหลือและสนับสนุน',
+          icon: Icons.handshake_outlined,
+          title: 'ระบบตัวแทน',
           onTap: () {
-            AppRouter.navigateTo(context, AppRoutes.help);
+            _navigateToAffiliate();
           },
         ),
         ProfileMenuItem(
-          icon: Icons.info_outline,
+          svgIconPath: AppIcons.info,
+          title: 'ช่วยเหลือและสนับสนุน',
+          onTap: () {
+            context.navigateWithAd(AppRoutes.help);
+          },
+        ),
+        ProfileMenuItem(
+          svgIconPath: AppIcons.info,
           title: 'เกี่ยวกับแอป',
           onTap: () {
-            AppRouter.navigateTo(context, AppRoutes.about);
+            context.navigateWithAd(AppRoutes.about);
           },
         ),
       ],
     );
+  }
+
+  Future<void> _navigateToAffiliate() async {
+    // Check if user is already an affiliate
+    final affiliate = await AffiliateService().getStatus();
+    if (!mounted) return;
+
+    if (affiliate != null) {
+      // Already registered - go to dashboard
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AffiliateDashboardScreen()),
+      );
+    } else {
+      // Not registered - go to register
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AffiliateRegisterScreen()),
+      );
+    }
   }
 
   Widget _buildLogoutButton() {
@@ -871,10 +903,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ),
-      icon: Icon(
-        Icons.logout,
-        color: Colors.red.shade400,
+      icon: SvgIcon(
+        AppIcons.logout,
         size: 20,
+        color: Colors.red.shade400,
       ),
     );
   }
@@ -896,7 +928,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: Text(
             'คุณต้องการออกจากระบบใช่หรือไม่?',
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.8),
+              color: AppColors.lightText.withValues(alpha: 0.8),
             ),
           ),
           actions: [

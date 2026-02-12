@@ -182,7 +182,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.7),
+                    color: AppColors.lightText.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -193,9 +193,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             value: value,
             onChanged: onChanged,
             activeColor: AppColors.primary,
-            activeTrackColor: AppColors.primary.withOpacity(0.3),
+            activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
             inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey.withOpacity(0.3),
+            inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
           ),
         ],
       ),
@@ -210,7 +210,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         color: AppColors.darkSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -232,7 +232,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Text(
                   'ดวงประจำวันจะถูกส่งในเวลานี้',
                   style: TextStyle(
-                    color: AppColors.lightText.withOpacity(0.7),
+                    color: AppColors.lightText.withValues(alpha: 0.7),
                     fontSize: 14,
                   ),
                 ),
@@ -244,7 +244,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(

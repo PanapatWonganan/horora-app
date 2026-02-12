@@ -12,16 +12,10 @@ export 'tarot_card_model.dart';
 // Chat related models
 export 'chat_model.dart';
 
-// Focus session related models
-export 'focus_model.dart';
-
 // Subscription and payment related models
 export 'subscription_model.dart';
 
 // App data related models
 export 'app_data_model.dart';
-
-// Tarot related models
-export 'tarot_card_model.dart';
 
 // Add other model exports here as needed

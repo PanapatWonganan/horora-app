@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <clipPath id="flag_clip_gb">
+      <circle cx="40" cy="40" r="36"/>
+    </clipPath>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="#1A237E"/>
+  <g clip-path="url(#flag_clip_gb)">
+    <rect x="4" y="4" width="72" height="72" fill="#1A237E"/>
+    <path d="M4 4 L76 76 M76 4 L4 76" stroke="#FFF" stroke-width="12"/>
+    <path d="M4 4 L76 76 M76 4 L4 76" stroke="#EF5350" stroke-width="6"/>
+    <rect x="34" y="4" width="12" height="72" fill="#FFF"/>
+    <rect x="4" y="34" width="72" height="12" fill="#FFF"/>
+    <rect x="36" y="4" width="8" height="72" fill="#EF5350"/>
+    <rect x="4" y="36" width="72" height="8" fill="#EF5350"/>
+  </g>
+  <circle cx="40" cy="40" r="36" fill="none" stroke="#E0E0E0" stroke-width="1"/>
+</svg>

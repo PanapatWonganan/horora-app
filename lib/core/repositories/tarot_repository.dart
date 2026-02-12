@@ -152,16 +152,6 @@ class TarotRepository {
   // ดึงข้อมูลการอ่านไพ่ทาโร่ของผู้ใช้
   Future<List<TarotReading>> getUserTarotReadings() async {
     try {
-      // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
-      final String? cachedData = _prefs.getString(_userReadingsKey);
-      List<TarotReading>? cachedReadings;
-
-      if (cachedData != null) {
-        final List<dynamic> decoded = jsonDecode(cachedData);
-        cachedReadings =
-            decoded.map((item) => TarotReading.fromJson(item)).toList();
-      }
-
       // ดึงข้อมูลจาก API
       final response = await _apiClient.get('/tarot/readings');
 

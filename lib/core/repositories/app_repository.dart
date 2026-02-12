@@ -146,11 +146,11 @@ class AppRepository {
             final String currentVersion = packageInfo.version;
             
             // ตรวจสอบว่ามีเวอร์ชันใหม่กว่าหรือไม่
-            final AppUpdate latestUpdate = updates.firstWhere(
-              (update) => _isNewerVersion(update.version, currentVersion),
+            final AppUpdate? latestUpdate = updates.cast<AppUpdate?>().firstWhere(
+              (update) => _isNewerVersion(update!.version, currentVersion),
               orElse: () => null,
             );
-            
+
             return latestUpdate;
           }
         }

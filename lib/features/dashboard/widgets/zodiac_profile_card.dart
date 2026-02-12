@@ -5,14 +5,12 @@ class ZodiacProfileCard extends StatelessWidget {
   final String zodiacSign;
   final String element;
   final String planet;
-  final String compatibility;
 
   const ZodiacProfileCard({
     Key? key,
     required this.zodiacSign,
     required this.element,
     required this.planet,
-    required this.compatibility,
   }) : super(key: key);
 
   @override
@@ -35,7 +33,7 @@ class ZodiacProfileCard extends StatelessWidget {
                   width: 60.0,
                   height: 60.0,
                   decoration: BoxDecoration(
-                    color: AppColors.zodiacFire.withOpacity(0.2),
+                    color: AppColors.zodiacFire.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -62,7 +60,7 @@ class ZodiacProfileCard extends StatelessWidget {
                       Text(
                         '21 มีนาคม - 19 เมษายน',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 14.0,
                         ),
                       ),
@@ -99,14 +97,6 @@ class ZodiacProfileCard extends StatelessWidget {
                     value: planet,
                   ),
                 ),
-                Expanded(
-                  child: _buildDetailItem(
-                    icon: Icons.favorite,
-                    label: 'เข้ากับราศี',
-                    value: compatibility,
-                    isMultiLine: true,
-                  ),
-                ),
               ],
             ),
           ],
@@ -135,7 +125,7 @@ class ZodiacProfileCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 12.0,
               ),
             ),

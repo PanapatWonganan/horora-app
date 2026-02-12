@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/utils/app_icons.dart';
 
 class ProfileMenuItem extends StatelessWidget {
-  final IconData icon;
+  final String? svgIconPath;
+  final IconData? icon;
   final String title;
   final VoidCallback onTap;
   final Widget? trailing;
 
   const ProfileMenuItem({
     Key? key,
-    required this.icon,
+    this.svgIconPath,
+    this.icon,
     required this.title,
     required this.onTap,
     this.trailing,
@@ -34,13 +37,21 @@ class ProfileMenuItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primary,
-                size: 20,
+              child: Center(
+                child: svgIconPath != null
+                    ? SvgIcon(
+                        svgIconPath!,
+                        size: 20,
+                        color: AppColors.primary,
+                      )
+                    : Icon(
+                        icon ?? Icons.circle,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
               ),
             ),
             const SizedBox(width: 16),
@@ -55,14 +66,14 @@ class ProfileMenuItem extends StatelessWidget {
               ),
             ),
             trailing ??
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.lightText.withOpacity(0.5),
+                SvgIcon(
+                  AppIcons.arrowForward,
                   size: 16,
+                  color: AppColors.lightText.withValues(alpha: 0.5),
                 ),
           ],
         ),
       ),
     );
   }
-} 
+}

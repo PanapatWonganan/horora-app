@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:lottie/lottie.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
@@ -57,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
         Text(
           'ค้นพบดวงชะตาของคุณ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.8),
+            color: AppColors.lightText.withValues(alpha: 0.8),
             fontSize: 18,
             fontWeight: FontWeight.w500,
           ),
@@ -68,21 +68,23 @@ class WelcomeScreen extends StatelessWidget {
 
   Widget _buildAnimation(Size size) {
     return Container(
-      width: size.width * 0.5,
-      height: size.width * 0.5,
+      width: size.width * 0.7,
+      height: size.width * 0.7,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 30,
-            spreadRadius: 10,
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 40,
+            spreadRadius: 15,
           ),
         ],
       ),
-      child: Image.asset(
-        'assets/images/backgrounds/splashscreen.png',
+      child: Lottie.asset(
+        'assets/animations/horowheel.json',
         fit: BoxFit.contain,
+        repeat: true,
+        animate: true,
       ),
     );
   }
@@ -96,7 +98,7 @@ class WelcomeScreen extends StatelessWidget {
             'ค้นหาความลับของดวงดาว ดูดวง และอ่านไพ่ทาโรต์',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.9),
+              color: AppColors.lightText.withValues(alpha: 0.9),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -121,7 +123,7 @@ class WelcomeScreen extends StatelessWidget {
               Text(
                 'มีบัญชีอยู่แล้ว? ',
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.8),
+                  color: AppColors.lightText.withValues(alpha: 0.8),
                   fontSize: 14,
                 ),
               ),

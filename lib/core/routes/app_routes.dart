@@ -3,6 +3,7 @@ class AppRoutes {
   static const String splash = '/';
   static const String welcome = '/welcome';
   static const String onboarding = '/onboarding';
+  static const String onboardingQuiz = '/onboarding/quiz'; // Full Quiz Flow
   static const String authWrapper = '/auth-wrapper';
 
   // Authentication
@@ -10,6 +11,7 @@ class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
   static const String verifyEmail = '/verify-email';
+  static const String emailConfirmation = '/email-confirmation';
   static const String resetPassword = '/reset-password';
 
   // Main Navigation
@@ -26,7 +28,6 @@ class AppRoutes {
   static const String weeklyHoroscope = '/horoscope/weekly';
   static const String monthlyHoroscope = '/horoscope/monthly';
   static const String yearlyHoroscope = '/horoscope/yearly';
-  static const String compatibilityCheck = '/horoscope/compatibility';
   static const String zodiacDetails = '/horoscope/zodiac-details';
 
   // Tarot Features
@@ -38,10 +39,6 @@ class AppRoutes {
   // Chat Features
   static const String newChat = '/chat/new';
   static const String chatDetails = '/chat/details';
-
-  // Focus Features
-  static const String focusSession = '/focus/session';
-  static const String focusHistory = '/focus/history';
 
   // Profile and Settings
   static const String editProfile = '/profile/edit';
@@ -58,4 +55,16 @@ class AppRoutes {
   static const String historyHoroscope = '/history/horoscope';
   static const String historyTarot = '/history/tarot';
   static const String historyChat = '/history/chat';
+
+  // Merit (ทำบุญออนไลน์)
+  static const String merit = '/merit';
+  static const String meritOrder = '/merit/order';
+  static const String meritPayment = '/merit/payment';
+  static const String meritHistory = '/merit/history';
+
+  // Affiliate (ระบบตัวแทน)
+  static const String affiliateDashboard = '/affiliate';
+  static const String affiliateRegister = '/affiliate/register';
+  static const String affiliateShare = '/affiliate/share';
+  static const String affiliateWithdraw = '/affiliate/withdraw';
 }

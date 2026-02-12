@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/services/supabase_service.dart';
 import '../core/services/auth_service.dart';
 import '../core/api/api_client.dart';
 import '../core/api/openai_client.dart';

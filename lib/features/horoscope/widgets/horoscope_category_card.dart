@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/utils/app_icons.dart';
 
 class HoroscopeCategoryCard extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final IconData? icon;
+  final String? svgIconPath;
   final Color color;
   final String description;
   final int rating;
@@ -13,7 +15,8 @@ class HoroscopeCategoryCard extends StatelessWidget {
   const HoroscopeCategoryCard({
     Key? key,
     required this.title,
-    required this.icon,
+    this.icon,
+    this.svgIconPath,
     required this.color,
     required this.description,
     required this.rating,
@@ -31,7 +34,7 @@ class HoroscopeCategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -47,13 +50,20 @@ class HoroscopeCategoryCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    icon,
-                    color: color,
-                    size: 20,
+                  child: Center(
+                    child: svgIconPath != null
+                        ? SvgIcon(
+                            svgIconPath!,
+                            size: 22,
+                          )
+                        : Icon(
+                            icon,
+                            color: color,
+                            size: 20,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -71,7 +81,7 @@ class HoroscopeCategoryCard extends StatelessWidget {
             Text(
               description,
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -84,18 +94,18 @@ class HoroscopeCategoryCard extends StatelessWidget {
                 ...List.generate(5, (index) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 4),
-                    child: Icon(
-                      index < rating ? Icons.star : Icons.star_border,
-                      color: index < rating ? color : color.withOpacity(0.3),
-                      size: 16,
+                    child: SvgIcon(
+                      index < rating ? AppIcons.starFilled : AppIcons.starOutline,
+                      size: 14,
+                      color: index < rating ? color : color.withValues(alpha: 0.3),
                     ),
                   );
                 }),
                 const Spacer(),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.lightText.withOpacity(0.5),
-                  size: 14,
+                SvgIcon(
+                  AppIcons.arrowForward,
+                  size: 12,
+                  color: AppColors.lightText.withValues(alpha: 0.5),
                 ),
               ],
             ),

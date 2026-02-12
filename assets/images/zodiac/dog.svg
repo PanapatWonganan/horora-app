@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="dog_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#90CAF9"/>
+      <stop offset="100%" stop-color="#64B5F6"/>
+    </linearGradient>
+    <linearGradient id="dog_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFCC80"/>
+      <stop offset="100%" stop-color="#FFB74D"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#dog_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <circle cx="40" cy="40" r="32" fill="none" stroke="#BBDEFB" stroke-width="2" stroke-dasharray="4 4"/>
+  <ellipse cx="40" cy="54" rx="18" ry="14" fill="url(#dog_body)"/>
+  <ellipse cx="40" cy="56" rx="12" ry="8" fill="#FFF"/>
+  <path d="M56 48 Q64 44 66 50 Q68 56 64 60 Q60 58 58 52" fill="url(#dog_body)"/>
+  <circle cx="40" cy="36" r="18" fill="url(#dog_body)"/>
+  <path d="M22 28 Q16 18 22 14 Q28 16 26 26" fill="url(#dog_body)"/>
+  <path d="M58 28 Q64 18 58 14 Q52 16 54 26" fill="url(#dog_body)"/>
+  <path d="M22 28 Q18 22 22 18" fill="#FFAB91"/>
+  <path d="M58 28 Q62 22 58 18" fill="#FFAB91"/>
+  <ellipse cx="40" cy="40" rx="10" ry="8" fill="#FFF"/>
+  <circle cx="34" cy="34" r="4" fill="#212121"/>
+  <circle cx="46" cy="34" r="4" fill="#212121"/>
+  <circle cx="35" cy="33" r="1.5" fill="#FFF"/>
+  <circle cx="47" cy="33" r="1.5" fill="#FFF"/>
+  <path d="M32 30 Q30 28 28 30" stroke="#5D4037" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <path d="M48 30 Q50 28 52 30" stroke="#5D4037" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="40" cy="42" rx="5" ry="4" fill="#5D4037"/>
+  <ellipse cx="40" cy="41" rx="2" ry="1" fill="#FFF" fill-opacity="0.5"/>
+  <circle cx="30" cy="40" r="4" fill="#FFAB91" fill-opacity="0.5"/>
+  <circle cx="50" cy="40" r="4" fill="#FFAB91" fill-opacity="0.5"/>
+  <path d="M36 48 Q40 52 44 48" stroke="#5D4037" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <ellipse cx="38" cy="50" rx="2" ry="3" fill="#FF7043"/>
+  <ellipse cx="28" cy="62" rx="5" ry="4" fill="url(#dog_body)"/>
+  <ellipse cx="52" cy="62" rx="5" ry="4" fill="url(#dog_body)"/>
+  <circle cx="14" cy="14" r="4" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+  <rect x="12" y="12" width="4" height="4" fill="#FFA000"/>
+  <circle cx="66" cy="66" r="3" fill="#FFD54F" stroke="#FFA000" stroke-width="1"/>
+</svg>

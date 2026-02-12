@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="leo_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9A56"/>
+      <stop offset="100%" stop-color="#FF6B35"/>
+    </linearGradient>
+    <linearGradient id="leo_mane" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="100%" stop-color="#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="leo_face" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFECD2"/>
+      <stop offset="100%" stop-color="#FFD4A3"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#leo_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  
+  <!-- Mane -->
+  <circle cx="40" cy="40" r="26" fill="url(#leo_mane)"/>
+  <!-- Mane spikes -->
+  <circle cx="40" cy="14" r="6" fill="url(#leo_mane)"/>
+  <circle cx="54" cy="18" r="5" fill="url(#leo_mane)"/>
+  <circle cx="63" cy="30" r="5" fill="url(#leo_mane)"/>
+  <circle cx="66" cy="44" r="5" fill="url(#leo_mane)"/>
+  <circle cx="60" cy="58" r="5" fill="url(#leo_mane)"/>
+  <circle cx="48" cy="66" r="5" fill="url(#leo_mane)"/>
+  <circle cx="32" cy="66" r="5" fill="url(#leo_mane)"/>
+  <circle cx="20" cy="58" r="5" fill="url(#leo_mane)"/>
+  <circle cx="14" cy="44" r="5" fill="url(#leo_mane)"/>
+  <circle cx="17" cy="30" r="5" fill="url(#leo_mane)"/>
+  <circle cx="26" cy="18" r="5" fill="url(#leo_mane)"/>
+  
+  <!-- Face -->
+  <circle cx="40" cy="42" r="18" fill="url(#leo_face)"/>
+  
+  <!-- Ears -->
+  <circle cx="24" cy="30" r="5" fill="url(#leo_face)"/>
+  <circle cx="56" cy="30" r="5" fill="url(#leo_face)"/>
+  <circle cx="24" cy="30" r="2.5" fill="#FFB7B7" fill-opacity="0.5"/>
+  <circle cx="56" cy="30" r="2.5" fill="#FFB7B7" fill-opacity="0.5"/>
+  
+  <!-- Eyes -->
+  <circle cx="34" cy="40" r="4" fill="#4A3728"/>
+  <circle cx="46" cy="40" r="4" fill="#4A3728"/>
+  <circle cx="35" cy="39" r="1.5" fill="#FFF"/>
+  <circle cx="47" cy="39" r="1.5" fill="#FFF"/>
+  
+  <!-- Eyebrows (proud lion) -->
+  <path d="M30 35 L38 36" stroke="#C68642" stroke-width="2" stroke-linecap="round"/>
+  <path d="M50 35 L42 36" stroke="#C68642" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Nose -->
+  <ellipse cx="40" cy="46" rx="4" ry="3" fill="#C68642"/>
+  <circle cx="40" cy="45" r="1" fill="#FFE4D6"/>
+  
+  <!-- Blush -->
+  <circle cx="28" cy="46" r="4" fill="#FFB7B7" fill-opacity="0.4"/>
+  <circle cx="52" cy="46" r="4" fill="#FFB7B7" fill-opacity="0.4"/>
+  
+  <!-- Smile -->
+  <path d="M35 52 Q40 56 45 52" stroke="#4A3728" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Whisker dots -->
+  <circle cx="32" cy="48" r="1" fill="#C68642"/>
+  <circle cx="30" cy="50" r="1" fill="#C68642"/>
+  <circle cx="48" cy="48" r="1" fill="#C68642"/>
+  <circle cx="50" cy="50" r="1" fill="#C68642"/>
+  
+  <!-- Crown -->
+  <path d="M30 22 L33 28 L37 24 L40 30 L43 24 L47 28 L50 22 L48 20 L32 20 Z" fill="#FFD93D" stroke="#FF9F1C" stroke-width="1"/>
+  <circle cx="40" cy="22" r="2" fill="#FF6B9D"/>
+  
+  <!-- Stars -->
+  <circle cx="14" cy="14" r="2" fill="#FFD93D"/>
+  <circle cx="66" cy="66" r="1.5" fill="#FFD93D"/>
+</svg>

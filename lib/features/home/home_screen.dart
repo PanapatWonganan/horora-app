@@ -4,10 +4,21 @@ import 'package:intl/intl.dart';
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/ad_service.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/daily_horoscope_card.dart';
 import 'widgets/feature_card.dart';
-import '../../ui/screens/horoscope_demo_screen.dart';
+import 'widgets/promo_banner_slider.dart';
+import 'widgets/in_app_message_dialog.dart';
+
+// RouteObserver สำหรับตรวจจับการกลับมาที่หน้า home
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
+
+// Static variable เก็บสถานะว่าเคยออกจาก home ไปหรือยัง
+class HomeScreenState {
+  static bool hasLeftHome = false;
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,27 +32,73 @@ class _HomeScreenState extends State<HomeScreen> {
   final DateTime _today = DateTime.now();
   final _authService = AuthService.instance;
 
+  // รายการแบนเนอร์โปรโมชั่น - สามารถแก้ไขได้ตามต้องการ
+  final List<PromoBanner> _promoBanners = [
+    const PromoBanner(
+      imageUrl: 'assets/images/banners/banner_new_year.webp',
+      linkUrl: 'https://lin.ee/XIF2jaM',
+    ),
+    const PromoBanner(
+      imageUrl: 'assets/images/banners/promo1.webp',
+      linkUrl: 'https://lin.ee/XIF2jaM',
+    ),
+    const PromoBanner(
+      imageUrl: 'assets/images/banners/special_offer.webp',
+      linkUrl: 'https://lin.ee/XIF2jaM',
+    ),
+  ];
+
+  // In-App Messages - สามารถแก้ไขข้อความได้ตามต้องการ
+  final List<InAppMessage> _inAppMessages = [
+    const InAppMessage(
+      imageUrl: 'assets/images/banners/special_offer.webp',
+      title: '✨ วอลเปเปอร์มงคลส่วนบุคคล ✨',
+      subtitle: 'เสริมดวง เรียกทรัพย์ ด้วยวอลเปเปอร์ที่ออกแบบเฉพาะคุณ! คำนวณจากวันเกิดและราศีของคุณโดยเฉพาะ พลังแห่งโชคลาภจะอยู่ในมือคุณทุกวัน',
+      buttonText: 'สั่งซื้อเลย',
+      buttonUrl: 'https://lin.ee/XIF2jaM',
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
     _loadUserName();
+
+    // แสดง In-App Message ทุกครั้งที่เข้าหน้า Home
+    _showInAppMessage();
+  }
+
+  @override
+  void dispose() {
+    // บันทึกว่าออกจากหน้า Home แล้ว
+    HomeScreenState.hasLeftHome = true;
+    super.dispose();
+  }
+
+  void _showInAppMessage() {
+    if (_inAppMessages.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted) {
+          InAppMessageDialog.show(
+            context,
+            message: _inAppMessages[0],
+          );
+        }
+      });
+    }
   }
 
   Future<void> _loadUserName() async {
     final user = _authService.currentUser;
-    if (user != null && user.userMetadata != null) {
-      if (user.userMetadata!['full_name'] != null) {
+    if (user != null) {
+      if (user.name.isNotEmpty) {
         setState(() {
-          _userName = user.userMetadata!['full_name'] as String;
+          _userName = user.name;
         });
-      } else if (user.userMetadata!['name'] != null) {
-        setState(() {
-          _userName = user.userMetadata!['name'] as String;
-        });
-      } else if (user.email != null) {
+      } else if (user.email.isNotEmpty) {
         // ถ้าไม่มีชื่อ ใช้อีเมลแทน
         setState(() {
-          _userName = user.email!.split('@')[0]; // ใช้ส่วนแรกของอีเมลก่อน @
+          _userName = user.email.split('@')[0]; // ใช้ส่วนแรกของอีเมลก่อน @
         });
       }
     }
@@ -72,9 +129,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const SizedBox(height: 20),
                   _buildHeader(),
+                  const SizedBox(height: 20),
+                  _buildPromoBanners(),
+                  const SizedBox(height: 24),
+                  // ทำบุญออนไลน์ - Main Feature
+                  _buildMeritHighlight(),
                   const SizedBox(height: 24),
                   _buildDailyHoroscope(),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+                  // Native Ad
+                  const NativeAdWidget(height: 280),
+                  const SizedBox(height: 24),
                   _buildFeatures(),
                   const SizedBox(height: 32),
                 ],
@@ -106,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               DateFormat('EEEE, d MMMM yyyy', 'th_TH').format(_today),
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -118,9 +183,10 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: CircleAvatar(
             radius: 24,
-            backgroundColor: AppColors.primary.withOpacity(0.2),
-            child: Icon(
-              Icons.person,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+            child: SvgIcon(
+              AppIcons.personFilled,
+              size: 24,
               color: AppColors.primary,
             ),
           ),
@@ -143,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.person_outline, color: Colors.white),
+                leading: SvgIcon(AppIcons.person, size: 24, color: Colors.white),
                 title: const Text('โปรไฟล์',
                     style: TextStyle(color: Colors.white)),
                 onTap: () {
@@ -152,8 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               ListTile(
-                leading:
-                    const Icon(Icons.settings_outlined, color: Colors.white),
+                leading: SvgIcon(AppIcons.settings, size: 24, color: Colors.white),
                 title: const Text('ตั้งค่า',
                     style: TextStyle(color: Colors.white)),
                 onTap: () {
@@ -163,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Divider(color: Colors.white24),
               ListTile(
-                leading: const Icon(Icons.logout, color: Colors.redAccent),
+                leading: SvgIcon(AppIcons.logout, size: 24, color: Colors.redAccent),
                 title: const Text('ออกจากระบบ',
                     style: TextStyle(color: Colors.redAccent)),
                 onTap: () async {
@@ -183,13 +248,23 @@ class _HomeScreenState extends State<HomeScreen> {
       await _authService.signOut();
       // Navigation will be handled by AuthWrapper
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('ออกจากระบบไม่สำเร็จ: ${e.toString()}'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ออกจากระบบไม่สำเร็จ: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
+  }
+
+  Widget _buildPromoBanners() {
+    return PromoBannerSlider(
+      banners: _promoBanners,
+      height: 130,
+      autoPlayDuration: const Duration(seconds: 4),
+    );
   }
 
   Widget _buildDailyHoroscope() {
@@ -209,10 +284,168 @@ class _HomeScreenState extends State<HomeScreen> {
           zodiacSign: "", // Empty string since zodiac sign is removed
           date: _today,
           onViewDetails: () {
-            AppRouter.navigateTo(context, AppRoutes.dailyHoroscope);
+            context.navigateWithAd(AppRoutes.dailyHoroscope);
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildMeritHighlight() {
+    return GestureDetector(
+      onTap: () {
+        // ไม่แสดงโฆษณาเพราะเป็น flow การซื้อของ
+        Navigator.pushNamed(context, AppRoutes.merit);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFFFD700),
+              Color(0xFFFF8C00),
+              Color(0xFFFF6B00),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+              blurRadius: 20,
+              spreadRadius: 2,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Background decoration
+            Positioned(
+              right: -30,
+              top: -30,
+              child: Opacity(
+                opacity: 0.15,
+                child: SvgIcon(
+                  AppIcons.temple,
+                  size: 150,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Positioned(
+              left: -20,
+              bottom: -20,
+              child: Opacity(
+                opacity: 0.1,
+                child: SvgIcon(
+                  AppIcons.sparkleFilled,
+                  size: 80,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            // Content
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: SvgIcon(
+                        AppIcons.temple,
+                        size: 32,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'ทำบุญออนไลน์',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'สะดวก รวดเร็ว ได้บุญจริง',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'ไหว้พระ ขอพร สถานที่ศักดิ์สิทธิ์ทั่วไทย\nเสริมดวง เรียกทรัพย์ ชีวิตรุ่งเรือง',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.95),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgIcon(
+                        AppIcons.heart,
+                        size: 20,
+                        color: const Color(0xFFFF6B00),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'เริ่มทำบุญเลย',
+                        style: TextStyle(
+                          color: Color(0xFFFF6B00),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SvgIcon(
+                        AppIcons.arrowForward,
+                        size: 20,
+                        color: const Color(0xFFFF6B00),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -221,118 +454,99 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'บริการของเรา',
+          'บริการอื่นๆ',
           style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            color: AppColors.lightText.withValues(alpha: 0.7),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: FeatureCard(
+              child: _buildSmallFeatureCard(
                 title: 'ไพ่ทาโรต์',
-                icon: Icons.auto_awesome,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFE91E63),
-                    Color(0xFF9C27B0),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.tarot);
-                },
+                svgIconPath: AppIcons.divination,
+                color: const Color(0xFFE91E63),
+                onTap: () => context.navigateWithAd(AppRoutes.tarot),
+                useIconColor: true,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
-              child: FeatureCard(
-                title: 'สนทนา AI',
-                icon: Icons.chat_bubble_outline,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF2196F3),
-                    Color(0xFF673AB7),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                onTap: () {
-                  AppRouter.navigateToReplacement(context, AppRoutes.chat);
-                },
+              child: _buildSmallFeatureCard(
+                title: 'พ่อหมอโหรา',
+                svgIconPath: AppIcons.chatFilled,
+                color: const Color(0xFF2196F3),
+                onTap: () => context.navigateReplacementWithAd(AppRoutes.chat),
+                useIconColor: true,
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
+            const SizedBox(width: 12),
             Expanded(
-              child: FeatureCard(
+              child: _buildSmallFeatureCard(
                 title: 'โหราศาสตร์',
-                icon: Icons.star_outline,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFFFF9800),
-                    Color(0xFFFF5722),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.horoscope);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: FeatureCard(
-                title: 'โหมดสมาธิ',
-                icon: Icons.self_improvement,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF4CAF50),
-                    Color(0xFF009688),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                onTap: () {
-                  AppRouter.navigateTo(context, AppRoutes.focusSession);
-                },
+                svgIconPath: AppIcons.starFilled,
+                color: const Color(0xFFFF9800),
+                onTap: () => context.navigateWithAd(AppRoutes.horoscope),
+                useIconColor: true,
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        // Demo button for testing the daily horoscope feature
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HoroscopeDemoScreen(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('ทดสอบดูดวงประจำวัน'),
+      ],
+    );
+  }
+
+  Widget _buildSmallFeatureCard({
+    required String title,
+    required String svgIconPath,
+    required Color color,
+    required VoidCallback onTap,
+    bool useIconColor = false, // ถ้า true จะไม่ใส่สีทับ (ใช้สีจาก SVG)
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withValues(alpha: 0.3),
+            width: 1,
           ),
         ),
-      ],
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: SvgIcon(
+                svgIconPath,
+                size: 22,
+                color: useIconColor ? null : color,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: AppColors.lightText,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

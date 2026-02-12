@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/routes/app_routes.dart';
-import '../../../core/routes/app_router.dart';
+import '../../../core/services/ad_service.dart';
+import '../../../core/utils/app_icons.dart';
 
 class AppBottomNavigation extends StatelessWidget {
   final int currentIndex;
@@ -18,43 +19,88 @@ class AppBottomNavigation extends StatelessWidget {
         color: AppColors.darkSurface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, -1),
           ),
         ],
       ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.lightText.withOpacity(0.5),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'หน้าหลัก',
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context: context,
+                index: 0,
+                iconPath: AppIcons.home,
+                activeIconPath: AppIcons.homeFilled,
+                label: 'หน้าหลัก',
+              ),
+              _buildNavItem(
+                context: context,
+                index: 1,
+                iconPath: AppIcons.sparkle,
+                activeIconPath: AppIcons.sparkleFilled,
+                label: 'ไพ่ทาโร่',
+              ),
+              _buildNavItem(
+                context: context,
+                index: 2,
+                iconPath: AppIcons.chat,
+                activeIconPath: AppIcons.chatFilled,
+                label: 'สนทนา',
+              ),
+              _buildNavItem(
+                context: context,
+                index: 3,
+                iconPath: AppIcons.person,
+                activeIconPath: AppIcons.personFilled,
+                label: 'โปรไฟล์',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_awesome_outlined),
-            activeIcon: Icon(Icons.auto_awesome),
-            label: 'ไพ่ทาโร่',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'สนทนา',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'โปรไฟล์',
-          ),
-        ],
-        onTap: (index) => _handleNavigation(context, index),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required int index,
+    required String iconPath,
+    required String activeIconPath,
+    required String label,
+  }) {
+    final isSelected = currentIndex == index;
+    final color = isSelected ? AppColors.primary : AppColors.lightText.withValues(alpha: 0.5);
+
+    return GestureDetector(
+      onTap: () => _handleNavigation(context, index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgIcon(
+              isSelected ? activeIconPath : iconPath,
+              size: 24,
+              color: color,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -82,7 +128,7 @@ class AppBottomNavigation extends StatelessWidget {
         route = AppRoutes.home;
     }
 
-    // นำทางไปยังเส้นทางที่กำหนด
-    AppRouter.navigateToReplacement(context, route);
+    // นำทางไปยังเส้นทางที่กำหนด พร้อม interstitial ad (70% probability)
+    context.navigateReplacementWithAd(route);
   }
 }

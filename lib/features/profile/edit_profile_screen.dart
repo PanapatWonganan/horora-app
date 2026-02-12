@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
-import '../../core/utils/zodiac_utils.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
 import '../auth/widgets/auth_text_field.dart';
 
@@ -21,7 +20,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _birthDateController = TextEditingController();
   
   DateTime? _selectedDate;
-  String? _zodiacSign;
+  ThaiZodiac? _thaiZodiac; // ปีนักษัตรไทย
   bool _isLoading = true;
   bool _isSaving = false;
   final _authService = AuthService.instance;
@@ -52,33 +51,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final currentUser = _authService.currentUser;
       
       if (currentUser != null) {
-        // ดึงข้อมูลจาก user metadata ของ auth
-        final userMetadata = currentUser.userMetadata;
-        
-        // ดึงข้อมูลอีเมลจาก auth
-        final email = currentUser.email;
-        
         // อัปเดตข้อมูลเบื้องต้นจาก auth
-        _userData['email'] = email ?? '';
-        
-        if (userMetadata != null) {
-          // ดึงชื่อจาก metadata ถ้ามี
-          if (userMetadata.containsKey('full_name')) {
-            _userData['full_name'] = userMetadata['full_name'];
-          }
-          
-          // ดึงวันเกิดจาก metadata ถ้ามี
-          if (userMetadata.containsKey('birth_date')) {
-            _userData['birth_date'] = userMetadata['birth_date'];
-            
-            // คำนวณราศีจากวันเกิด
-            try {
-              final birthDate = DateTime.parse(userMetadata['birth_date']);
-              _userData['zodiac_sign'] = ZodiacUtils.getZodiacSign(birthDate);
-            } catch (e) {
-              debugPrint('Error parsing birth date from metadata: $e');
-            }
-          }
+        _userData['email'] = currentUser.email;
+
+        // ดึงชื่อจาก user
+        if (currentUser.name.isNotEmpty) {
+          _userData['full_name'] = currentUser.name;
+        }
+
+        // ดึงวันเกิดและคำนวณปีนักษัตร
+        if (currentUser.birthDate != null) {
+          _userData['birth_date'] = currentUser.birthDate!.toIso8601String().split('T')[0];
+
+          // คำนวณปีนักษัตรจากวันเกิด
+          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(currentUser.birthDate!);
+          _userData['thai_animal'] = thaiZodiac.animalName;
+          _userData['thai_year_name'] = thaiZodiac.thaiName;
+        } else if (currentUser.thaiAnimal != null) {
+          _userData['thai_animal'] = currentUser.thaiAnimal;
+          _userData['thai_year_name'] = currentUser.thaiYearName ?? 'ปี${currentUser.thaiAnimal}';
         }
       }
       
@@ -104,7 +95,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         try {
           _selectedDate = DateTime.parse(_userData['birth_date']);
           _birthDateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
-          _zodiacSign = _userData['zodiac_sign'] ?? ZodiacUtils.getZodiacSign(_selectedDate!);
+          _thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(_selectedDate!);
         } catch (e) {
           debugPrint('Error parsing birth date: $e');
         }
@@ -144,9 +135,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() {
         _selectedDate = picked;
         _birthDateController.text = DateFormat('dd/MM/yyyy').format(picked);
-        
-        // คำนวณราศีจากวันเกิด
-        _zodiacSign = ZodiacUtils.getZodiacSign(picked);
+
+        // คำนวณปีนักษัตรจากวันเกิด
+        _thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(picked);
       });
     }
   }
@@ -166,8 +157,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         // เพิ่มวันเกิดถ้ามีการเลือก
         if (_selectedDate != null) {
           updatedData['birth_date'] = _selectedDate!.toIso8601String();
-          if (_zodiacSign != null) {
-            updatedData['zodiac_sign'] = _zodiacSign!;
+          if (_thaiZodiac != null) {
+            updatedData['thai_animal'] = _thaiZodiac!.animalName;
+            updatedData['thai_year_name'] = _thaiZodiac!.thaiName;
           }
         }
         
@@ -282,7 +274,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(50),
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: AppColors.primary.withOpacity(0.2),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.2),
                 child: _userData['profile_image_url'] != null && _userData['profile_image_url'].isNotEmpty
                   ? Image.network(
                       _userData['profile_image_url'],
@@ -305,7 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           Text(
             'อีเมล: ${_userData['email'] ?? ''}',
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
               fontSize: 14,
             ),
           ),
@@ -350,24 +342,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return null;
           },
         ),
-        if (_zodiacSign != null && _selectedDate != null) ...[
+        if (_thaiZodiac != null && _selectedDate != null) ...[
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.3),
+                color: AppColors.primary.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
-                Icon(
-                  ZodiacUtils.getZodiacIcon(_zodiacSign!),
-                  color: AppColors.primary,
-                  size: 24,
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.pets,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -375,7 +375,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        ZodiacUtils.getZodiacSignThai(_selectedDate!),
+                        _thaiZodiac!.thaiName,
                         style: TextStyle(
                           color: AppColors.lightText,
                           fontSize: 16,
@@ -384,9 +384,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        ZodiacUtils.getZodiacDateRange(_zodiacSign!),
+                        '${_thaiZodiac!.animalName} (${_thaiZodiac!.englishName})',
                         style: TextStyle(
-                          color: AppColors.lightText.withOpacity(0.7),
+                          color: AppColors.lightText.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),

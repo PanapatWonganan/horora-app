@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../../core/repositories/user_repository.dart';
-import '../../core/repositories/horoscope_repository.dart';
 
 class UserProvider extends ChangeNotifier {
   final UserRepository _userRepository;
-  final HoroscopeRepository _horoscopeRepository;
 
   String? _userZodiacSign;
   String? get userZodiacSign => _userZodiacSign;
@@ -17,9 +15,7 @@ class UserProvider extends ChangeNotifier {
 
   UserProvider({
     required UserRepository userRepository,
-    required HoroscopeRepository horoscopeRepository,
-  })  : _userRepository = userRepository,
-        _horoscopeRepository = horoscopeRepository;
+  })  : _userRepository = userRepository;
 
   // เริ่มต้นโหลดข้อมูลผู้ใช้
   Future<void> initialize() async {

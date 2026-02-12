@@ -75,10 +75,10 @@ class OnboardingPage extends StatelessWidget {
       height: size.width * 0.8,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             blurRadius: 20,
             spreadRadius: 5,
           ),
@@ -112,7 +112,7 @@ class OnboardingPage extends StatelessWidget {
             data.description,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: AppColors.lightText.withOpacity(0.8),
+              color: AppColors.lightText.withValues(alpha: 0.8),
               fontSize: 16,
               height: 1.5,
             ),

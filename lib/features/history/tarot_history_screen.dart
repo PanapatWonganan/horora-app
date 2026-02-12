@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/models/tarot_card_model.dart';
-import '../../core/repositories/mock_tarot_repository.dart';
+import '../../core/repositories/tarot_repository.dart';
 import '../../core/routes/routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../shared/widgets/loading_indicator.dart';
@@ -16,7 +16,7 @@ class TarotHistoryScreen extends StatefulWidget {
 }
 
 class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
-  late MockTarotRepository _tarotRepository;
+  late TarotRepository _tarotRepository;
   List<TarotReading>? _readings;
   bool _isLoading = false;
   String? _errorMessage;
@@ -24,7 +24,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _tarotRepository = Provider.of<MockTarotRepository>(context, listen: false);
+    _tarotRepository = Provider.of<TarotRepository>(context, listen: false);
     _loadReadings();
   }
 
@@ -94,7 +94,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
         children: [
           Icon(
             Icons.auto_awesome,
-            color: AppColors.primary.withOpacity(0.5),
+            color: AppColors.primary.withValues(alpha: 0.5),
             size: 64,
           ),
           const SizedBox(height: 16),
@@ -111,7 +111,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
             'เริ่มอ่านไพ่ทาโร่เพื่อรับคำทำนายและคำแนะนำ',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -226,7 +226,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
                 'คำถาม: $question',
                 style: TextStyle(
                   fontSize: 14.0,
-                  color: AppColors.lightText.withOpacity(0.8),
+                  color: AppColors.lightText.withValues(alpha: 0.8),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -280,10 +280,10 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
       decoration: BoxDecoration(
         color: AppColors.darkSurface,
         borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1.0),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 4.0,
             offset: const Offset(0, 2),
           ),

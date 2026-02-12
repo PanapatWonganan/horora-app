@@ -14,7 +14,7 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/">
+  <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -47,20 +47,194 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
+    const serviceWorkerVersion = null;
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
+
+  <style>
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      z-index: 9999;
+    }
+    .loading-content {
+      text-align: center;
+    }
+    .progress-bar {
+      width: 300px;
+      height: 4px;
+      background: #eee;
+      border-radius: 2px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .loading-status {
+      margin-top: 20px;
+      color: #666;
+    }
+    .error-message {
+      margin-top: 20px;
+      color: red;
+      padding: 10px;
+      background: #ffebee;
+      border-radius: 4px;
+      max-width: 300px;
+      margin: 20px auto;
+    }
+    .retry-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .retry-button:hover {
+      background: #45a049;
+    }
+  </style>
 </head>
 <body>
   <script>
+    // Add loading indicator with progress bar
+    document.body.innerHTML = `
+      <div class="loading">
+        <div class="loading-content">
+          <h2>Loading Horora...</h2>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+          <div class="loading-status" id="loading-status">Initializing...</div>
+          <div class="error-message" id="error-message"></div>
+          <button class="retry-button" id="retry-button" style="display: none;">Retry</button>
+        </div>
+      </div>
+    `;
+
+    // Update loading progress
+    function updateProgress(percent) {
+      const progressBar = document.getElementById('progress-bar-fill');
+      if (progressBar) {
+        progressBar.style.width = percent + '%';
+      }
+    }
+
+    // Update loading status
+    function updateLoadingStatus(status) {
+      const statusElement = document.getElementById('loading-status');
+      if (statusElement) {
+        statusElement.textContent = status;
+      }
+    }
+
+    // Show error message
+    function showError(message) {
+      const errorElement = document.getElementById('error-message');
+      const retryButton = document.getElementById('retry-button');
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+      }
+      if (retryButton) {
+        retryButton.style.display = 'inline-block';
+      }
+    }
+
+    // Hide error message
+    function hideError() {
+      const errorElement = document.getElementById('error-message');
+      const retryButton = document.getElementById('retry-button');
+      if (errorElement) {
+        errorElement.style.display = 'none';
+      }
+      if (retryButton) {
+        retryButton.style.display = 'none';
+      }
+    }
+
+    // Initialize Flutter
+    function initializeFlutter() {
+      hideError();
+      updateProgress(10);
+      updateLoadingStatus('Loading Flutter engine...');
+
+      try {
+        // Download main.dart.js
+        _flutter.loader.loadEntrypoint({
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+          },
+          onEntrypointLoaded: function(engineInitializer) {
+            updateProgress(50);
+            updateLoadingStatus('Initializing Flutter engine...');
+            
+            engineInitializer.initializeEngine().then(function(appRunner) {
+              updateProgress(80);
+              updateLoadingStatus('Starting application...');
+              
+              appRunner.runApp();
+            }).catch(function(error) {
+              showError('Failed to initialize Flutter engine: ' + error.message);
+            });
+          }
+        });
+      } catch (error) {
+        showError('Failed to load Flutter: ' + error.message);
+      }
+    }
+
+    // Error handling
+    window.addEventListener('error', function(e) {
+      console.error('Error:', e.message);
+      showError('Error: ' + e.message);
+    });
+
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Unhandled Promise Rejection:', e.reason);
+      showError('Unhandled Error: ' + e.reason);
+    });
+
+    // Add retry button functionality
+    document.getElementById('retry-button').addEventListener('click', function() {
+      initializeFlutter();
+    });
+
+    // Start initialization when page loads
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.load({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        }
-      });
+      initializeFlutter();
+    });
+
+    // Check loading progress
+    const checkProgress = setInterval(function() {
+      if (window._flutter && window._flutter.loader) {
+        updateProgress(30);
+        updateLoadingStatus('Flutter loader ready');
+      }
+    }, 100);
+
+    // Remove loading screen when Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      updateProgress(100);
+      updateLoadingStatus('Application ready!');
+      setTimeout(function() {
+        document.querySelector('.loading').style.display = 'none';
+      }, 500);
     });
   </script>
 </body>

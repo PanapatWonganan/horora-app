@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="dragon_res_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EF5350"/>
+      <stop offset="100%" stop-color="#E53935"/>
+    </linearGradient>
+    <linearGradient id="dragon_res_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#FFC107"/>
+    </linearGradient>
+  </defs>
+  <circle cx="40" cy="40" r="38" fill="url(#dragon_res_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  <path d="M50 52 Q60 50 66 58 Q70 66 64 70" stroke="url(#dragon_res_body)" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="36" cy="48" rx="16" ry="12" fill="url(#dragon_res_body)"/>
+  <circle cx="36" cy="34" r="14" fill="url(#dragon_res_body)"/>
+  <path d="M24 24 Q20 16 26 14 Q30 18 26 26" fill="#FF7043"/>
+  <path d="M32 20 Q30 12 36 12 Q40 16 34 22" fill="#FF7043"/>
+  <path d="M42 20 Q40 12 46 12 Q50 16 44 22" fill="#FF7043"/>
+  <path d="M50 24 Q54 16 48 14 Q44 18 48 26" fill="#FF7043"/>
+  <circle cx="30" cy="32" r="4" fill="#FFF"/>
+  <circle cx="42" cy="32" r="4" fill="#FFF"/>
+  <circle cx="31" cy="32" r="2.5" fill="#212121"/>
+  <circle cx="43" cy="32" r="2.5" fill="#212121"/>
+  <circle cx="32" cy="31" r="1" fill="#FFF"/>
+  <circle cx="44" cy="31" r="1" fill="#FFF"/>
+  <ellipse cx="36" cy="40" rx="4" ry="2.5" fill="#FF7043"/>
+  <circle cx="34" cy="40" r="1" fill="#5D4037"/>
+  <circle cx="38" cy="40" r="1" fill="#5D4037"/>
+  <path d="M32 44 Q36 48 40 44" stroke="#5D4037" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <circle cx="26" cy="36" r="2.5" fill="#FFAB91" fill-opacity="0.6"/>
+  <circle cx="46" cy="36" r="2.5" fill="#FFAB91" fill-opacity="0.6"/>
+  <circle cx="62" cy="64" r="3" fill="#FFF" fill-opacity="0.5"/>
+  <circle cx="66" cy="58" r="2" fill="#FFF" fill-opacity="0.5"/>
+  <path d="M14 16 L16 20 L14 18 L12 20 Z" fill="#FFD54F"/>
+  <path d="M66 14 L68 18 L66 16 L64 18 Z" fill="#FFD54F"/>
+  <circle cx="18" cy="58" r="2" fill="#FFF" fill-opacity="0.6"/>
+</svg>

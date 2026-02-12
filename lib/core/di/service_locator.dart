@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:dio/dio.dart';
 
 import '../api/api_client.dart';
 import '../repositories/repositories.dart';
@@ -25,16 +24,12 @@ class ServiceLocator {
     // PackageInfo
     final packageInfo = await PackageInfo.fromPlatform();
     serviceLocator.registerSingleton<PackageInfo>(packageInfo);
-
-    // Dio
-    final dio = Dio();
-    serviceLocator.registerSingleton<Dio>(dio);
   }
 
   // ตั้งค่า API Client
   static void _setupApiClient() {
     serviceLocator.registerSingleton<ApiClient>(
-      ApiClient(dio: serviceLocator<Dio>()),
+      ApiClient(),
     );
   }
 
@@ -67,14 +62,6 @@ class ServiceLocator {
     // Chat Repository
     serviceLocator.registerSingleton<ChatRepository>(
       ChatRepository(
-        apiClient: serviceLocator<ApiClient>(),
-        prefs: serviceLocator<SharedPreferences>(),
-      ),
-    );
-
-    // Focus Repository
-    serviceLocator.registerSingleton<FocusRepository>(
-      FocusRepository(
         apiClient: serviceLocator<ApiClient>(),
         prefs: serviceLocator<SharedPreferences>(),
       ),

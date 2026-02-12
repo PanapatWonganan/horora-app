@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/services/auth_service.dart';
-import '../../../core/utils/zodiac_utils.dart';
+import '../../../core/services/thai_zodiac_service.dart';
+import '../../../core/utils/app_icons.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
-import '../widgets/social_login_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -27,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _birthDateController = TextEditingController();
 
   DateTime? _selectedDate;
-  String? _zodiacSign;
+  ThaiZodiac? _thaiZodiac;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -70,8 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPrimary: Colors.white,
               surface: AppColors.darkSurface,
               onSurface: AppColors.lightText,
-            ),
-            dialogBackgroundColor: AppColors.darkSurface,
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.darkSurface),
           ),
           child: child!,
         );
@@ -83,8 +80,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _selectedDate = picked;
         _birthDateController.text = DateFormat('dd/MM/yyyy').format(picked);
 
-        // คำนวณราศีจากวันเกิด
-        _zodiacSign = ZodiacUtils.getZodiacSignThai(picked);
+        // คำนวณปีนักษัตรไทยจากวันเกิด
+        _thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(picked);
       });
     }
   }
@@ -116,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Check if registration was successful
         if (response.user != null) {
-          // แสดง popup ให้ยืนยันอีเมล
+          // ลงทะเบียนสำเร็จ
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -125,8 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             );
 
-            // แสดง popup และนำทางไปยังหน้า home หลังจากปิด popup
-            _showVerifyEmailDialog();
+            // นำทางไปหน้า home ทันที (ไม่ต้องยืนยันอีเมล)
+            AppRouter.navigateAndClearStack(context, AppRoutes.home);
           }
         } else {
           // Show error message if registration failed
@@ -138,16 +135,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             );
           }
-        }
-      } on AuthException catch (e) {
-        // Handle Supabase auth exceptions
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('ลงทะเบียนไม่สำเร็จ: ${e.message}'),
-              backgroundColor: AppColors.error,
-            ),
-          );
         }
       } catch (e) {
         // Show error message for other exceptions
@@ -285,16 +272,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(height: 12),
               Text(
                 'โปรดยืนยันอีเมลของคุณเพื่อให้สามารถดูดวงในราศีของคุณได้อย่างเต็มที่',
-                style: TextStyle(color: AppColors.lightText.withOpacity(0.8)),
+                style: TextStyle(color: AppColors.lightText.withValues(alpha: 0.8)),
               ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -397,7 +384,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Text(
           'สร้างบัญชีเพื่อเริ่มต้นการเดินทางค้นหาดวงดาวของคุณ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 16,
           ),
         ),
@@ -413,7 +400,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           AuthTextField(
             controller: _nameController,
             hintText: 'ชื่อ-นามสกุล',
-            icon: Icons.person_outline,
+            svgIconPath: AppIcons.person,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'กรุณากรอกชื่อ-นามสกุล';
@@ -425,7 +412,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           AuthTextField(
             controller: _emailController,
             hintText: 'อีเมล',
-            icon: Icons.email_outlined,
+            svgIconPath: AppIcons.email,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -442,7 +429,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           AuthTextField(
             controller: _passwordController,
             hintText: 'รหัสผ่าน',
-            icon: Icons.lock_outline,
+            svgIconPath: AppIcons.lock,
             obscureText: _obscurePassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -454,11 +441,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return null;
             },
             suffixIcon: IconButton(
-              icon: Icon(
+              icon: SvgIcon(
                 _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppColors.lightText.withOpacity(0.7),
+                    ? AppIcons.visibility
+                    : AppIcons.visibilityOff,
+                size: 20,
+                color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _togglePasswordVisibility,
             ),
@@ -467,7 +455,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           AuthTextField(
             controller: _confirmPasswordController,
             hintText: 'ยืนยันรหัสผ่าน',
-            icon: Icons.lock_outline,
+            svgIconPath: AppIcons.lock,
             obscureText: _obscureConfirmPassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -479,11 +467,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return null;
             },
             suffixIcon: IconButton(
-              icon: Icon(
+              icon: SvgIcon(
                 _obscureConfirmPassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppColors.lightText.withOpacity(0.7),
+                    ? AppIcons.visibility
+                    : AppIcons.visibilityOff,
+                size: 20,
+                color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _toggleConfirmPasswordVisibility,
             ),
@@ -492,7 +481,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           AuthTextField(
             controller: _birthDateController,
             hintText: 'วันเกิด (วว/ดด/ปปปป)',
-            icon: Icons.calendar_today_outlined,
+            svgIconPath: AppIcons.calendar,
             readOnly: true,
             onTap: () => _selectDate(context),
             validator: (value) {
@@ -502,48 +491,94 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return null;
             },
           ),
-          if (_zodiacSign != null) ...[
+          if (_thaiZodiac != null) ...[
             const SizedBox(height: 16),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.15),
+                    AppColors.primary.withValues(alpha: 0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    ZodiacUtils.getZodiacIcon(
-                      ZodiacUtils.getZodiacSign(_selectedDate!),
-                    ),
-                    color: AppColors.primary,
-                    size: 24,
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.auto_awesome,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _thaiZodiac!.thaiName,
+                              style: TextStyle(
+                                color: AppColors.lightText,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${_thaiZodiac!.elementThai} • ${_thaiZodiac!.englishName}',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkSurface.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _zodiacSign!,
+                          'ลักษณะนิสัย:',
                           style: TextStyle(
-                            color: AppColors.lightText,
-                            fontSize: 16,
+                            color: AppColors.lightText.withValues(alpha: 0.8),
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          ZodiacUtils.getZodiacDateRange(
-                            ZodiacUtils.getZodiacSign(_selectedDate!),
-                          ),
+                          _thaiZodiac!.characteristics,
                           style: TextStyle(
-                            color: AppColors.lightText.withOpacity(0.7),
-                            fontSize: 14,
+                            color: AppColors.lightText.withValues(alpha: 0.7),
+                            fontSize: 13,
+                            height: 1.4,
                           ),
                         ),
                       ],
@@ -590,7 +625,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return Colors.transparent;
             }),
             side: BorderSide(
-              color: AppColors.lightText.withOpacity(0.7),
+              color: AppColors.lightText.withValues(alpha: 0.7),
               width: 1.5,
             ),
             shape: RoundedRectangleBorder(
@@ -604,7 +639,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             text: TextSpan(
               text: 'ฉันยอมรับ ',
               style: TextStyle(
-                color: AppColors.lightText.withOpacity(0.7),
+                color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
               children: [
@@ -636,7 +671,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             Expanded(
               child: Divider(
-                color: AppColors.lightText.withOpacity(0.3),
+                color: AppColors.lightText.withValues(alpha: 0.3),
                 thickness: 1,
               ),
             ),
@@ -645,14 +680,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Text(
                 'หรือสมัครสมาชิกด้วย',
                 style: TextStyle(
-                  color: AppColors.lightText.withOpacity(0.7),
+                  color: AppColors.lightText.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
             ),
             Expanded(
               child: Divider(
-                color: AppColors.lightText.withOpacity(0.3),
+                color: AppColors.lightText.withValues(alpha: 0.3),
                 thickness: 1,
               ),
             ),
@@ -702,7 +737,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Text(
           'มีบัญชีอยู่แล้ว? ',
           style: TextStyle(
-            color: AppColors.lightText.withOpacity(0.7),
+            color: AppColors.lightText.withValues(alpha: 0.7),
             fontSize: 14,
           ),
         ),

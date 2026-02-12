@@ -92,7 +92,7 @@ class CosmicPainter extends CustomPainter {
       final starSize = star.size * (0.7 + (twinkle * 0.3));
       
       final starPaint = Paint()
-        ..color = Colors.white.withOpacity(starOpacity)
+        ..color = Colors.white.withValues(alpha: starOpacity)
         ..style = PaintingStyle.fill;
       
       canvas.drawCircle(Offset(starX, starY), starSize, starPaint);
@@ -100,10 +100,10 @@ class CosmicPainter extends CustomPainter {
       // Draw glow effect for larger stars
       if (star.size > 1.5) {
         final glowPaint = Paint()
-          ..color = Colors.white.withOpacity(starOpacity * 0.3)
+          ..color = Colors.white.withValues(alpha: starOpacity * 0.3)
           ..style = PaintingStyle.fill
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
-        
+
         canvas.drawCircle(Offset(starX, starY), starSize * 2, glowPaint);
       }
     }

@@ -37,7 +37,7 @@ class FeatureCard extends StatelessWidget {
                 width: 50.0,
                 height: 50.0,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -61,7 +61,7 @@ class FeatureCard extends StatelessWidget {
               Text(
                 description,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 12.0,
                 ),
                 maxLines: 2,

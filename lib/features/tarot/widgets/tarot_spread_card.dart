@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/utils/app_icons.dart';
 
 class TarotSpreadCard extends StatelessWidget {
   final String title;
   final String description;
   final String imagePath;
-  final IconData icon;
+  final String? svgIconPath;
   final VoidCallback onTap;
 
   const TarotSpreadCard({
@@ -14,7 +15,7 @@ class TarotSpreadCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.imagePath,
-    this.icon = Icons.auto_awesome,
+    this.svgIconPath,
     required this.onTap,
   }) : super(key: key);
 
@@ -28,7 +29,7 @@ class TarotSpreadCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -50,16 +51,15 @@ class TarotSpreadCard extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary.withOpacity(0.3),
-                    AppColors.secondary.withOpacity(0.2),
+                    AppColors.primary.withValues(alpha: 0.3),
+                    AppColors.secondary.withValues(alpha: 0.2),
                   ],
                 ),
               ),
               child: Center(
-                child: Icon(
-                  icon,
+                child: SvgIcon(
+                  svgIconPath ?? AppIcons.divination,
                   size: 50,
-                  color: Colors.white.withOpacity(0.8),
                 ),
               ),
             ),
@@ -80,7 +80,7 @@ class TarotSpreadCard extends StatelessWidget {
                   Text(
                     description,
                     style: TextStyle(
-                      color: AppColors.lightText.withOpacity(0.7),
+                      color: AppColors.lightText.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                     maxLines: 2,
@@ -96,7 +96,7 @@ class TarotSpreadCard extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: AppColors.primary.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -111,10 +111,10 @@ class TarotSpreadCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward,
-                              color: AppColors.primary,
+                            SvgIcon(
+                              AppIcons.arrowForward,
                               size: 12,
+                              color: AppColors.primary,
                             ),
                           ],
                         ),

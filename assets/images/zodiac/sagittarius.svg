@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <defs>
+    <linearGradient id="sag_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9575CD"/>
+      <stop offset="100%" stop-color="#7E57C2"/>
+    </linearGradient>
+    <linearGradient id="sag_skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE4D6"/>
+      <stop offset="100%" stop-color="#FFCDB2"/>
+    </linearGradient>
+    <linearGradient id="sag_hair" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8D6E63"/>
+      <stop offset="100%" stop-color="#6D4C41"/>
+    </linearGradient>
+    <linearGradient id="sag_horse" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D7CCC8"/>
+      <stop offset="100%" stop-color="#BCAAA4"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#sag_bg)"/>
+  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
+  
+  <!-- Horse body -->
+  <ellipse cx="44" cy="54" rx="18" ry="12" fill="url(#sag_horse)"/>
+  
+  <!-- Horse legs -->
+  <rect x="30" y="60" width="4" height="10" rx="2" fill="url(#sag_horse)"/>
+  <rect x="38" y="62" width="4" height="8" rx="2" fill="url(#sag_horse)"/>
+  <rect x="50" y="62" width="4" height="8" rx="2" fill="url(#sag_horse)"/>
+  <rect x="58" y="60" width="4" height="10" rx="2" fill="url(#sag_horse)"/>
+  
+  <!-- Horse tail -->
+  <path d="M62 50 Q70 48 68 56 Q66 62 62 58" fill="url(#sag_hair)"/>
+  
+  <!-- Human torso -->
+  <ellipse cx="34" cy="44" rx="10" ry="12" fill="#7E57C2"/>
+  
+  <!-- Head -->
+  <circle cx="34" cy="30" r="12" fill="url(#sag_skin)"/>
+  
+  <!-- Hair -->
+  <path d="M22 28 Q24 18 34 16 Q44 18 46 28 Q44 24 34 22 Q24 24 22 28" fill="url(#sag_hair)"/>
+  <ellipse cx="24" cy="32" rx="3" ry="5" fill="url(#sag_hair)"/>
+  
+  <!-- Hair flowing back -->
+  <path d="M44 24 Q52 22 54 28 Q52 32 48 30" fill="url(#sag_hair)"/>
+  
+  <!-- Eyes -->
+  <circle cx="30" cy="30" r="3" fill="#4A3728"/>
+  <circle cx="38" cy="30" r="3" fill="#4A3728"/>
+  <circle cx="31" cy="29" r="1.2" fill="#FFF"/>
+  <circle cx="39" cy="29" r="1.2" fill="#FFF"/>
+  
+  <!-- Blush -->
+  <circle cx="26" cy="34" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  <circle cx="42" cy="34" r="3" fill="#FFB7B7" fill-opacity="0.5"/>
+  
+  <!-- Smile -->
+  <path d="M31 37 Q34 40 37 37" stroke="#4A3728" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Bow -->
+  <path d="M8 32 Q4 20 12 12 Q16 8 20 12" stroke="#8D6E63" stroke-width="2.5" fill="none"/>
+  <line x1="8" y1="32" x2="20" y2="12" stroke="#8D6E63" stroke-width="1.5"/>
+  
+  <!-- Arrow -->
+  <line x1="18" y1="14" x2="50" y2="6" stroke="#FFD93D" stroke-width="2"/>
+  <path d="M50 6 L54 4 L52 8 Z" fill="#FFD93D"/>
+  <path d="M18 14 L16 18 M18 14 L14 14" stroke="#FF6B6B" stroke-width="1.5"/>
+  
+  <!-- Arm holding bow -->
+  <path d="M26 42 Q18 38 12 30" stroke="url(#sag_skin)" stroke-width="5" stroke-linecap="round" fill="none"/>
+  
+  <!-- Stars -->
+  <circle cx="66" cy="16" r="2" fill="#FFD93D"/>
+  <circle cx="62" cy="24" r="1.5" fill="#FFF"/>
+  <circle cx="70" cy="30" r="1.5" fill="#FFF"/>
+  
+  <!-- Sparkle -->
+  <path d="M56 8 L58 12 L56 10 L54 12 Z" fill="#FFD93D"/>
+</svg>

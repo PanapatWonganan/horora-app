@@ -95,7 +95,7 @@ class AppTheme {
         ),
         hintStyle: GoogleFonts.kanit(
           fontSize: 16,
-          color: AppColors.darkText.withOpacity(0.5),
+          color: AppColors.darkText.withValues(alpha: 0.5),
         ),
       ),
       cardTheme: CardTheme(
@@ -106,13 +106,13 @@ class AppTheme {
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: AppColors.darkText.withOpacity(0.1),
+        color: AppColors.darkText.withValues(alpha: 0.1),
         thickness: 1,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.lightSurface,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.darkText.withOpacity(0.5),
+        unselectedItemColor: AppColors.darkText.withValues(alpha: 0.5),
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: GoogleFonts.kanit(
@@ -149,7 +149,7 @@ class AppTheme {
       ),
       tabBarTheme: TabBarTheme(
         labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.darkText.withOpacity(0.5),
+        unselectedLabelColor: AppColors.darkText.withValues(alpha: 0.5),
         indicatorColor: AppColors.primary,
         labelStyle: GoogleFonts.kanit(
           fontSize: 14,
@@ -167,7 +167,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        side: BorderSide(color: AppColors.darkText.withOpacity(0.5)),
+        side: BorderSide(color: AppColors.darkText.withValues(alpha: 0.5)),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -177,7 +177,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
-          return AppColors.darkText.withOpacity(0.5);
+          return AppColors.darkText.withValues(alpha: 0.5);
         }),
       ),
       switchTheme: SwitchThemeData(
@@ -189,25 +189,25 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith<Color>((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withOpacity(0.5);
+            return AppColors.primary.withValues(alpha: 0.5);
           }
-          return AppColors.darkText.withOpacity(0.2);
+          return AppColors.darkText.withValues(alpha: 0.2);
         }),
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: AppColors.primary,
-        inactiveTrackColor: AppColors.darkText.withOpacity(0.2),
+        inactiveTrackColor: AppColors.darkText.withValues(alpha: 0.2),
         thumbColor: AppColors.primary,
-        overlayColor: AppColors.primary.withOpacity(0.2),
+        overlayColor: AppColors.primary.withValues(alpha: 0.2),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
-        circularTrackColor: AppColors.darkText.withOpacity(0.1),
-        linearTrackColor: AppColors.darkText.withOpacity(0.1),
+        circularTrackColor: AppColors.darkText.withValues(alpha: 0.1),
+        linearTrackColor: AppColors.darkText.withValues(alpha: 0.1),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.lightSurface,
-        disabledColor: AppColors.darkText.withOpacity(0.1),
+        disabledColor: AppColors.darkText.withValues(alpha: 0.1),
         selectedColor: AppColors.primary,
         secondarySelectedColor: AppColors.secondary,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -318,7 +318,7 @@ class AppTheme {
         ),
         hintStyle: GoogleFonts.kanit(
           fontSize: 16,
-          color: AppColors.lightText.withOpacity(0.5),
+          color: AppColors.lightText.withValues(alpha: 0.5),
         ),
       ),
       cardTheme: CardTheme(
@@ -329,13 +329,13 @@ class AppTheme {
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: AppColors.lightText.withOpacity(0.1),
+        color: AppColors.lightText.withValues(alpha: 0.1),
         thickness: 1,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.lightText.withOpacity(0.5),
+        unselectedItemColor: AppColors.lightText.withValues(alpha: 0.5),
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: GoogleFonts.kanit(
@@ -372,7 +372,7 @@ class AppTheme {
       ),
       tabBarTheme: TabBarTheme(
         labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.lightText.withOpacity(0.5),
+        unselectedLabelColor: AppColors.lightText.withValues(alpha: 0.5),
         indicatorColor: AppColors.primary,
         labelStyle: GoogleFonts.kanit(
           fontSize: 14,
@@ -390,7 +390,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        side: BorderSide(color: AppColors.lightText.withOpacity(0.5)),
+        side: BorderSide(color: AppColors.lightText.withValues(alpha: 0.5)),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -400,7 +400,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return AppColors.primary;
           }
-          return AppColors.lightText.withOpacity(0.5);
+          return AppColors.lightText.withValues(alpha: 0.5);
         }),
       ),
       switchTheme: SwitchThemeData(
@@ -412,25 +412,25 @@ class AppTheme {
         }),
         trackColor: WidgetStateProperty.resolveWith<Color>((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.primary.withOpacity(0.5);
+            return AppColors.primary.withValues(alpha: 0.5);
           }
-          return AppColors.lightText.withOpacity(0.2);
+          return AppColors.lightText.withValues(alpha: 0.2);
         }),
       ),
       sliderTheme: SliderThemeData(
         activeTrackColor: AppColors.primary,
-        inactiveTrackColor: AppColors.lightText.withOpacity(0.2),
+        inactiveTrackColor: AppColors.lightText.withValues(alpha: 0.2),
         thumbColor: AppColors.primary,
-        overlayColor: AppColors.primary.withOpacity(0.2),
+        overlayColor: AppColors.primary.withValues(alpha: 0.2),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
-        circularTrackColor: AppColors.lightText.withOpacity(0.1),
-        linearTrackColor: AppColors.lightText.withOpacity(0.1),
+        circularTrackColor: AppColors.lightText.withValues(alpha: 0.1),
+        linearTrackColor: AppColors.lightText.withValues(alpha: 0.1),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.darkSurface,
-        disabledColor: AppColors.lightText.withOpacity(0.1),
+        disabledColor: AppColors.lightText.withValues(alpha: 0.1),
         selectedColor: AppColors.primary,
         secondarySelectedColor: AppColors.secondary,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

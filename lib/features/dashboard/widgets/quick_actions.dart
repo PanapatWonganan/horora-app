@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../core/utils/app_icons.dart';
 
 class QuickActions extends StatelessWidget {
   const QuickActions({Key? key}) : super(key: key);
@@ -23,49 +24,31 @@ class QuickActions extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _buildQuickActionButton(
+              _buildQuickActionButtonSvg(
                 context,
-                icon: Icons.today,
+                svgIcon: AppIcons.calendar,
                 label: 'ดูดวงวันนี้',
                 color: AppColors.zodiacFire,
                 onTap: () {
                   Navigator.pushNamed(context, AppRoutes.dailyHoroscope);
                 },
               ),
-              _buildQuickActionButton(
+              _buildQuickActionButtonSvg(
                 context,
-                icon: Icons.shuffle,
+                svgIcon: AppIcons.sparkle,
                 label: 'เปิดไพ่ 1 ใบ',
                 color: AppColors.tarotMajor,
                 onTap: () {
                   Navigator.pushNamed(context, AppRoutes.tarotReading);
                 },
               ),
-              _buildQuickActionButton(
+              _buildQuickActionButtonSvg(
                 context,
-                icon: Icons.favorite,
-                label: 'ดูดวงความรัก',
-                color: Colors.pink,
-                onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.compatibilityCheck);
-                },
-              ),
-              _buildQuickActionButton(
-                context,
-                icon: Icons.chat_bubble_outline,
+                svgIcon: AppIcons.chat,
                 label: 'แชทใหม่',
                 color: AppColors.chatBubble,
                 onTap: () {
                   Navigator.pushNamed(context, AppRoutes.newChat);
-                },
-              ),
-              _buildQuickActionButton(
-                context,
-                icon: Icons.self_improvement,
-                label: 'นั่งสมาธิ',
-                color: AppColors.focusMeditation,
-                onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.focusSession);
                 },
               ),
             ],
@@ -75,9 +58,9 @@ class QuickActions extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActionButton(
+  Widget _buildQuickActionButtonSvg(
     BuildContext context, {
-    required IconData icon,
+    required String svgIcon,
     required String label,
     required Color color,
     required VoidCallback onTap,
@@ -93,17 +76,19 @@ class QuickActions extends StatelessWidget {
               width: 60.0,
               height: 60.0,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16.0),
                 border: Border.all(
-                  color: color.withOpacity(0.5),
+                  color: color.withValues(alpha: 0.5),
                   width: 1.0,
                 ),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 28.0,
+              child: Center(
+                child: SvgIcon(
+                  svgIcon,
+                  size: 28.0,
+                  color: color,
+                ),
               ),
             ),
           ),
