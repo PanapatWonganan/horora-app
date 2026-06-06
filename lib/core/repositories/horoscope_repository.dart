@@ -3,20 +3,17 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
-import '../api/openai_client.dart';
 import '../models/models.dart';
 import '../models/compatibility_result.dart';
 import '../services/thai_zodiac_service.dart';
-import '../services/smart_horoscope_service.dart';
 import '../services/laravel_auth_service.dart';
+import '../../config/constants.dart';
 import '../../features/chat/repositories/chat_repository.dart';
 import '../utils/exceptions.dart' as ex;
 
 class HoroscopeRepository {
   final ApiClient _apiClient;
-  final OpenAIClient? _openaiClient;
   final SharedPreferences _prefs;
-  final bool _useOpenAI;
 
   // Key constants for SharedPreferences
   static const String _dailyHoroscopeKey = 'daily_horoscope';
@@ -26,39 +23,54 @@ class HoroscopeRepository {
   HoroscopeRepository({
     required ApiClient apiClient,
     required SharedPreferences prefs,
-    OpenAIClient? openaiClient,
-    bool useOpenAI = false,
   })  : _apiClient = apiClient,
-        _prefs = prefs,
-        _openaiClient = openaiClient,
-        _useOpenAI = useOpenAI;
+        _prefs = prefs;
 
   // ดึงดวงชะตาประจำวันตามปีนักษัตรไทย
+  // AI ถูกพร็อกซีผ่าน backend แล้ว (OpenAI key อยู่ฝั่ง server เท่านั้น)
+  // - ผู้ใช้ที่ล็อกอิน: GET /horoscope/daily?zodiac_sign=...
+  // - ผู้ใช้ guest: POST /horoscope/guest
   Future<DailyHoroscope> getDailyHoroscope(String thaiAnimal) async {
+    final today = DateTime.now();
+    final String dateStr = today.toIso8601String().split('T')[0];
+    final String cacheKey = '${_dailyHoroscopeKey}_${thaiAnimal}_$dateStr';
+
     try {
-      final today = DateTime.now();
-      
-      // Debug: ล้าง cache เพื่อให้ได้ข้อมูลใหม่ทุกครั้ง (เพื่อทดสอบ)
-      await SmartHoroscopeService.clearAllCache();
-      
-      // ใช้ SmartHoroscopeService ที่จัดการ OpenAI + caching + templates
-      final horoscopeData = await SmartHoroscopeService.getDailyHoroscope(thaiAnimal, today);
-      
-      // แปลงเป็น DailyHoroscope model
-      return DailyHoroscope(
-        id: today.millisecondsSinceEpoch,
-        thaiAnimal: thaiAnimal,
-        date: today,
-        content: horoscopeData['content_th'] ?? 'คำทำนายสำหรับวันนี้',
-        contentTh: horoscopeData['content_th'] ?? 'คำทำนายสำหรับวันนี้',
-        loveRating: horoscopeData['love_rating'] ?? 3,
-        careerRating: horoscopeData['career_rating'] ?? 3,
-        healthRating: horoscopeData['health_rating'] ?? 3,
-        luckyNumber: horoscopeData['lucky_number'] ?? '7, 14, 21',
-        luckyColor: horoscopeData['lucky_color'] ?? 'น้ำเงิน',
-        createdAt: today,
-        updatedAt: today,
-      );
+      // ตรวจสอบ cache ของ backend result ก่อน
+      final String? cachedData = _prefs.getString(cacheKey);
+      if (cachedData != null) {
+        return _dailyHoroscopeFromBackend(jsonDecode(cachedData), thaiAnimal, today);
+      }
+
+      // เรียก backend (proxy) แทนการเรียก OpenAI ตรงๆ
+      final bool isLoggedIn = LaravelAuthService.instance.currentUser != null;
+      final Map<String, dynamic> response;
+      if (isLoggedIn) {
+        response = Map<String, dynamic>.from(
+          await _apiClient.get(
+            ApiConstants.horoscopeDailyPath,
+            queryParams: {
+              'zodiac_sign': thaiAnimal,
+              'date': dateStr,
+            },
+          ),
+        );
+      } else {
+        response = Map<String, dynamic>.from(
+          await _apiClient.post(
+            ApiConstants.horoscopeGuestPath,
+            data: {
+              'zodiac_sign': thaiAnimal,
+              'date': dateStr,
+            },
+          ),
+        );
+      }
+
+      // บันทึก backend result ลง cache (ตาม thaiAnimal + date)
+      await _prefs.setString(cacheKey, jsonEncode(response));
+
+      return _dailyHoroscopeFromBackend(response, thaiAnimal, today);
     } catch (e) {
       debugPrint('Error getting daily horoscope: $e');
       // Fallback to mock data
@@ -66,14 +78,34 @@ class HoroscopeRepository {
     }
   }
 
+  // แปลง response จาก backend เป็น DailyHoroscope model
+  DailyHoroscope _dailyHoroscopeFromBackend(
+    Map<String, dynamic> data,
+    String thaiAnimal,
+    DateTime today,
+  ) {
+    final String content =
+        (data['content'] as String?) ?? 'คำทำนายสำหรับวันนี้';
+    return DailyHoroscope(
+      id: today.millisecondsSinceEpoch,
+      thaiAnimal: (data['thai_animal'] as String?) ?? thaiAnimal,
+      date: today,
+      content: content,
+      contentTh: content,
+      loveRating: (data['love_rating'] as num?)?.toInt() ?? 3,
+      careerRating: (data['career_rating'] as num?)?.toInt() ?? 3,
+      healthRating: (data['health_rating'] as num?)?.toInt() ?? 3,
+      luckyNumber: data['lucky_number']?.toString() ?? '7, 14, 21',
+      luckyColor: (data['lucky_color'] as String?) ?? 'น้ำเงิน',
+      createdAt: today,
+      updatedAt: today,
+    );
+  }
+
   // ดึงดวงชะตารายสัปดาห์ตามราศี
+  // หมายเหตุ: backend ยังไม่มี endpoint รายสัปดาห์/รายเดือน จึงใช้ mock เมื่อ API ล้มเหลว
   Future<Map<String, dynamic>> getWeeklyHoroscope(String zodiacSign) async {
     try {
-      // ตรวจสอบว่าใช้ OpenAI หรือไม่
-      if (_useOpenAI && _openaiClient != null) {
-        return await getWeeklyHoroscopeFromOpenAI(zodiacSign);
-      }
-
       // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
       final weekStartDate = _getStartOfWeek(DateTime.now());
       final String cacheKey =
@@ -93,53 +125,12 @@ class HoroscopeRepository {
 
         return response;
       } catch (e) {
-        // ถ้าไม่สามารถดึงข้อมูลจาก API ได้
-        // ลองใช้ OpenAI หากมีการตั้งค่าไว้
-        if (_openaiClient != null) {
-          try {
-            return await getWeeklyHoroscopeFromOpenAI(zodiacSign);
-          } catch (openaiError) {
-            // ถ้า OpenAI ล้มเหลว ใช้ข้อมูลตัวอย่าง
-            return _getMockWeeklyHoroscope(zodiacSign);
-          }
-        } else {
-          // ถ้าไม่มี OpenAI ใช้ข้อมูลตัวอย่าง
-          return _getMockWeeklyHoroscope(zodiacSign);
-        }
+        // ถ้าไม่สามารถดึงข้อมูลจาก API ได้ ใช้ข้อมูลตัวอย่าง
+        return _getMockWeeklyHoroscope(zodiacSign);
       }
     } catch (e) {
       // ในกรณีที่มีข้อผิดพลาด ให้ใช้ข้อมูลตัวอย่าง
       return _getMockWeeklyHoroscope(zodiacSign);
-    }
-  }
-
-  // ดึงข้อมูลดวงชะตารายสัปดาห์จาก OpenAI
-  Future<Map<String, dynamic>> getWeeklyHoroscopeFromOpenAI(
-      String zodiacSign) async {
-    if (_openaiClient == null) {
-      throw ex.AppException('OpenAI client is not initialized');
-    }
-
-    try {
-      return await _openaiClient!.getWeeklyHoroscope(zodiacSign);
-    } catch (e) {
-      throw ex.DataException(
-          'Failed to get weekly horoscope from OpenAI: ${e.toString()}');
-    }
-  }
-
-  // ดึงข้อมูลดวงชะตารายเดือนจาก OpenAI
-  Future<Map<String, dynamic>> getMonthlyHoroscopeFromOpenAI(
-      String zodiacSign) async {
-    if (_openaiClient == null) {
-      throw ex.AppException('OpenAI client is not initialized');
-    }
-
-    try {
-      return await _openaiClient!.getMonthlyHoroscope(zodiacSign);
-    } catch (e) {
-      throw ex.DataException(
-          'Failed to get monthly horoscope from OpenAI: ${e.toString()}');
     }
   }
 
@@ -657,13 +648,9 @@ class HoroscopeRepository {
   }
 
   // ดึงดวงชะตารายเดือนตามราศี
+  // หมายเหตุ: backend ยังไม่มี endpoint รายเดือน จึงใช้ mock เมื่อ API ล้มเหลว
   Future<Map<String, dynamic>> getMonthlyHoroscope(String zodiacSign) async {
     try {
-      // ตรวจสอบว่าใช้ OpenAI หรือไม่
-      if (_useOpenAI && _openaiClient != null) {
-        return await getMonthlyHoroscopeFromOpenAI(zodiacSign);
-      }
-
       // ตรวจสอบว่ามีข้อมูลในแคชหรือไม่
       final DateTime now = DateTime.now();
       final String cacheKey =
@@ -683,19 +670,8 @@ class HoroscopeRepository {
 
         return response;
       } catch (e) {
-        // ถ้าไม่สามารถดึงข้อมูลจาก API ได้
-        // ลองใช้ OpenAI หากมีการตั้งค่าไว้
-        if (_openaiClient != null) {
-          try {
-            return await getMonthlyHoroscopeFromOpenAI(zodiacSign);
-          } catch (openaiError) {
-            // ถ้า OpenAI ล้มเหลว ใช้ข้อมูลตัวอย่าง
-            return _getMockMonthlyHoroscope(zodiacSign);
-          }
-        } else {
-          // ถ้าไม่มี OpenAI ใช้ข้อมูลตัวอย่าง
-          return _getMockMonthlyHoroscope(zodiacSign);
-        }
+        // ถ้าไม่สามารถดึงข้อมูลจาก API ได้ ใช้ข้อมูลตัวอย่าง
+        return _getMockMonthlyHoroscope(zodiacSign);
       }
     } catch (e) {
       // ในกรณีที่มีข้อผิดพลาด ให้ใช้ข้อมูลตัวอย่าง

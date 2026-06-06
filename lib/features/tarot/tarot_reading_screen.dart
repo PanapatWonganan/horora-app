@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/models/tarot_card_model.dart';
 import '../../core/repositories/tarot_repository.dart';
 import '../../core/services/auth_service.dart';
-import '../../core/services/openai_service.dart';
+import '../../core/services/laravel_auth_service.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/api/api_client.dart';
 import '../../config/constants.dart';
@@ -26,7 +26,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     with TickerProviderStateMixin {
   final TextEditingController _questionController = TextEditingController();
   final AuthService _authService = AuthService.instance;
-  final OpenAIService _openAIService = OpenAIService.instance;
+  final ApiClient _apiClient = LaravelAuthService.instance.apiClient;
   // ignore: unused_field - Reserved for future API integration
   late TarotRepository _tarotRepository;
 
@@ -244,7 +244,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     });
 
     try {
-      // สร้างรายการไพ่พร้อมความหมาย
+      // สร้างรายการไพ่พร้อมความหมาย (ใช้แสดงผล + บันทึก)
       final List<String> cardsWithMeanings =
           _selectedCards.asMap().entries.map((entry) {
         final index = entry.key;
@@ -255,32 +255,24 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         return '${card.nameTh} (${isReversed ? "คว่ำ" : "หงาย"}): $meaning';
       }).toList();
 
-      // สร้าง prompt สำหรับ AI
-      final prompt = '''
-      ช่วยตีความการอ่านไพ่ทาโรต์ต่อไปนี้:
-
-      รูปแบบการอ่าน: ${_getSpreadTypeText()}
-      คำถาม: ${_questionController.text}
-      ไพ่ที่เลือก:
-      ${cardsWithMeanings.join('\n')}
-      ${_userThaiZodiac != null ? '\nปีนักษัตรของผู้ถาม: $_userThaiZodiac' : ''}
-
-      กรุณาตีความให้ครอบคลุม:
-      1. ความหมายรวมของไพ่ทั้งหมด
-      2. ความสัมพันธ์ระหว่างไพ่แต่ละใบ
-      3. คำแนะนำสำหรับผู้ถาม
-      4. ${_userThaiZodiac != null ? 'อิทธิพลของปีนักษัตรต่อการตีความ' : ''}
-      ''';
-
-      // เรียกใช้ OpenAI API
-      final response = await _openAIService.sendMessage(
-        prompt: prompt,
-        history: [],
-        temperature: 0.9,
+      // AI ถูกพร็อกซีผ่าน backend แล้ว (OpenAI key อยู่ฝั่ง server เท่านั้น)
+      // หมายเหตุการออกแบบ: หน้าจอนี้ยังคงสุ่ม/เปิดไพ่ฝั่ง client เพื่อรักษา UX
+      // การโต้ตอบ (สับไพ่/เลือกไพ่/พลิกไพ่) ส่วน "คำทำนาย" เราเรียก backend
+      // POST /tarot/readings (auth-only) แล้วใช้ค่า `interpretation` เป็นข้อความคำทำนาย
+      // backend จะสุ่มไพ่ของตัวเอง แต่เรายังคงแสดงไพ่ที่ผู้ใช้เปิดไว้ตามเดิม
+      final response = Map<String, dynamic>.from(
+        await _apiClient.post(
+          ApiConstants.tarotReadingsPath,
+          data: {
+            'spread_type': _backendSpreadType(),
+            if (_questionController.text.trim().isNotEmpty)
+              'question': _questionController.text.trim(),
+          },
+        ),
       );
 
-      // แยกข้อความคำทำนายจาก response
-      final content = response['content'][0]['text'];
+      // ใช้ข้อความคำทำนายจาก backend
+      final content = (response['interpretation'] as String?) ?? '';
 
       setState(() {
         _interpretation = content;
@@ -310,18 +302,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     }
   }
 
-  String _getSpreadTypeText() {
+  // แปลง spread type ฝั่ง client เป็นค่าที่ backend รองรับ
+  // backend: 'single' | 'three_card' | 'celtic_cross'
+  String _backendSpreadType() {
     switch (_spreadType) {
       case 'single':
-        return 'ไพ่ 1 ใบ';
+        return 'single';
       case 'three':
-        return 'ไพ่ 3 ใบ (อดีต ปัจจุบัน อนาคต)';
+        return 'three_card';
       case 'cross':
-        return 'ไพ่กางเขน';
       case 'celtic':
-        return 'ไพ่เซลติก';
+        return 'celtic_cross';
       default:
-        return 'ไพ่ 1 ใบ';
+        return 'three_card';
     }
   }
 

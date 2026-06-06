@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/services/auth_service.dart';
+import '../config/constants.dart';
 import '../core/api/api_client.dart';
-import '../core/api/openai_client.dart';
 import '../core/repositories/horoscope_repository.dart';
 import '../features/chat/repositories/chat_repository.dart';
 
@@ -35,14 +35,7 @@ class AppProviders extends StatelessWidget {
             providers: [
               Provider<ApiClient>(
                 create: (_) =>
-                    ApiClient(baseUrl: 'https://api.astrology-app.com/api'),
-              ),
-              Provider<OpenAIClient>(
-                create: (_) => OpenAIClient(
-                  apiKey: const String.fromEnvironment('OPENAI_API_KEY',
-                      defaultValue: 'YOUR_API_KEY_HERE'),
-                  prefs: sharedPreferences,
-                ),
+                    ApiClient(baseUrl: ApiConstants.baseUrl),
               ),
               Provider<AuthService>(
                 create: (_) => AuthService.instance,
@@ -54,7 +47,6 @@ class AppProviders extends StatelessWidget {
                 create: (_) => HoroscopeRepository(
                   apiClient: Provider.of<ApiClient>(_, listen: false),
                   prefs: sharedPreferences,
-                  useOpenAI: false,
                 ),
               ),
             ],

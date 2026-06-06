@@ -21,6 +21,13 @@ class ApiConstants {
   static const String tarotEndpoint = '$baseUrl/tarot';
   static const String chatEndpoint = '$baseUrl/chat';
   static const String meritEndpoint = '$baseUrl/merit';
+
+  // AI proxied through the backend (OpenAI key stays server-side, never in client).
+  // Paths are relative to baseUrl, used via ApiClient.
+  static const String horoscopeGuestPath = '/horoscope/guest';   // public (guest)
+  static const String horoscopeDailyPath = '/horoscope/daily';   // auth
+  static const String chatSessionsPath = '/chat/sessions';       // auth
+  static const String tarotReadingsPath = '/tarot/readings';     // auth
 }
 
 // ค่าคงที่สำหรับการจัดเก็บข้อมูลในเครื่อง

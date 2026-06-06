@@ -1,16 +1,19 @@
 import 'package:flutter/foundation.dart';
-import '../../../core/services/openai_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/laravel_auth_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/api/api_client.dart';
+import '../../../config/constants.dart';
 import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 
 class ChatRepository {
-  final OpenAIService _openaiService = OpenAIService.instance;
   final AuthService _authService = AuthService.instance;
   final ApiClient _apiClient = LaravelAuthService.instance.apiClient;
+
+  // เก็บ session id ของ backend ที่สร้างแบบ lazy ไว้ใช้ซ้ำ
+  // (system prompt + AI ถูกจัดการฝั่ง backend แล้ว)
+  String? _backendSessionId;
 
   // Get chat history from Laravel API
   Future<List<ChatSession>> getChatHistory() async {
@@ -91,76 +94,56 @@ class ChatRepository {
     }
   }
 
-  // Send message to OpenAI API
+  // ส่งข้อความผ่าน backend chat (AI proxied — system prompt สร้างฝั่ง backend)
+  // - สร้าง session แบบ lazy ในข้อความแรก แล้วใช้ซ้ำ
+  // - ดึงคำตอบจาก ai_message.content
   Future<ChatMessage> sendMessage({
     required String message,
     required List<ChatMessage> history,
     required String topic,
   }) async {
     try {
-      // Format history for OpenAI API
-      final formattedHistory = history
-          .map((msg) => {
-                'isUser': msg.isUser,
-                'content': msg.content,
-              })
-          .toList();
+      final sessionId = await _ensureSession(topic);
 
-      // Get user's Thai zodiac sign
-      final userThaiAnimal = await getUserZodiacSign();
-      final zodiacInfo = userThaiAnimal != null
-          ? 'ผู้ใช้เกิดปี$userThaiAnimal'
-          : 'ไม่ทราบปีนักษัตรของผู้ใช้';
-
-      // Create system prompt with Thai astrology context and user's zodiac sign
-      final systemPrompt = '''
-      คุณเป็นนักพยากรณ์ดวงชะตาไทยที่มีความเชี่ยวชาญในด้านปีนักษัตรไทย 12 ปี ไพ่ทาโร่ และโหราศาสตร์ไทย
-
-      ข้อมูลผู้ใช้:
-      $zodiacInfo
-
-      หัวข้อการสนทนา: $topic
-
-      ความรู้เกี่ยวกับปีนักษัตรไทย:
-      - 12 ปี ได้แก่: ชวด, ฉลู, ขาล, เถาะ, มะโรง, มะเส็ง, มะเมีย, มะแม, วอก, ระกา, จอ, กุน
-      - 5 ธาตุ ได้แก่: ทอง, น้ำ, ไม้, ไฟ, ดิน
-
-      กฎในการตอบ:
-      1. ตอบด้วยภาษาไทยเสมอ
-      2. ใช้ความรู้เกี่ยวกับปีนักษัตรไทยในการทำนาย
-      3. ให้คำแนะนำที่เป็นประโยชน์และเชิงบวก
-      4. อธิบายเหตุผลทางโหราศาสตร์ไทยประกอบคำทำนาย
-      5. ไม่ให้คำทำนายที่เป็นลางร้ายหรือทำให้ผู้ใช้กังวล
-      6. ไม่แนะนำให้ผู้ใช้ตัดสินใจทางการเงินหรือสุขภาพโดยอิงจากคำทำนายเพียงอย่างเดียว
-      7. ใช้ข้อมูลปีนักษัตรของผู้ใช้ในการให้คำแนะนำที่เฉพาะเจาะจงมากขึ้น
-
-      ตอบคำถามต่อไปนี้โดยใช้ความรู้ด้านโหราศาสตร์ไทยและไพ่ทาโร่:
-      ''';
-
-      // Combine system prompt with user message
-      final fullPrompt = '$systemPrompt\n\n$message';
-
-      // Send to OpenAI API
-      final response = await _openaiService.sendMessage(
-        prompt: fullPrompt,
-        history: formattedHistory,
-        model: 'gpt-4o',
-        temperature: 0.7,
+      final response = Map<String, dynamic>.from(
+        await _apiClient.post(
+          '${ApiConstants.chatSessionsPath}/$sessionId/messages',
+          data: {'content': message},
+        ),
       );
 
-      // Extract assistant's response
-      final assistantMessage = response['content'][0]['text'];
+      // คำตอบของผู้ช่วยอยู่ใน ai_message.content
+      final aiMessage =
+          Map<String, dynamic>.from(response['ai_message'] as Map);
+      final assistantMessage = (aiMessage['content'] as String?) ?? '';
 
-      // Create and return ChatMessage
       return ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: aiMessage['id']?.toString() ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
         content: assistantMessage,
         timestamp: DateTime.now(),
         isUser: false,
       );
     } catch (e) {
-      debugPrint('Error sending message to OpenAI: $e');
+      debugPrint('Error sending message to backend chat: $e');
       throw Exception('Failed to get response from assistant');
     }
+  }
+
+  // สร้าง backend session แบบ lazy (ถ้ายังไม่มี) แล้วคืน session id
+  Future<String> _ensureSession(String topic) async {
+    if (_backendSessionId != null) {
+      return _backendSessionId!;
+    }
+
+    final created = Map<String, dynamic>.from(
+      await _apiClient.post(
+        ApiConstants.chatSessionsPath,
+        data: {'topic': topic.isNotEmpty ? topic : 'การสนทนาใหม่'},
+      ),
+    );
+
+    _backendSessionId = created['id'].toString();
+    return _backendSessionId!;
   }
 }
