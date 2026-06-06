@@ -251,11 +251,11 @@ class WeeklyMeritSchedule {
         ),
       ],
     ),
-    // วันเสาร์ - ท้าวเวสสุวรรณ วัดจุฬามณี
+    // วันเสาร์ - ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)
     WeeklyMeritSchedule(
       day: MeritDay.saturday,
-      locationId: 'vessavana',
-      locationName: 'ท้าวเวสสุวรรณ วัดจุฬามณี',
+      locationId: 'vessavana_sampheng',
+      locationName: 'ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)',
       belief: 'ป้องกันภัย โชคลาภ เสริมดวง',
       requiredItems: [
         const MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
@@ -451,10 +451,10 @@ class MeritLocation {
       sortOrder: 7,
     ),
     const MeritLocation(
-      id: 'vessavana',
-      nameTh: 'ท้าวเวสสุวรรณ วัดจุฬามณี',
-      nameEn: 'Vessavana Wat Chulamani',
-      description: 'ท้าวเวสสุวรรณที่ศักดิ์สิทธิ์',
+      id: 'vessavana_sampheng',
+      nameTh: 'ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)',
+      nameEn: 'Vessavana Wat Chulamani Sampheng',
+      description: 'ท้าวเวสสุวรรณที่ศักดิ์สิทธิ์ย่านสำเพ็ง เยาวราช กทม.',
       belief: 'ป้องกันภัย โชคลาภ ค้าขาย',
       sortOrder: 8,
     ),
@@ -620,6 +620,9 @@ class MeritOrder {
   final String? prayerPhone;
   final double price;
   final String? slipUrl;
+  // Single-use token returned only by the create-weekly-order response.
+  // Used to authorize the subsequent guest slip upload (IDOR mitigation).
+  final String? slipUploadToken;
   final DateTime? paidAt;
   final MeritOrderStatus status;
   final List<String>? proofUrls;
@@ -645,6 +648,7 @@ class MeritOrder {
     this.prayerPhone,
     required this.price,
     this.slipUrl,
+    this.slipUploadToken,
     this.paidAt,
     this.status = MeritOrderStatus.pending,
     this.proofUrls,
@@ -672,6 +676,7 @@ class MeritOrder {
       prayerPhone: json['prayer_phone'] as String?,
       price: (json['price'] as num).toDouble(),
       slipUrl: json['slip_url'] as String?,
+      slipUploadToken: json['slip_upload_token'] as String?,
       paidAt: json['paid_at'] != null
           ? DateTime.parse(json['paid_at'] as String)
           : null,

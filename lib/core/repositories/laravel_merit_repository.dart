@@ -124,6 +124,7 @@ class MeritOrder {
   final String? prayerPhone;
   final double price;
   final String? slipUrl;
+  final String? slipUploadToken;
   final DateTime? paidAt;
   final String status;
   final List<String>? proofUrls;
@@ -145,6 +146,7 @@ class MeritOrder {
     this.prayerPhone,
     required this.price,
     this.slipUrl,
+    this.slipUploadToken,
     this.paidAt,
     required this.status,
     this.proofUrls,
@@ -180,6 +182,7 @@ class MeritOrder {
       prayerPhone: json['prayer_phone'],
       price: price,
       slipUrl: json['slip_url'],
+      slipUploadToken: json['slip_upload_token'],
       paidAt: json['paid_at'] != null ? DateTime.tryParse(json['paid_at']) : null,
       status: json['status'] ?? 'pending',
       proofUrls: json['proof_urls'] != null
@@ -392,13 +395,22 @@ class LaravelMeritRepository {
     }
   }
 
-  // Upload slip for weekly order (no auth required)
-  Future<MeritOrder> uploadWeeklySlip(String orderId, String filePath) async {
+  // Upload slip for weekly order (no auth required).
+  // [uploadToken] authorizes this upload against the order (IDOR mitigation);
+  // it is the single-use token returned when the order was created.
+  Future<MeritOrder> uploadWeeklySlip(
+    String orderId,
+    String filePath, {
+    String? uploadToken,
+  }) async {
     try {
       final file = await _apiClient.createMultipartFile(filePath, fieldName: 'slip');
       final response = await _apiClient.postMultipart(
         '/merit/weekly-orders/$orderId/slip',
-        formData: {'slip': file},
+        formData: {
+          'slip': file,
+          if (uploadToken != null) 'upload_token': uploadToken,
+        },
       );
       return MeritOrder.fromJson(response);
     } catch (e) {

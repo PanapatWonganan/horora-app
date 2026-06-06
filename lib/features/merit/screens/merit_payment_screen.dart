@@ -113,7 +113,12 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
     setState(() => _isUploading = true);
     try {
       // ใช้ uploadWeeklySlip สำหรับ weekly order flow
-      await _meritService.uploadWeeklySlip(_createdOrder!.id!, _slipImage!);
+      // ส่ง single-use token จากตอนสร้าง order เพื่อยืนยันสิทธิ์ (กัน IDOR)
+      await _meritService.uploadWeeklySlip(
+        _createdOrder!.id!,
+        _slipImage!,
+        uploadToken: _createdOrder!.slipUploadToken,
+      );
 
       if (mounted) {
         _showSuccessDialog();

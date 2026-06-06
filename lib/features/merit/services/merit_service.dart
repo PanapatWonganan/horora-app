@@ -191,9 +191,18 @@ class MeritService {
   }
 
   /// Upload slip สำหรับ weekly order (ไม่ต้อง login)
-  Future<String?> uploadWeeklySlip(String orderId, File slipFile) async {
+  /// [uploadToken] = single-use token จากตอนสร้าง order (กัน IDOR)
+  Future<String?> uploadWeeklySlip(
+    String orderId,
+    File slipFile, {
+    String? uploadToken,
+  }) async {
     try {
-      final order = await _meritRepo.uploadWeeklySlip(orderId, slipFile.path);
+      final order = await _meritRepo.uploadWeeklySlip(
+        orderId,
+        slipFile.path,
+        uploadToken: uploadToken,
+      );
 
       // หมายเหตุ: การแจ้งเตือน Telegram ทำที่ฝั่ง backend แล้ว
       // (token อยู่ที่ server เท่านั้น เพื่อไม่ให้ secret หลุดไปอยู่ใน client)
@@ -311,6 +320,7 @@ class MeritService {
       prayerPhone: order.prayerPhone,
       price: order.price,
       slipUrl: order.slipUrl,
+      slipUploadToken: order.slipUploadToken,
       paidAt: order.paidAt,
       status: _parseOrderStatus(order.status),
       proofUrls: order.proofUrls,
