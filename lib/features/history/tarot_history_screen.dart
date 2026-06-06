@@ -82,7 +82,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
                       const SizedBox(height: 16),
                       Text(
                         _errorMessage!,
-                        style: TextStyle(color: AppColors.lightText),
+                        style: const TextStyle(color: AppColors.lightText),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
@@ -110,7 +110,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
             size: 64,
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'ยังไม่มีประวัติการอ่านไพ่',
             style: TextStyle(
               fontSize: 18,
@@ -246,7 +246,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
               const SizedBox(height: 16.0),
               _buildCardsList(reading.cards),
               const SizedBox(height: 16.0),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
@@ -306,7 +306,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
         children: [
           Transform.rotate(
             angle: cardPosition.isReversed ? 3.14159 : 0, // 180 degrees if reversed
-            child: Icon(
+            child: const Icon(
               Icons.auto_awesome,
               color: AppColors.primary,
               size: 32.0,

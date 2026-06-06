@@ -121,12 +121,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: AppColors.darkSurface,
               onSurface: AppColors.lightText,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.darkSurface),
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.darkSurface),
           ),
           child: child!,
         );
@@ -203,7 +203,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'แก้ไขโปรไฟล์',
           style: TextStyle(
             color: AppColors.lightText,
@@ -213,26 +213,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
         child: SafeArea(
           child: _isLoading
-              ? Center(
+              ? const Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primary,
                   ),
@@ -281,13 +281,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ? Image.network(
                       _userData['profile_image_url'],
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Icon(
+                      errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.person,
                         size: 50,
                         color: AppColors.primary,
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.person,
                       size: 50,
                       color: AppColors.primary,
@@ -312,7 +312,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'ข้อมูลส่วนตัว',
           style: TextStyle(
             color: AppColors.lightText,
@@ -365,7 +365,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     color: AppColors.primary.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.pets,
                     color: AppColors.primary,
                     size: 20,
@@ -378,7 +378,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       Text(
                         _thaiZodiac!.thaiName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.lightText,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -407,7 +407,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return GradientButton(
       text: 'บันทึกข้อมูล',
       onPressed: _saveProfile,
-      gradient: LinearGradient(
+      gradient: const LinearGradient(
         colors: AppColors.primaryGradient,
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,

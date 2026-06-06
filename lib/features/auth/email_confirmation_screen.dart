@@ -69,13 +69,13 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -87,14 +87,14 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (_isVerifying) ...[
-                    CircularProgressIndicator(
+                    const CircularProgressIndicator(
                       color: AppColors.primary,
                       strokeWidth: 3,
                     ),
                     const SizedBox(height: 24),
                     Text(
                       _message,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.lightText,
                         fontSize: 18,
                       ),
@@ -109,7 +109,7 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
                     const SizedBox(height: 24),
                     Text(
                       _message,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.lightText,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

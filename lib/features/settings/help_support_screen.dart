@@ -9,7 +9,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'ช่วยเหลือและสนับสนุน',
           style: TextStyle(
             color: AppColors.lightText,
@@ -19,20 +19,20 @@ class HelpSupportScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -100,7 +100,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.lightText,
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -118,7 +118,7 @@ class HelpSupportScreen extends StatelessWidget {
       child: ExpansionTile(
         title: Text(
           question,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.lightText,
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -181,7 +181,7 @@ class HelpSupportScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.lightText,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/theme.dart';
@@ -74,9 +75,11 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ไม่สามารถโหลดดวงประจำวันได้: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('ไม่สามารถโหลดดวงประจำวันได้: ${e.toString()}')),
+        );
+      }
     }
   }
   
@@ -236,29 +239,43 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         height: 250,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: const Center(
           child: LoadingIndicator(),
         ),
       );
     }
-    
+
     final horoscope = _horoscope;
     if (horoscope == null) {
       return Container(
         height: 250,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Center(
           child: Text(
             'ไม่สามารถโหลดดวงประจำวันได้',
-            style: TextStyle(
-              color: AppColors.lightText,
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 16,
             ),
           ),
@@ -269,38 +286,38 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withValues(alpha: 0.8),
-            AppColors.secondary.withValues(alpha: 0.8),
-          ],
+        gradient: const LinearGradient(
+          colors: AppColors.primaryGradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            blurRadius: 10,
+            color: AppColors.primary.withValues(alpha: 0.28),
+            blurRadius: 22,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         child: Stack(
           children: [
-            // Background pattern
-            Positioned.fill(
+            // Soft celestial highlight glow in the corner.
+            Positioned(
+              top: -40,
+              right: -30,
               child: Container(
+                width: 160,
+                height: 160,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
                     colors: [
-                      AppColors.primary.withValues(alpha: 0.1),
-                      AppColors.secondary.withValues(alpha: 0.05),
+                      Colors.white.withValues(alpha: 0.35),
+                      Colors.white.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -320,28 +337,35 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                         children: [
                           Text(
                             _userZodiacSignThai ?? widget.zodiacSign,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: GoogleFonts.kanit(
+                              color: AppColors.deepText,
                               fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             DateFormat('d MMMM yyyy', 'th_TH').format(horoscope.date),
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
-                              fontSize: 14,
+                            style: GoogleFonts.kanit(
+                              color: AppColors.deepText.withValues(alpha: 0.85),
+                              fontSize: 13,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        width: 50,
-                        height: 50,
+                        width: 54,
+                        height: 54,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withValues(alpha: 0.55),
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.18),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Text(
@@ -355,15 +379,15 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                   const SizedBox(height: 16),
                   Text(
                     horoscope.contentTh,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: GoogleFonts.kanit(
+                      color: AppColors.deepText.withValues(alpha: 0.85),
                       fontSize: 14,
-                      height: 1.5,
+                      height: 1.6,
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -466,8 +490,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText.withValues(alpha: 0.85),
             fontSize: 12,
           ),
         ),
@@ -476,33 +500,35 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
           children: List.generate(
             5,
             (index) => Icon(
-              index < rating ? Icons.star : Icons.star_border,
-              color: Colors.amber,
-              size: 14,
+              index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+              color: index < rating
+                  ? AppColors.accent
+                  : AppColors.deepText.withValues(alpha: 0.25),
+              size: 15,
             ),
           ),
         ),
       ],
     );
   }
-  
+
   Widget _buildLuckyItem(String label, String value) {
     return Column(
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText.withValues(alpha: 0.85),
             fontSize: 12,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.amber,
+          style: GoogleFonts.kanit(
+            color: AppColors.primary,
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

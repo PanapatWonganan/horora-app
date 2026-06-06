@@ -135,32 +135,29 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: isActive ? 0.4 : 0.2),
-              blurRadius: isActive ? 20 : 10,
-              offset: const Offset(0, 8),
-              spreadRadius: isActive ? 2 : 0,
+              color: AppColors.primary.withValues(alpha: isActive ? 0.32 : 0.16),
+              blurRadius: isActive ? 24 : 12,
+              offset: const Offset(0, 10),
+              spreadRadius: isActive ? 1 : 0,
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 10,
+              color: AppColors.secondary.withValues(alpha: 0.15),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primary.withValues(alpha: 0.1),
-                  AppColors.secondary.withValues(alpha: 0.1),
-                ],
+                colors: AppColors.primaryGradient,
               ),
             ),
             child: Stack(
@@ -228,12 +225,12 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(22),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.center,
                         colors: [
-                          Colors.white.withValues(alpha: 0.1),
+                          Colors.white.withValues(alpha: 0.18),
                           Colors.transparent,
                         ],
                       ),
@@ -315,17 +312,17 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
 
   Widget _buildLoadingBanner() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.darkSurface,
-            AppColors.darkBackground,
+            AppColors.surfaceMuted,
+            AppColors.cream,
           ],
         ),
       ),
-      child: Center(
+      child: const Center(
         child: CircularProgressIndicator(
           color: AppColors.primary,
           strokeWidth: 2,
@@ -354,14 +351,16 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
             width: _currentPage == index ? 28 : 8,
             decoration: BoxDecoration(
               gradient: _currentPage == index
-                  ? LinearGradient(
+                  ? const LinearGradient(
                       colors: [
                         AppColors.primary,
                         AppColors.secondary,
                       ],
                     )
                   : null,
-              color: _currentPage == index ? null : Colors.white.withValues(alpha: 0.3),
+              color: _currentPage == index
+                  ? null
+                  : AppColors.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(4),
               boxShadow: _currentPage == index
                   ? [

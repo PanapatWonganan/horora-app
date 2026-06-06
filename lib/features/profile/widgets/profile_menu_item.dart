@@ -58,7 +58,7 @@ class ProfileMenuItem extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

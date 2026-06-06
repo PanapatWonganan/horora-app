@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_icons.dart';
 
-/// Card สำหรับตัวเลือก Quiz
+/// Card สำหรับตัวเลือก Quiz — Soft Celestial pastel style
 class QuizOptionCard extends StatelessWidget {
   final String? emoji;
   final String? svgIconPath;
@@ -26,46 +27,50 @@ class QuizOptionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(16),
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected ? AppColors.surfaceMuted : AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : Colors.white.withValues(alpha: 0.1),
-            width: isSelected ? 2 : 1,
+            color: isSelected ? AppColors.primary : AppColors.divider,
+            width: isSelected ? 2 : 1.2,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    spreadRadius: 0,
-                  ),
-                ]
-              : null,
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? AppColors.primary.withValues(alpha: 0.22)
+                  : AppColors.primary.withValues(alpha: 0.06),
+              blurRadius: isSelected ? 18 : 12,
+              spreadRadius: 0,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           children: [
             // Icon or Emoji
-            Container(
-              width: 50,
-              height: 50,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isSelected
+                      ? AppColors.primaryGradient
+                      : [AppColors.surfaceMuted, AppColors.surfaceMuted],
+                ),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
                 child: svgIconPath != null
                     ? SvgIcon(
                         svgIconPath!,
-                        size: 36,
+                        size: 32,
+                        color: isSelected ? Colors.white : AppColors.primary,
                       )
                     : Text(
                         emoji ?? '',
@@ -82,19 +87,21 @@ class QuizOptionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      color: Colors.white,
+                    style: GoogleFonts.kanit(
+                      color: AppColors.deepText,
                       fontSize: 16,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w600,
                     ),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
                     Text(
                       subtitle!,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                      style: GoogleFonts.kanit(
+                        color: AppColors.mutedText,
                         fontSize: 13,
+                        height: 1.3,
                       ),
                     ),
                   ],
@@ -103,20 +110,28 @@ class QuizOptionCard extends StatelessWidget {
             ),
 
             // Checkmark
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: isSelected ? 1.0 : 0.0,
+            AnimatedScale(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutBack,
+              scale: isSelected ? 1.0 : 0.0,
               child: Container(
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  gradient: const LinearGradient(colors: AppColors.primaryGradient),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Center(
                   child: SvgIcon(
                     AppIcons.check,
-                    size: 18,
+                    size: 16,
                     color: Colors.white,
                   ),
                 ),

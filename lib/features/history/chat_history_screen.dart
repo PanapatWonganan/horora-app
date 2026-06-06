@@ -62,7 +62,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         backgroundColor: AppColors.darkSurface,
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             )
           : _chatHistory.isEmpty
@@ -84,7 +84,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
               size: 64,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'ยังไม่มีประวัติการสนทนา',
               style: TextStyle(
                 color: AppColors.lightText,
@@ -168,7 +168,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
               ),
               child: Text(
                 topic,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12.0,
                   color: AppColors.primary,
                 ),

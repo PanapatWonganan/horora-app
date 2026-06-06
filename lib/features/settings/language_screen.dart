@@ -52,7 +52,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'ภาษา',
           style: TextStyle(
             color: AppColors.lightText,
@@ -62,20 +62,20 @@ class _LanguageScreenState extends State<LanguageScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -88,7 +88,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'เลือกภาษา',
                         style: TextStyle(
                           color: AppColors.lightText,
@@ -115,7 +115,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 child: GradientButton(
                   text: 'บันทึกการตั้งค่า',
                   onPressed: _saveLanguage,
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: AppColors.primaryGradient,
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -171,7 +171,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 children: [
                   Text(
                     language['native_name'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.lightText,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -189,7 +189,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
             ),
             if (isSelected)
-              SvgIcon(
+              const SvgIcon(
                 AppIcons.check,
                 size: 20,
                 color: AppColors.primary,

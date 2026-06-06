@@ -131,7 +131,7 @@ class OutlinedGradientButton extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
             child: isLoading
-                ? SizedBox(
+                ? const SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(

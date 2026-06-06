@@ -25,14 +25,15 @@ class ZodiacSignCard extends StatelessWidget {
       child: Container(
         width: 120,
         margin: const EdgeInsets.only(right: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: AppColors.primary.withValues(alpha: 0.14),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -45,9 +46,11 @@ class ZodiacSignCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.2),
-                    AppColors.secondary.withValues(alpha: 0.1),
+                    AppColors.primary.withValues(alpha: 0.22),
+                    AppColors.secondary.withValues(alpha: 0.16),
                   ],
                 ),
               ),
@@ -60,21 +63,21 @@ class ZodiacSignCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               name,
-              style: TextStyle(
-                color: AppColors.lightText,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                color: AppColors.deepText,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
             ),
             if (date != null) ...[
               const SizedBox(height: 4),
               Text(
                 date!,
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                style: const TextStyle(
+                  color: AppColors.mutedText,
                   fontSize: 12,
                 ),
               ),

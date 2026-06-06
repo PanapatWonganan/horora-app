@@ -77,13 +77,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'เข้าสู่ระบบ',
           style: TextStyle(
             color: AppColors.lightText,
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
           GradientButton(
             text: 'เข้าสู่ระบบ',
             onPressed: _login,
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
         onPressed: () {
           AppRouter.navigateTo(context, AppRoutes.forgotPassword);
         },
-        child: Text(
+        child: const Text(
           'ลืมรหัสผ่าน?',
           style: TextStyle(
             color: AppColors.primary,
@@ -306,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.register);
           },
-          child: Text(
+          child: const Text(
             'สมัครสมาชิก',
             style: TextStyle(
               color: AppColors.primary,

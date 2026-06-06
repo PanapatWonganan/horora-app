@@ -102,12 +102,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: AppColors.darkSurface,
               onSurface: AppColors.lightText,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.darkSurface),
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.darkSurface),
           ),
           child: child!,
         );
@@ -129,8 +129,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       if (!_acceptTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('กรุณายอมรับข้อกำหนดและเงื่อนไขการใช้งาน'),
+          const SnackBar(
+            content: Text('กรุณายอมรับข้อกำหนดและเงื่อนไขการใช้งาน'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -198,13 +198,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -239,7 +239,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'สมัครสมาชิก',
           style: TextStyle(
             color: AppColors.lightText,
@@ -388,7 +388,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           color: AppColors.primary.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.auto_awesome,
                           color: AppColors.primary,
                           size: 24,
@@ -401,7 +401,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           children: [
                             Text(
                               _thaiZodiac!.thaiName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColors.lightText,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -410,7 +410,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             const SizedBox(height: 2),
                             Text(
                               '${_thaiZodiac!.elementThai} • ${_thaiZodiac!.englishName}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -459,7 +459,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           GradientButton(
             text: 'สมัครสมาชิก',
             onPressed: _register,
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -509,7 +509,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: AppColors.lightText.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
-              children: [
+              children: const [
                 TextSpan(
                   text: 'ข้อกำหนดและเงื่อนไขการใช้งาน',
                   style: TextStyle(
@@ -612,7 +612,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.login);
           },
-          child: Text(
+          child: const Text(
             'เข้าสู่ระบบ',
             style: TextStyle(
               color: AppColors.primary,

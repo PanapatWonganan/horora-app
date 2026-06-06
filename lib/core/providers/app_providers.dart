@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_client.dart';
+import '../../config/constants.dart';
 import '../repositories/tarot_repository.dart';
 import '../repositories/horoscope_repository.dart';
 
@@ -38,7 +39,7 @@ class AppProviders extends StatelessWidget {
               // API Client
               Provider<ApiClient>(
                 create: (_) =>
-                    ApiClient(baseUrl: 'https://api.astrology-app.com/api'),
+                    ApiClient(baseUrl: ApiConstants.baseUrl),
               ),
 
               // Tarot Repository

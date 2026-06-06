@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -52,30 +53,26 @@ class InAppMessageDialog extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF2D2D44),
-              Color(0xFF1A1A2E),
+              AppColors.lightSurface,
+              AppColors.cream,
             ],
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
+            color: AppColors.primary.withValues(alpha: 0.12),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.3),
-              blurRadius: 30,
-              spreadRadius: 5,
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: AppColors.primary.withValues(alpha: 0.22),
+              blurRadius: 36,
+              spreadRadius: 2,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
           child: Stack(
             children: [
               // Background decorations
@@ -131,13 +128,13 @@ class InAppMessageDialog extends StatelessWidget {
                           },
                           icon: Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
+                            decoration: const BoxDecoration(
+                              color: AppColors.surfaceMuted,
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
                               Icons.close,
-                              color: Colors.white70,
+                              color: AppColors.mutedText,
                               size: 20,
                             ),
                           ),
@@ -156,17 +153,17 @@ class InAppMessageDialog extends StatelessWidget {
                       height: 150,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: AppColors.primary.withValues(alpha: 0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         child: message.imageUrl!.startsWith('http')
                             ? Image.network(
                                 message.imageUrl!,
@@ -199,10 +196,10 @@ class InAppMessageDialog extends StatelessWidget {
                     child: Text(
                       message.title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.kanit(
+                        color: AppColors.deepText,
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         height: 1.3,
                       ),
                     ),
@@ -216,10 +213,10 @@ class InAppMessageDialog extends StatelessWidget {
                       child: Text(
                         message.subtitle!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 15,
-                          height: 1.5,
+                        style: GoogleFonts.kanit(
+                          color: AppColors.deepText.withValues(alpha: 0.72),
+                          fontSize: 14,
+                          height: 1.55,
                         ),
                       ),
                     ),
@@ -280,28 +277,30 @@ class InAppMessageDialog extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [
               AppColors.primary,
               AppColors.secondary,
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: AppColors.primary.withValues(alpha: 0.32),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
         child: Text(
           message.buttonText!,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: GoogleFonts.kanit(
             color: Colors.white,
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -318,7 +317,7 @@ class InAppMessageDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
-      barrierColor: Colors.black.withValues(alpha: 0.7),
+      barrierColor: const Color(0xFF2F2A40).withValues(alpha: 0.45),
       builder: (context) => InAppMessageDialog(
         message: message,
         onDismiss: onDismiss,

@@ -77,13 +77,13 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   Widget build(BuildContext context) {
     // แสดง Loading Indicator ระหว่างโหลดข้อมูล
     if (_isLoading) {
-      return Scaffold(
+      return const Scaffold(
         body: GradientBackground(
           colors: [
             AppColors.primary,
             AppColors.secondary,
           ],
-          child: const Center(
+          child: Center(
             child: LoadingIndicator(),
           ),
         ),
@@ -94,7 +94,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     if (_errorMessage.isNotEmpty) {
       return Scaffold(
         body: GradientBackground(
-          colors: [
+          colors: const [
             AppColors.primary,
             AppColors.secondary,
           ],
@@ -135,7 +135,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     // แสดงหน้าจอปกติเมื่อไม่มีข้อผิดพลาด
     return Scaffold(
       body: GradientBackground(
-        colors: [
+        colors: const [
           AppColors.primary,
           AppColors.secondary,
         ],

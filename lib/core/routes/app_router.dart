@@ -41,6 +41,8 @@ class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       // Splash and Onboarding
+      case AppRoutes.splash:
+        return MaterialPageRoute(builder: (_) => const AuthWrapper());
       case AppRoutes.welcome:
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case AppRoutes.onboarding:

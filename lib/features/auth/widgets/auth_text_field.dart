@@ -63,7 +63,7 @@ class AuthTextField extends StatelessWidget {
       autofocus: autofocus,
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.lightText,
         fontSize: 16,
       ),
@@ -105,26 +105,26 @@ class AuthTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
             color: AppColors.primary,
             width: 2,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
             color: AppColors.error,
             width: 2,
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
             color: AppColors.error,
             width: 2,
           ),
         ),
-        errorStyle: TextStyle(
+        errorStyle: const TextStyle(
           color: AppColors.error,
           fontSize: 12,
         ),

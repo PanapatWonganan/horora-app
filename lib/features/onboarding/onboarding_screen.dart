@@ -117,7 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             GradientButton(
               text: _currentPage == _pages.length - 1 ? 'เริ่มต้นใช้งาน' : 'ถัดไป',
               onPressed: _nextPage,
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: AppColors.primaryGradient,
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,

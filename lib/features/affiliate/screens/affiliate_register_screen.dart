@@ -86,7 +86,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: AppColors.primaryGradient,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -237,7 +237,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
             ),
             child: Text(
               rate,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
               ),

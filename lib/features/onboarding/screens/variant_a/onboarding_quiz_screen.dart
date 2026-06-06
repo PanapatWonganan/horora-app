@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter/material.dart' as material show TimeOfDay;
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/routes/app_router.dart';
@@ -63,15 +64,18 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.lightBackground,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.mysticalGradient[1].withValues(alpha: 0.35),
+              AppColors.cosmicGradient[1].withValues(alpha: 0.30),
             ],
+            stops: const [0.0, 0.65, 1.0],
           ),
         ),
         child: SafeArea(
@@ -83,9 +87,23 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      IconButton(
-                        onPressed: _previousPage,
-                        icon: SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.lightSurface,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.10),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: _previousPage,
+                          icon: const SvgIcon(AppIcons.arrowBack,
+                              size: 20, color: AppColors.deepText),
+                        ),
                       ),
                       Expanded(
                         child: ProgressIndicatorDots(
@@ -133,40 +151,44 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         children: [
           // Logo/Icon
           Container(
-            width: 120,
-            height: 120,
+            width: 124,
+            height: 124,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.secondary,
-                ],
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: AppColors.primaryGradient,
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.4),
-                  blurRadius: 30,
-                  spreadRadius: 5,
+                  color: AppColors.primary.withValues(alpha: 0.28),
+                  blurRadius: 36,
+                  spreadRadius: 4,
+                ),
+                BoxShadow(
+                  color: AppColors.secondary.withValues(alpha: 0.22),
+                  blurRadius: 24,
+                  spreadRadius: 2,
                 ),
               ],
             ),
-            child: SvgIcon(
+            child: const SvgIcon(
               AppIcons.sparkleFilled,
-              size: 60,
+              size: 58,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 40),
 
-          const Text(
+          Text(
             'ค้นพบเส้นทางมงคล\nของคุณ',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              height: 1.3,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontSize: 30,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
             ),
           ),
           const SizedBox(height: 16),
@@ -174,8 +196,8 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'ตอบคำถามง่ายๆ 4 ข้อ\nเพื่อรับคำทำนายที่เหมาะกับคุณโดยเฉพาะ',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 16,
               height: 1.5,
             ),
@@ -185,31 +207,44 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           // CTA Button
           SizedBox(
             width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: _nextPage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 8,
-                shadowColor: AppColors.primary.withValues(alpha: 0.5),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'เริ่มต้นการเดินทาง',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+            height: 58,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: AppColors.primaryGradient),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.32),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                  const SizedBox(width: 8),
-                  SvgIcon(AppIcons.arrowForward, size: 20, color: Colors.white),
                 ],
+              ),
+              child: ElevatedButton(
+                onPressed: _nextPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'เริ่มต้นการเดินทาง',
+                      style: GoogleFonts.kanit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const SvgIcon(AppIcons.arrowForward,
+                        size: 20, color: Colors.white),
+                  ],
+                ),
               ),
             ),
           ),
@@ -226,24 +261,24 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'คุณต้องการเสริมดวง\nด้านไหนมากที่สุด?',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              height: 1.3,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontSize: 27,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'เลือก 1 ข้อที่ตรงกับคุณมากที่สุด',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
           Expanded(
             child: ListView.separated(
@@ -281,19 +316,19 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'วันเกิดของคุณ',
-            style: TextStyle(
-              color: Colors.white,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'เพื่อวิเคราะห์ดวงชะตาตามราศีและปีนักษัตร',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
@@ -306,14 +341,22 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.lightSurface,
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: _data.birthDate != null
                       ? AppColors.primary
-                      : Colors.white.withValues(alpha: 0.2),
-                  width: 2,
+                      : AppColors.divider,
+                  width: _data.birthDate != null ? 2 : 1.2,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(
+                        alpha: _data.birthDate != null ? 0.16 : 0.06),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -321,7 +364,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                     AppIcons.calendar,
                     color: _data.birthDate != null
                         ? AppColors.primary
-                        : Colors.white.withValues(alpha: 0.5),
+                        : AppColors.mutedText,
                     size: 28,
                   ),
                   const SizedBox(width: 16),
@@ -329,18 +372,21 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                     _data.birthDate != null
                         ? _formatThaiDate(_data.birthDate!)
                         : 'แตะเพื่อเลือกวันเกิด',
-                    style: TextStyle(
+                    style: GoogleFonts.kanit(
                       color: _data.birthDate != null
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
+                          ? AppColors.deepText
+                          : AppColors.mutedText,
                       fontSize: 18,
+                      fontWeight: _data.birthDate != null
+                          ? FontWeight.w600
+                          : FontWeight.w400,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Optional: Birth time
           GestureDetector(
@@ -349,19 +395,21 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.surfaceMuted.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: _data.birthTime != null
                       ? AppColors.primary.withValues(alpha: 0.5)
-                      : Colors.white.withValues(alpha: 0.1),
+                      : AppColors.divider,
                 ),
               ),
               child: Row(
                 children: [
                   SvgIcon(
                     AppIcons.clock,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: _data.birthTime != null
+                        ? AppColors.primary
+                        : AppColors.mutedText,
                     size: 28,
                   ),
                   const SizedBox(width: 16),
@@ -373,15 +421,15 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                           _data.birthTime != null
                               ? 'เวลาเกิด: ${_data.birthTime}'
                               : 'เวลาเกิด (ถ้าทราบ)',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                          style: GoogleFonts.kanit(
+                            color: AppColors.deepText.withValues(alpha: 0.85),
                             fontSize: 16,
                           ),
                         ),
                         Text(
                           'ไม่จำเป็นต้องใส่',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.4),
+                          style: GoogleFonts.kanit(
+                            color: AppColors.mutedText,
                             fontSize: 12,
                           ),
                         ),
@@ -399,22 +447,41 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: ElevatedButton(
-              onPressed: _data.birthDate != null ? _nextPage : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.white.withValues(alpha: 0.1),
-                disabledForegroundColor: Colors.white.withValues(alpha: 0.3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: _data.birthDate != null
+                    ? const LinearGradient(colors: AppColors.primaryGradient)
+                    : null,
+                color: _data.birthDate != null ? null : AppColors.surfaceMuted,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: _data.birthDate != null
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.30),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : null,
               ),
-              child: const Text(
-                'ถัดไป',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              child: ElevatedButton(
+                onPressed: _data.birthDate != null ? _nextPage : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  disabledBackgroundColor: Colors.transparent,
+                  disabledForegroundColor: AppColors.mutedText,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: Text(
+                  'ถัดไป',
+                  style: GoogleFonts.kanit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -433,24 +500,24 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'คุณชอบเสริมดวง\nแบบไหน?',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              height: 1.3,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontSize: 27,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'เราจะแนะนำบริการที่เหมาะกับคุณ',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
           Expanded(
             child: ListView.separated(
@@ -483,144 +550,188 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
   Widget _buildResultPage() {
     final result = _generateQuizResult();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+    // Keep the CTA pinned so desktop/web users can always continue even when
+    // Flutter's internal scroll area is hard to drive from a browser canvas.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
       child: Column(
         children: [
-          const SizedBox(height: 20),
-
-          // Celebration icon
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFFFD700),
-                  const Color(0xFFFF8C00),
-                ],
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-                  blurRadius: 20,
-                ),
-              ],
-            ),
-            child: SvgIcon(
-              AppIcons.sparkleFilled,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          const Text(
-            'ผลวิเคราะห์ของคุณ',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Result cards
-          _buildResultCard(
-            svgIconPath: AppIcons.starFilled,
-            title: 'ราศี',
-            value: result.zodiacSign,
-          ),
-          const SizedBox(height: 12),
-          _buildResultCard(
-            svgIconPath: AppIcons.dragon,
-            title: 'ปีนักษัตร',
-            value: result.chineseZodiac,
-          ),
-          const SizedBox(height: 12),
-          _buildResultCard(
-            svgIconPath: AppIcons.palette,
-            title: 'สีมงคล',
-            value: result.luckyColor,
-          ),
-          const SizedBox(height: 12),
-          _buildResultCard(
-            svgIconPath: AppIcons.numbers,
-            title: 'เลขมงคล',
-            value: result.luckyNumber,
-          ),
-          const SizedBox(height: 24),
-
-          // Fortune preview (blurred/locked)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary.withValues(alpha: 0.2),
-                  AppColors.secondary.withValues(alpha: 0.2),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Column(
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
               children: [
-                SvgIcon(
-                  AppIcons.lock,
-                  color: Colors.white,
-                  size: 32,
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'คำทำนายประจำวันของคุณ',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(height: 8),
-                Text(
-                  'สมัครสมาชิกเพื่อดูคำทำนายฉบับเต็ม\nและรับการแจ้งเตือนวันมงคล',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 14,
+
+                // Celebration icon
+                Center(
+                  child: Container(
+                    width: 76,
+                    height: 76,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.accent,
+                          AppColors.secondary,
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.40),
+                          blurRadius: 26,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: const SvgIcon(
+                      AppIcons.sparkleFilled,
+                      size: 36,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
+                const SizedBox(height: 18),
+
+                Text(
+                  'ผลวิเคราะห์ของคุณ',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Result cards
+                _buildResultCard(
+                  svgIconPath: AppIcons.starFilled,
+                  title: 'ราศี',
+                  value: result.zodiacSign,
+                ),
+                const SizedBox(height: 10),
+                _buildResultCard(
+                  svgIconPath: AppIcons.dragon,
+                  title: 'ปีนักษัตร',
+                  value: result.chineseZodiac,
+                ),
+                const SizedBox(height: 10),
+                _buildResultCard(
+                  svgIconPath: AppIcons.palette,
+                  title: 'สีมงคล',
+                  value: result.luckyColor,
+                ),
+                const SizedBox(height: 10),
+                _buildResultCard(
+                  svgIconPath: AppIcons.numbers,
+                  title: 'เลขมงคล',
+                  value: result.luckyNumber,
+                ),
+                const SizedBox(height: 16),
+
+                // Fortune preview (blurred/locked)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.14),
+                        AppColors.secondary.withValues(alpha: 0.16),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.lightSurface,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.15),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: const SvgIcon(
+                          AppIcons.lock,
+                          color: AppColors.primary,
+                          size: 26,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'คำทำนายประจำวันของคุณ',
+                        style: GoogleFonts.kanit(
+                          color: AppColors.deepText,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'สมัครสมาชิกเพื่อดูคำทำนายฉบับเต็ม\nและรับการแจ้งเตือนวันมงคล',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.kanit(
+                          color: AppColors.mutedText,
+                          fontSize: 14,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
-          const SizedBox(height: 32),
 
-          // CTA
+          // Sticky CTA: always visible above the fold.
           SizedBox(
             width: double.infinity,
             height: 56,
-            child: ElevatedButton(
-              onPressed: _nextPage,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: AppColors.primaryGradient),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.30),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-              child: const Text(
-                'สมัครเพื่อดูคำทำนายเต็ม',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              child: ElevatedButton(
+                onPressed: _nextPage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: Text(
+                  'สมัครเพื่อดูคำทำนายเต็ม',
+                  style: GoogleFonts.kanit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
         ],
       ),
     );
@@ -635,29 +746,47 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          SvgIcon(svgIconPath, size: 28, color: AppColors.primary),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: SvgIcon(svgIconPath, size: 24, color: AppColors.primary),
+            ),
+          ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.6),
+                style: GoogleFonts.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 12,
                 ),
               ),
               Text(
                 value,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: GoogleFonts.kanit(
+                  color: AppColors.deepText,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -675,19 +804,19 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'สมัครสมาชิก',
-            style: TextStyle(
-              color: Colors.white,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'รับคำทำนายส่วนตัวและการแจ้งเตือนวันมงคล',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
@@ -719,31 +848,44 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           // Primary CTA: เริ่มใช้งานเลย (guest-first — ค่าเริ่มต้น)
           SizedBox(
             width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: _startAsGuest,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 8,
-                shadowColor: AppColors.primary.withValues(alpha: 0.5),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'เริ่มใช้งานเลย',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+            height: 58,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: AppColors.primaryGradient),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.32),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                  const SizedBox(width: 8),
-                  SvgIcon(AppIcons.arrowForward, size: 20, color: Colors.white),
                 ],
+              ),
+              child: ElevatedButton(
+                onPressed: _startAsGuest,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'เริ่มใช้งานเลย',
+                      style: GoogleFonts.kanit(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const SvgIcon(AppIcons.arrowForward,
+                        size: 20, color: Colors.white),
+                  ],
+                ),
               ),
             ),
           ),
@@ -752,7 +894,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           // Secondary CTA: สมัครเพื่อบันทึก (ไป RegisterScreen พร้อม onboarding data)
           SizedBox(
             width: double.infinity,
-            height: 52,
+            height: 54,
             child: OutlinedButton(
               onPressed: () async {
                 await _abTest.completeOnboarding();
@@ -766,25 +908,26 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                 }
               },
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.primary,
+                backgroundColor: AppColors.lightSurface,
                 side: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.6),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                   width: 1.5,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'สมัครเพื่อบันทึก',
-                style: TextStyle(
+                style: GoogleFonts.kanit(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // Login option
           Center(
@@ -794,9 +937,10 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
               },
               child: Text(
                 'มีบัญชีแล้ว? เข้าสู่ระบบ',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                style: GoogleFonts.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -823,20 +967,28 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.2),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withValues(alpha: 0.16),
+                AppColors.secondary.withValues(alpha: 0.18),
+              ],
+            ),
             shape: BoxShape.circle,
           ),
           child: SvgIcon(svgIconPath, color: AppColors.primary, size: 20),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 14),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText.withValues(alpha: 0.88),
               fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -855,9 +1007,14 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
-              surface: AppColors.darkSurface,
+              onPrimary: Colors.white,
+              surface: AppColors.lightSurface,
+              onSurface: AppColors.deepText,
+            ),
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppColors.lightSurface,
             ),
           ),
           child: child!,
@@ -879,9 +1036,14 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
-              surface: AppColors.darkSurface,
+              onPrimary: Colors.white,
+              surface: AppColors.lightSurface,
+              onSurface: AppColors.deepText,
+            ),
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppColors.lightSurface,
             ),
           ),
           child: child!,

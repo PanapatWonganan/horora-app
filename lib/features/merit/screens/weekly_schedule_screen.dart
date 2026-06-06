@@ -38,13 +38,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -72,7 +72,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
           ),
           const Expanded(
             child: Text(
@@ -176,7 +176,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgIcon(
+          const SvgIcon(
             AppIcons.calendar,
             size: 80,
             color: Colors.white24,
@@ -246,7 +246,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                         color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: SvgIcon(
+                      child: const SvgIcon(
                         AppIcons.temple,
                         size: 28,
                         color: Colors.white,
@@ -286,7 +286,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   ),
                   child: Row(
                     children: [
-                      SvgIcon(AppIcons.sparkle, size: 16, color: Colors.white),
+                      const SvgIcon(AppIcons.sparkle, size: 16, color: Colors.white),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -383,7 +383,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     ),
                   ),
                 ),
-                SvgIcon(
+                const SvgIcon(
                   AppIcons.checkCircle,
                   size: 20,
                   color: Colors.green,
@@ -524,12 +524,12 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             ),
           ],
         ),
-        child: Row(
+        child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgIcon(AppIcons.heart, size: 20, color: Colors.white),
-            const SizedBox(width: 8),
-            const Text(
+            SizedBox(width: 8),
+            Text(
               'สั่งจองฝากมู',
               style: TextStyle(
                 color: Colors.white,

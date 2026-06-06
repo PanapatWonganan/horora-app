@@ -18,6 +18,11 @@ class NotificationService {
   Future<void> initialize() async {
     if (_isInitialized) return;
 
+    if (kIsWeb) {
+      debugPrint('OneSignal push notifications are not initialized on Flutter web');
+      return;
+    }
+
     if (oneSignalAppId.isEmpty) {
       debugPrint('OneSignal App ID not configured, skipping initialization');
       return;
@@ -81,8 +86,11 @@ class NotificationService {
     // }
   }
 
+  bool get _canUseOneSignal => !kIsWeb && _isInitialized;
+
   /// Set user tags for targeting notifications
   Future<void> setUserTags(Map<String, String> tags) async {
+    if (!_canUseOneSignal) return;
     await OneSignal.User.addTags(tags);
     debugPrint('User tags set: $tags');
   }
@@ -94,23 +102,27 @@ class NotificationService {
 
   /// Set user's language preference
   Future<void> setLanguage(String language) async {
+    if (!_canUseOneSignal) return;
     await OneSignal.User.setLanguage(language);
   }
 
   /// Set external user ID (e.g., Laravel user ID)
   Future<void> setExternalUserId(String userId) async {
+    if (!_canUseOneSignal) return;
     await OneSignal.login(userId);
     debugPrint('External user ID set: $userId');
   }
 
   /// Remove external user ID (on logout)
   Future<void> removeExternalUserId() async {
+    if (!_canUseOneSignal) return;
     await OneSignal.logout();
     debugPrint('External user ID removed');
   }
 
   /// Get OneSignal player/subscription ID
   Future<String?> getPlayerId() async {
+    if (!_canUseOneSignal) return null;
     final id = OneSignal.User.pushSubscription.id;
     debugPrint('OneSignal Player ID: $id');
     return id;
@@ -118,22 +130,26 @@ class NotificationService {
 
   /// Check if notifications are enabled
   bool get areNotificationsEnabled {
+    if (!_canUseOneSignal) return false;
     return OneSignal.Notifications.permission;
   }
 
   /// Request notification permission
   Future<bool> requestPermission() async {
+    if (!_canUseOneSignal) return false;
     final result = await OneSignal.Notifications.requestPermission(true);
     return result;
   }
 
   /// Opt user in to notifications
   Future<void> optIn() async {
+    if (!_canUseOneSignal) return;
     OneSignal.User.pushSubscription.optIn();
   }
 
   /// Opt user out of notifications
   Future<void> optOut() async {
+    if (!_canUseOneSignal) return;
     OneSignal.User.pushSubscription.optOut();
   }
 

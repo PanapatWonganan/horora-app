@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/models/tarot_card_model.dart';
@@ -10,6 +11,7 @@ import '../../core/services/rating_service.dart';
 import '../../core/api/api_client.dart';
 import '../../config/constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/app_icons.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
 
@@ -380,33 +382,81 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text('การอ่านไพ่ทาโร่'),
-        backgroundColor: AppColors.darkSurface,
+        title: Text(
+          'การอ่านไพ่ทาโร่',
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        backgroundColor: AppColors.lightBackground,
+        foregroundColor: AppColors.deepText,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
       ),
-      body: _isLoading
-          ? _buildLoadingAnimation()
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSpreadTypeSelector(),
-                  const SizedBox(height: 16),
-                  _buildQuestionInput(),
-                  const SizedBox(height: 16),
-                  if (_userThaiZodiac != null) _buildZodiacInfo(),
-                  const SizedBox(height: 24),
-                  if (!_hasSelectedCards && !_isSelectingCards)
-                    _buildStartButton(),
-                  if (_isShuffling) _buildShufflingAnimation(),
-                  if (_isSelectingCards) _buildSelectCardsButton(),
-                  if (_hasSelectedCards) _buildSelectedCards(),
-                  const SizedBox(height: 24),
-                  if (_interpretation != null) _buildInterpretation(),
-                ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.lightBackground,
+              AppColors.surfaceMuted,
+            ],
+          ),
+        ),
+        child: _isLoading
+            ? _buildLoadingAnimation()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSpreadTypeSelector(),
+                    const SizedBox(height: 16),
+                    _buildQuestionInput(),
+                    const SizedBox(height: 16),
+                    if (_userThaiZodiac != null) _buildZodiacInfo(),
+                    const SizedBox(height: 24),
+                    if (!_hasSelectedCards && !_isSelectingCards)
+                      _buildStartButton(),
+                    if (_isShuffling) _buildShufflingAnimation(),
+                    if (_isSelectingCards) _buildSelectCardsButton(),
+                    if (_hasSelectedCards) _buildSelectedCards(),
+                    const SizedBox(height: 24),
+                    if (_interpretation != null) _buildInterpretation(),
+                  ],
+                ),
               ),
-            ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.accent,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 
@@ -414,14 +464,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'เลือกรูปแบบการอ่านไพ่',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
+        _buildSectionTitle('เลือกรูปแบบการอ่านไพ่'),
         const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -453,38 +496,55 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           _spreadType = type;
         });
       },
-      child: Container(
-        width: 120,
-        padding: const EdgeInsets.all(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: 124,
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(12),
+          gradient: isSelected
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: AppColors.primaryGradient,
+                )
+              : null,
+          color: isSelected ? null : AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.primary
-                : AppColors.darkSurface.withValues(alpha: 0.5),
-            width: 2,
+                ? AppColors.accent.withValues(alpha: 0.7)
+                : AppColors.divider,
+            width: isSelected ? 1.5 : 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: (isSelected ? AppColors.primary : AppColors.deepText)
+                  .withValues(alpha: isSelected ? 0.18 : 0.05),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? AppColors.primary : AppColors.lightText,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? AppColors.deepText : AppColors.deepText,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               description,
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 fontSize: 12,
-                color: AppColors.lightText.withValues(alpha: 0.7),
+                height: 1.3,
+                color: isSelected
+                    ? AppColors.deepText.withValues(alpha: 0.7)
+                    : AppColors.mutedText,
               ),
             ),
           ],
@@ -497,30 +557,31 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'คำถามหรือประเด็นที่ต้องการคำตอบ',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
+        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ'),
         const SizedBox(height: 12),
         TextField(
           controller: _questionController,
           decoration: InputDecoration(
             hintText: 'พิมพ์คำถามของคุณที่นี่...',
-            hintStyle: TextStyle(color: AppColors.lightText.withValues(alpha: 0.5)),
+            hintStyle: GoogleFonts.kanit(color: AppColors.mutedText),
             filled: true,
-            fillColor: AppColors.darkSurface,
+            fillColor: AppColors.lightSurface,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.divider, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
-          style: TextStyle(color: AppColors.lightText),
+          style: GoogleFonts.kanit(color: AppColors.deepText),
           maxLines: 3,
         ),
       ],
@@ -531,39 +592,57 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.surfaceMuted,
+            AppColors.cream.withValues(alpha: 0.6),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
+          color: AppColors.accent.withValues(alpha: 0.35),
           width: 1,
         ),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.auto_awesome,
-            color: AppColors.primary,
-            size: 24,
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
+            child: const Center(
+              child: SvgIcon(
+                AppIcons.sparkle,
+                size: 22,
+                color: AppColors.accent,
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'ปีนักษัตร: $_userThaiZodiac',
-                  style: TextStyle(
+                  style: GoogleFonts.kanit(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'การตีความไพ่จะคำนึงถึงราศีของคุณเพื่อให้คำทำนายที่แม่นยำยิ่งขึ้น',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.lightText.withValues(alpha: 0.8),
+                  style: GoogleFonts.kanit(
+                    fontSize: 13,
+                    height: 1.4,
+                    color: AppColors.mutedText,
                   ),
                 ),
               ],
@@ -579,7 +658,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       child: GradientButton(
         text: 'เริ่มการอ่านไพ่',
         onPressed: _shuffleCards,
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: AppColors.primaryGradient,
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -603,10 +682,31 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             builder: (context, child) {
               return Transform.rotate(
                 angle: _shuffleAnimation.value * 2 * pi,
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: AppColors.primary,
-                  size: 48,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: AppColors.mysticalGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.25),
+                        blurRadius: 16,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: SvgIcon(
+                      AppIcons.sparkle,
+                      size: 34,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               );
             },
@@ -614,10 +714,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           const SizedBox(height: 16),
           Text(
             'กำลังสับไพ่...',
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.lightText,
+              fontWeight: FontWeight.w700,
+              color: AppColors.deepText,
             ),
           ),
         ],
@@ -630,7 +730,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       child: GradientButton(
         text: 'เลือกไพ่',
         onPressed: _selectCards,
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: AppColors.primaryGradient,
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
@@ -648,14 +748,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'ไพ่ของคุณ',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
+        _buildSectionTitle('ไพ่ของคุณ'),
         const SizedBox(height: 16),
         Center(
           child: Wrap(
@@ -681,93 +774,146 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
-        width: 120,
-        height: 200,
+        width: 124,
+        height: 204,
+        padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: isRevealed ? Colors.white : AppColors.primary.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(12),
+          // Soft gold celestial frame around every card.
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.accent.withValues(alpha: 0.9),
+              AppColors.accent.withValues(alpha: 0.45),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: AppColors.primary.withValues(alpha: 0.18),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: isRevealed
-            ? Transform.rotate(
-                angle: isReversed ? pi : 0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Image.asset(
-                          _selectedCards[index].imagePath,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
-                            return Icon(
-                              Icons.auto_awesome,
-                              color: AppColors.primary,
-                              size: 32,
-                            );
-                          },
+        child: Container(
+          decoration: BoxDecoration(
+            color: isRevealed
+                ? Colors.white
+                : AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: isRevealed
+              ? Transform.rotate(
+                  angle: isReversed ? pi : 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Image.asset(
+                            _selectedCards[index].imagePath,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
+                              return const Center(
+                                child: SvgIcon(
+                                  AppIcons.sparkle,
+                                  size: 32,
+                                  color: AppColors.primary,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Column(
-                          children: [
-                            Text(
-                              _selectedCards[index].nameTh,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            if (isReversed)
-                              const Text(
-                                '(กลับหัว)',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.red,
+                        Container(
+                          width: double.infinity,
+                          color: AppColors.surfaceMuted,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Column(
+                            children: [
+                              Text(
+                                _selectedCards[index].nameTh,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.kanit(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.deepText,
                                 ),
                               ),
-                          ],
+                              if (isReversed)
+                                Text(
+                                  '(กลับหัว)',
+                                  style: GoogleFonts.kanit(
+                                    fontSize: 12,
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            : Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primary.withValues(alpha: 0.7),
-                        AppColors.secondary.withValues(alpha: 0.7),
                       ],
                     ),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.help_outline,
-                      color: Colors.white,
-                      size: 48,
+                )
+              : Center(
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: AppColors.mysticalGradient,
+                      ),
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Positioned(
+                          top: 14,
+                          left: 14,
+                          child: SvgIcon(
+                            AppIcons.star,
+                            size: 12,
+                            color: Colors.white.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const Positioned(
+                          bottom: 16,
+                          right: 16,
+                          child: SvgIcon(
+                            AppIcons.sparkle,
+                            size: 14,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.25),
+                            border: Border.all(
+                              color: AppColors.accent.withValues(alpha: 0.8),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Center(
+                            child: SvgIcon(
+                              AppIcons.sparkle,
+                              size: 28,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -776,49 +922,72 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'คำทำนาย',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
+        _buildSectionTitle('คำทำนาย'),
         const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.darkSurface,
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.lightSurface,
+                AppColors.surfaceMuted.withValues(alpha: 0.7),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.3),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: AppColors.primary.withValues(alpha: 0.1),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_userThaiZodiac != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    'สำหรับผู้ที่เกิด$_userThaiZodiac',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  const SvgIcon(
+                    AppIcons.sparkle,
+                    size: 18,
+                    color: AppColors.accent,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'ดวงใจของไพ่บอกว่า',
+                    style: GoogleFonts.kanit(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.primary,
                     ),
                   ),
+                ],
+              ),
+              if (_userThaiZodiac != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(
+                    'สำหรับผู้ที่เกิด$_userThaiZodiac',
+                    style: GoogleFonts.kanit(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.deepText,
+                    ),
+                  ),
                 ),
+              const SizedBox(height: 12),
               Text(
                 _interpretation ?? '',
-                style: TextStyle(
+                style: GoogleFonts.kanit(
                   fontSize: 16,
-                  color: AppColors.lightText,
-                  height: 1.5,
+                  color: AppColors.deepText,
+                  height: 1.65,
                 ),
               ),
             ],
@@ -829,7 +998,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           child: GradientButton(
             text: 'อ่านไพ่อีกครั้ง',
             onPressed: _shuffleCards,
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -921,11 +1090,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                               ),
                             ),
                             // ไอคอน
-                            Center(
-                              child: Icon(
-                                Icons.auto_awesome,
+                            const Center(
+                              child: SvgIcon(
+                                AppIcons.sparkle,
                                 color: AppColors.primary,
-                                size: 48,
+                                size: 44,
                               ),
                             ),
                           ],
@@ -940,18 +1109,18 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           const SizedBox(height: 24),
           Text(
             'กำลังตีความไพ่...',
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.lightText,
+              fontWeight: FontWeight.w700,
+              color: AppColors.deepText,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'กำลังวิเคราะห์ความหมายและความสัมพันธ์ของไพ่',
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 14,
-              color: AppColors.lightText.withValues(alpha: 0.7),
+              color: AppColors.mutedText,
             ),
             textAlign: TextAlign.center,
           ),

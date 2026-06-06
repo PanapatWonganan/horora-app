@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
@@ -21,13 +22,13 @@ class _TarotScreenState extends State<TarotScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.surfaceMuted,
             ],
           ),
         ),
@@ -61,27 +62,87 @@ class _TarotScreenState extends State<TarotScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'ไพ่ทาโรต์',
-              style: TextStyle(
-                color: AppColors.lightText,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                Text(
+                  'ไพ่ทาโรต์',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const SvgIcon(
+                  AppIcons.sparkle,
+                  size: 18,
+                  color: AppColors.accent,
+                ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
               'ค้นพบความลึกลับของชีวิต',
-              style: TextStyle(
-                color: AppColors.lightText.withValues(alpha: 0.7),
-                fontSize: 16,
+              style: GoogleFonts.kanit(
+                color: AppColors.mutedText,
+                fontSize: 15,
               ),
             ),
           ],
         ),
-        const SvgIcon(
-          AppIcons.divination,
-          size: 48,
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              colors: AppColors.mysticalGradient,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.6),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.18),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: const Center(
+            child: SvgIcon(
+              AppIcons.divination,
+              size: 32,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.accent,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );
@@ -91,14 +152,25 @@ class _TarotScreenState extends State<TarotScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.lightSurface,
+            AppColors.cream.withValues(alpha: 0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.25),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
+            color: AppColors.primary.withValues(alpha: 0.1),
+            blurRadius: 18,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -110,34 +182,37 @@ class _TarotScreenState extends State<TarotScreen> {
               const SvgIcon(
                 AppIcons.divination,
                 size: 24,
+                color: AppColors.primary,
               ),
               const SizedBox(width: 12),
-              Text(
-                'ยินดีต้อนรับสู่โลกแห่งไพ่ทาโรต์',
-                style: TextStyle(
-                  color: AppColors.lightText,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'ยินดีต้อนรับสู่โลกแห่งไพ่ทาโรต์',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Text(
             'ไพ่ทาโรต์เป็นเครื่องมือในการทำนายและให้คำแนะนำที่มีประวัติศาสตร์ยาวนาน ช่วยให้คุณเข้าใจตัวเองและสถานการณ์ในชีวิตได้ลึกซึ้งยิ่งขึ้น',
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.7),
+            style: GoogleFonts.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
-              height: 1.5,
+              height: 1.55,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           GradientButton(
             text: 'เริ่มการอ่านไพ่',
             onPressed: () {
               Navigator.pushNamed(context, AppRoutes.tarotReading);
             },
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -157,14 +232,7 @@ class _TarotScreenState extends State<TarotScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'รูปแบบการอ่านไพ่',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        _buildSectionTitle('รูปแบบการอ่านไพ่'),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -232,59 +300,70 @@ class _TarotScreenState extends State<TarotScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'การอ่านไพ่ที่บันทึกไว้',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        _buildSectionTitle('การอ่านไพ่ที่บันทึกไว้'),
         const SizedBox(height: 16),
         // TODO: Implement saved readings list when data is available
         Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(16),
+              color: AppColors.lightSurface,
+              borderRadius: BorderRadius.circular(22),
               border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
+                color: AppColors.primary.withValues(alpha: 0.18),
                 width: 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
             child: Column(
               children: [
-                SvgIcon(
-                  AppIcons.bookmarkOutline,
-                  size: 48,
-                  color: AppColors.lightText.withValues(alpha: 0.5),
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surfaceMuted,
+                  ),
+                  child: Center(
+                    child: SvgIcon(
+                      AppIcons.bookmarkOutline,
+                      size: 36,
+                      color: AppColors.primary.withValues(alpha: 0.7),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'ยังไม่มีการอ่านไพ่ที่บันทึกไว้',
-                  style: TextStyle(
-                    color: AppColors.lightText,
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'เมื่อคุณบันทึกการอ่านไพ่ คุณจะสามารถกลับมาดูได้ที่นี่',
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.7),
+                  style: GoogleFonts.kanit(
+                    color: AppColors.mutedText,
                     fontSize: 14,
+                    height: 1.4,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 OutlinedGradientButton(
                   text: 'เริ่มการอ่านไพ่ใหม่',
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.tarotReading);
                   },
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: AppColors.primaryGradient,
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,

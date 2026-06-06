@@ -100,25 +100,25 @@ class WeeklyMeritSchedule {
   /// ตารางการไปมูประจำสัปดาห์ (Default)
   static List<WeeklyMeritSchedule> get defaultSchedule => [
     // วันจันทร์ - ศาลหลักเมือง
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.monday,
       locationId: 'city_pillar',
       locationName: 'ศาลหลักเมือง',
       belief: 'ความสำเร็จ การงาน ความมั่นคง',
       requiredItems: [
-        const MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_1', name: 'เทียน 1 เล่ม', isRequired: true),
-        const MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
-        const MeritOfferingItem(id: 'lotus', name: 'ดอกบัว', isRequired: true),
+        MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_1', name: 'เทียน 1 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
+        MeritOfferingItem(id: 'lotus', name: 'ดอกบัว', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'lamp_oil',
           name: 'น้ำมันเติมตะเกียง',
           description: 'สื่อถึงการต่อช่วงโชติช่วงชัชวาล',
           price: 99,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'silk_3_colors',
           name: 'ผ้าแพร 3 สี',
           description: 'ผ้าแพรมงคล 3 สี ถวายเพื่อเสริมบารมี',
@@ -127,30 +127,30 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันอังคาร - ศาลเจ้าพ่อเสือ
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.tuesday,
       locationId: 'tiger_shrine',
       locationName: 'ศาลเจ้าพ่อเสือ',
       belief: 'โชคลาภ การค้าขาย ป้องกันภัย',
       requiredItems: [
-        const MeritOfferingItem(id: 'pork_belly', name: 'หมูสามชั้นดิบ', isRequired: true),
-        const MeritOfferingItem(id: 'raw_egg', name: 'ไข่ไก่ดิบ', isRequired: true),
-        const MeritOfferingItem(id: 'sticky_rice_sweet', name: 'ข้าวเหนียวหวาน', isRequired: true),
+        MeritOfferingItem(id: 'pork_belly', name: 'หมูสามชั้นดิบ', isRequired: true),
+        MeritOfferingItem(id: 'raw_egg', name: 'ไข่ไก่ดิบ', isRequired: true),
+        MeritOfferingItem(id: 'sticky_rice_sweet', name: 'ข้าวเหนียวหวาน', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'joss_paper',
           name: 'กระดาษไหว้เจ้า',
           description: 'เผาเพื่อส่งคำขอถึงเจ้าพ่อเสือ',
           price: 129,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'lucky_orange',
           name: 'ส้มมงคล 4 ลูก',
           description: 'ส้มมงคลนำโชค เสริมความเป็นสิริมงคล',
           price: 79,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'indian_incense',
           name: 'ธูปหอมอินเดีย',
           description: 'ธูปหอมเฉพาะจากอินเดีย',
@@ -159,31 +159,31 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันพุธ - พระพิฆเนศ ห้วยขวาง
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.wednesday,
       locationId: 'ganesha_huaykwang',
       locationName: 'พระพิฆเนศ ห้วยขวาง',
       belief: 'การศึกษา ศิลปะ ความสำเร็จ',
       requiredItems: [
-        const MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_1', name: 'เทียน 1 เล่ม', isRequired: true),
-        const MeritOfferingItem(id: 'garland_jasmine', name: 'พวงมาลัยดอกมะลิ', isRequired: true),
-        const MeritOfferingItem(id: 'banana', name: 'กล้วยน้ำว้า', isRequired: true),
+        MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_1', name: 'เทียน 1 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'garland_jasmine', name: 'พวงมาลัยดอกมะลิ', isRequired: true),
+        MeritOfferingItem(id: 'banana', name: 'กล้วยน้ำว้า', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'modak',
           name: 'ขนมโมทกะ',
           description: 'ขนมโปรดของพระพิฆเนศ',
           price: 149,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'red_cloth',
           name: 'ผ้าแดงถวาย',
           description: 'ผ้าแดงมงคลสำหรับพระพิฆเนศ',
           price: 199,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'durva_grass',
           name: 'หญ้าแพรก',
           description: 'หญ้าศักดิ์สิทธิ์สำหรับบูชา',
@@ -192,25 +192,25 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันพฤหัสบดี - วัดระฆังโฆสิตาราม (หลวงพ่อโต)
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.thursday,
       locationId: 'wat_rakang',
       locationName: 'วัดระฆังโฆสิตาราม',
       belief: 'โชคลาภ การเงิน ค้าขายร่ำรวย',
       requiredItems: [
-        const MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        const MeritOfferingItem(id: 'lotus_9', name: 'ดอกบัว 9 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
+        MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'lotus_9', name: 'ดอกบัว 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'bell_offering',
           name: 'ตีระฆังขอพร',
           description: 'ตีระฆังส่งเสียงถึงสวรรค์',
           price: 99,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'sanghathan',
           name: 'ชุดสังฆทาน',
           description: 'ถวายสังฆทานเสริมบุญ',
@@ -219,31 +219,31 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันศุกร์ - วัดเล่งเน่ยยี่ (วัดมังกรกมลาวาส) - เจ้าแม่กวนอิม
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.friday,
       locationId: 'wat_leng_noei_yi',
       locationName: 'วัดเล่งเน่ยยี่ (วัดมังกรกมลาวาส)',
       belief: 'เจ้าแม่กวนอิม - สุขภาพ ลูกหลาน ครอบครัว ขอบุตร',
       requiredItems: [
-        const MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        const MeritOfferingItem(id: 'fruit_5', name: 'ผลไม้ 5 อย่าง', isRequired: true),
-        const MeritOfferingItem(id: 'flower_white', name: 'ดอกไม้สีขาว', isRequired: true),
+        MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'fruit_5', name: 'ผลไม้ 5 อย่าง', isRequired: true),
+        MeritOfferingItem(id: 'flower_white', name: 'ดอกไม้สีขาว', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'vegetarian_set',
           name: 'ชุดอาหารเจ',
           description: 'อาหารเจถวายเจ้าแม่กวนอิม',
           price: 199,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'tea_offering',
           name: 'ชาถวาย 3 ถ้วย',
           description: 'ชาหอมถวายเจ้าแม่',
           price: 79,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'joss_paper_gold',
           name: 'กระดาษทอง',
           description: 'กระดาษทองเผาถวาย',
@@ -252,25 +252,25 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันเสาร์ - ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.saturday,
       locationId: 'vessavana_sampheng',
       locationName: 'ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)',
       belief: 'ป้องกันภัย โชคลาภ เสริมดวง',
       requiredItems: [
-        const MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        const MeritOfferingItem(id: 'red_water', name: 'น้ำแดง', isRequired: true),
-        const MeritOfferingItem(id: 'garland_red', name: 'พวงมาลัยสีแดง', isRequired: true),
+        MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'red_water', name: 'น้ำแดง', isRequired: true),
+        MeritOfferingItem(id: 'garland_red', name: 'พวงมาลัยสีแดง', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'yantra',
           name: 'ผ้ายันต์ท้าวเวสสุวรรณ',
           description: 'ผ้ายันต์ป้องกันภัย',
           price: 299,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'gold_leaf_9',
           name: 'ทองคำเปลว 9 แผ่น',
           description: 'ปิดทององค์ท้าวเวสสุวรรณ',
@@ -279,24 +279,24 @@ class WeeklyMeritSchedule {
       ],
     ),
     // วันอาทิตย์ - ท้าวมหาพรหม เอราวัณ
-    WeeklyMeritSchedule(
+    const WeeklyMeritSchedule(
       day: MeritDay.sunday,
       locationId: 'brahma_erawan',
       locationName: 'ท้าวมหาพรหม เอราวัณ',
       belief: 'ขอพรทุกด้าน โชคลาภ ความสำเร็จ',
       requiredItems: [
-        const MeritOfferingItem(id: 'garland_7_colors', name: 'มาลัยเจ็ดสีเจ็ดศอก 4 พวง (4 พักตร์)', isRequired: true),
-        const MeritOfferingItem(id: 'incense_12', name: 'ธูป 12 ดอก', isRequired: true),
-        const MeritOfferingItem(id: 'candle_4', name: 'เทียน 4 เล่ม', isRequired: true),
+        MeritOfferingItem(id: 'garland_7_colors', name: 'มาลัยเจ็ดสีเจ็ดศอก 4 พวง (4 พักตร์)', isRequired: true),
+        MeritOfferingItem(id: 'incense_12', name: 'ธูป 12 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_4', name: 'เทียน 4 เล่ม', isRequired: true),
       ],
       addons: [
-        const MeritAddon(
+        MeritAddon(
           id: 'thai_dance',
           name: 'รำถวาย',
           description: 'รำถวายบูชาองค์พระพรหม',
           price: 599,
         ),
-        const MeritAddon(
+        MeritAddon(
           id: 'gold_elephant',
           name: 'ช้างทองคำเปลว',
           description: 'ช้างมงคลปิดทองคำเปลว',

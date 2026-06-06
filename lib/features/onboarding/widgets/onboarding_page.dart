@@ -50,8 +50,8 @@ class OnboardingPage extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -101,7 +101,7 @@ class OnboardingPage extends StatelessWidget {
         children: [
           Text(
             data.title,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.lightText,
               fontSize: 28,
               fontWeight: FontWeight.bold,

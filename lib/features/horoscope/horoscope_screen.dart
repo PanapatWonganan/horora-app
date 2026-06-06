@@ -390,7 +390,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildDailyTab() {
     if (_isHoroscopeLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
@@ -414,7 +414,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildWeeklyTab() {
     if (_isHoroscopeLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
@@ -440,7 +440,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'ดวงชะตาประจำสัปดาห์',
             style: TextStyle(
               color: AppColors.lightText,
@@ -518,7 +518,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'ข้อมูลเพิ่มเติม',
                   style: TextStyle(
                     color: AppColors.lightText,
@@ -542,7 +542,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildMonthlyTab() {
     if (_isHoroscopeLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
@@ -577,7 +577,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'ภาพรวมประจำเดือน',
                   style: TextStyle(
                     color: AppColors.lightText,
@@ -598,7 +598,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             ),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'ด้านต่างๆ ของชีวิต',
             style: TextStyle(
               color: AppColors.lightText,
@@ -673,7 +673,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildYearlyTab() {
     if (_isHoroscopeLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
         ),
@@ -708,7 +708,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'ภาพรวมประจำปี',
                   style: TextStyle(
                     color: AppColors.lightText,
@@ -726,7 +726,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
+                const Text(
                   'คำแนะนำ',
                   style: TextStyle(
                     color: AppColors.lightText,
@@ -747,7 +747,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             ),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'ด้านต่างๆ ของชีวิต',
             style: TextStyle(
               color: AppColors.lightText,
@@ -851,7 +851,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               const SizedBox(height: 4),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
@@ -870,7 +870,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'ดวงชะตาวันนี้',
             style: TextStyle(
               color: AppColors.lightText,
@@ -949,7 +949,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'ดวงชะตาวันนี้',
           style: TextStyle(
             color: AppColors.lightText,
@@ -969,7 +969,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             children: [
               Text(
                 'คำทำนายประจำวันที่ ${_dailyHoroscope!.date.day}/${_dailyHoroscope!.date.month}/${_dailyHoroscope!.date.year}',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -1060,7 +1060,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'สิ่งนำโชค',
             style: TextStyle(
               color: AppColors.lightText,
@@ -1095,7 +1095,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'สิ่งนำโชค',
           style: TextStyle(
             color: AppColors.lightText,
@@ -1157,7 +1157,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               const SizedBox(height: 4),
               Text(
                 value,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

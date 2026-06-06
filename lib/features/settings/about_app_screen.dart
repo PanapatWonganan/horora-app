@@ -9,7 +9,7 @@ class AboutAppScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'เกี่ยวกับแอป',
           style: TextStyle(
             color: AppColors.lightText,
@@ -19,20 +19,20 @@ class AboutAppScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -94,14 +94,14 @@ class AboutAppScreen extends StatelessWidget {
             color: AppColors.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(
+          child: const Icon(
             Icons.auto_awesome,
             color: AppColors.primary,
             size: 60,
           ),
         ),
         const SizedBox(height: 16),
-        Text(
+        const Text(
           'Horora',
           style: TextStyle(
             color: AppColors.lightText,
@@ -143,7 +143,7 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.lightText,
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -175,7 +175,7 @@ class AboutAppScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.description_outlined,
               color: AppColors.primary,
               size: 24,
@@ -184,7 +184,7 @@ class AboutAppScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -246,7 +246,7 @@ class AboutAppScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.lightText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,

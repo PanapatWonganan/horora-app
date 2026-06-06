@@ -25,7 +25,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'การแจ้งเตือน',
           style: TextStyle(
             color: AppColors.lightText,
@@ -35,20 +35,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -143,7 +143,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.lightText,
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -172,7 +172,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.lightText,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -220,7 +220,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'เวลาที่ต้องการรับการแจ้งเตือน',
                   style: TextStyle(
                     color: AppColors.lightText,
@@ -249,7 +249,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
               child: Text(
                 _formatTimeOfDay(_dailyHoroscopeTime),
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -269,12 +269,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: AppColors.darkSurface,
               onSurface: AppColors.lightText,
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.darkSurface),
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.darkSurface),
           ),
           child: child!,
         );
@@ -298,7 +298,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return GradientButton(
       text: 'บันทึกการตั้งค่า',
       onPressed: _saveSettings,
-      gradient: LinearGradient(
+      gradient: const LinearGradient(
         colors: AppColors.primaryGradient,
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,

@@ -235,19 +235,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
         child: SafeArea(
           child: _isLoading
-              ? Center(
+              ? const Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primary,
                   ),
@@ -291,14 +291,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgIcon(
+            const SvgIcon(
               AppIcons.error,
               size: 64,
             ),
             const SizedBox(height: 16),
             Text(
               _errorMessage,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.lightText,
                 fontSize: 16,
               ),
@@ -308,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             GradientButton(
               text: 'ลองใหม่อีกครั้ง',
               onPressed: _loadUserProfile,
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [
                   AppColors.primary,
                   AppColors.secondary,
@@ -327,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
+        const Text(
           'โปรไฟล์',
           style: TextStyle(
             color: AppColors.lightText,
@@ -336,7 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         IconButton(
-          icon: SvgIcon(
+          icon: const SvgIcon(
             AppIcons.settings,
             size: 24,
             color: AppColors.lightText,
@@ -385,13 +385,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? Image.network(
                       _userData['profile_image_url'],
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => SvgIcon(
+                      errorBuilder: (context, error, stackTrace) => const SvgIcon(
                         AppIcons.personFilled,
                         size: 40,
                         color: AppColors.primary,
                       ),
                     )
-                  : SvgIcon(
+                  : const SvgIcon(
                       AppIcons.personFilled,
                       size: 40,
                       color: AppColors.primary,
@@ -406,7 +406,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 _userData['full_name'] ?? 'ผู้ใช้งาน',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.lightText,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -472,7 +472,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 return 'ไม่ทราบปีนักษัตร';
                               }
                             }(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: AppColors.primary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -500,15 +500,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           SvgIcon(
                             AppIcons.starFilled,
                             size: 12,
                             color: Colors.white,
                           ),
-                          const SizedBox(width: 4),
-                          const Text(
+                          SizedBox(width: 4),
+                          Text(
                             'พรีเมียม',
                             style: TextStyle(
                               color: Colors.white,
@@ -525,7 +525,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         IconButton(
-          icon: SvgIcon(
+          icon: const SvgIcon(
             AppIcons.edit,
             size: 20,
             color: Colors.amber,
@@ -574,14 +574,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               SvgIcon(
                 AppIcons.starFilled,
                 size: 24,
                 color: Colors.amber,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Text(
                 'อัพเกรดเป็นพรีเมียม',
                 style: TextStyle(
@@ -621,10 +621,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    title: Row(
+                    title: const Row(
                       children: [
                         SvgIcon(AppIcons.info, size: 24, color: AppColors.primary),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Text(
                           'แจ้งให้ทราบ',
                           style: TextStyle(
@@ -634,7 +634,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ],
                     ),
-                    content: Text(
+                    content: const Text(
                       'กำลังพัฒนาส่วนนี้',
                       style: TextStyle(
                         color: AppColors.lightText,
@@ -645,7 +645,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
+                        child: const Text(
                           'ตกลง',
                           style: TextStyle(
                             color: AppColors.primary,
@@ -665,7 +665,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            icon: SvgIcon(
+            icon: const SvgIcon(
               AppIcons.starFilled,
               size: 20,
               color: Colors.white,
@@ -701,15 +701,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               SvgIcon(
                 AppIcons.diamond,
                 size: 24,
                 color: Colors.white,
               ),
-              const SizedBox(width: 12),
-              const Text(
+              SizedBox(width: 12),
+              Text(
                 'สมาชิกพรีเมียม',
                 style: TextStyle(
                   color: Colors.white,
@@ -743,7 +743,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgIcon(
@@ -751,8 +751,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   size: 16,
                   color: Colors.white,
                 ),
-                const SizedBox(width: 8),
-                const Text(
+                SizedBox(width: 8),
+                Text(
                   'สมาชิกภาพของคุณจะหมดอายุในวันที่ 31/12/2024',
                   style: TextStyle(
                     color: Colors.white,
@@ -772,7 +772,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Expanded(
       child: Row(
         children: [
-          SvgIcon(
+          const SvgIcon(
             AppIcons.checkCircle,
             size: 16,
           ),
@@ -780,7 +780,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Flexible(
             child: Text(
               text,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.lightText,
                 fontSize: 12,
               ),
@@ -796,7 +796,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Expanded(
       child: Row(
         children: [
-          SvgIcon(
+          const SvgIcon(
             AppIcons.checkCircle,
             size: 16,
             color: Colors.white,
@@ -821,7 +821,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'การตั้งค่า',
           style: TextStyle(
             color: AppColors.lightText,
@@ -945,7 +945,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: AppColors.darkSurface,
-          title: Text(
+          title: const Text(
             'ยืนยันการออกจากระบบ',
             style: TextStyle(
               color: AppColors.lightText,
@@ -961,7 +961,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
+              child: const Text(
                 'ยกเลิก',
                 style: TextStyle(
                   color: AppColors.primary,

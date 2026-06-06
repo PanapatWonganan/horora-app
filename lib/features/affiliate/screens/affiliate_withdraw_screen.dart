@@ -107,7 +107,7 @@ class _AffiliateWithdrawScreenState extends State<AffiliateWithdrawScreen> {
                   const SizedBox(height: 4),
                   Text(
                     '฿${widget.availableBalance.toStringAsFixed(0)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,

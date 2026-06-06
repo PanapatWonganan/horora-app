@@ -150,7 +150,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppColors.primary, AppColors.secondary],
                 ),
@@ -170,7 +170,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             const SizedBox(height: 12),
             Text(
               'เลขที่คำสั่งซื้อ: ${_createdOrder?.orderNumber}',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontSize: 14,
               ),
@@ -285,13 +285,13 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -301,13 +301,13 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               _buildHeader(),
               Expanded(
                 child: _isCreatingOrder
-                    ? Center(
+                    ? const Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CircularProgressIndicator(color: AppColors.primary),
-                            const SizedBox(height: 16),
-                            const Text(
+                            SizedBox(height: 16),
+                            Text(
                               'กำลังสร้างคำสั่งซื้อ...',
                               style: TextStyle(color: Colors.white),
                             ),

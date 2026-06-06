@@ -63,7 +63,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'ประวัติการดูดวงจากราศี',
           style: TextStyle(
             color: AppColors.lightText,
@@ -73,20 +73,20 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: AppColors.lightText,
         ),
       ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -104,14 +104,14 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
   }
 
   Widget _buildLoadingView() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
             color: AppColors.primary,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             'กำลังโหลดประวัติการดูดวง...',
             style: TextStyle(
@@ -131,7 +131,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               color: AppColors.error,
               size: 64,
@@ -139,7 +139,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'เกิดข้อผิดพลาดในการโหลดข้อมูล',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.lightText,
                 fontSize: 16,
               ),
@@ -149,7 +149,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             GradientButton(
               text: 'ลองใหม่อีกครั้ง',
               onPressed: _loadHoroscopeHistory,
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: AppColors.primaryGradient,
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -174,7 +174,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
               size: 64,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'ยังไม่มีประวัติการดูดวง',
               style: TextStyle(
                 color: AppColors.lightText,
@@ -199,7 +199,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/horoscope');
               },
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: AppColors.primaryGradient,
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
@@ -256,7 +256,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
                     const SizedBox(width: 8),
                     Text(
                       _getThaiZodiacName(zodiacSign),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.lightText,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -274,7 +274,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'คำทำนายประจำวัน',
               style: TextStyle(
                 color: AppColors.primary,
@@ -285,7 +285,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             const SizedBox(height: 8),
             Text(
               prediction,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.lightText,
                 fontSize: 14,
                 height: 1.5,

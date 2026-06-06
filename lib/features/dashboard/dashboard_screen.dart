@@ -217,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onPressed: () {
                             // Navigate to history
                           },
-                          child: Text(
+                          child: const Text(
                             'ดูทั้งหมด',
                             style: TextStyle(
                               color: AppColors.primary,
@@ -231,7 +231,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 16.0),
                     
                     // Recent activity cards
-                    RecentActivityCard(
+                    const RecentActivityCard(
                       title: 'ดูดวงประจำวัน',
                       subtitle: 'ราศีเมษ - 14 มีนาคม 2567',
                       icon: Icons.auto_awesome,
@@ -241,7 +241,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     
                     const SizedBox(height: 12.0),
                     
-                    RecentActivityCard(
+                    const RecentActivityCard(
                       title: 'เปิดไพ่ทาโร่',
                       subtitle: 'การเปิดไพ่แบบ 3 ใบ - ความรัก',
                       icon: Icons.style,
@@ -251,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     
                     const SizedBox(height: 12.0),
                     
-                    RecentActivityCard(
+                    const RecentActivityCard(
                       title: 'สนทนากับนักพยากรณ์',
                       subtitle: 'หัวข้อ: ดวงความรัก',
                       icon: Icons.chat_bubble_outline,

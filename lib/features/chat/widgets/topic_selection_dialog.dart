@@ -209,7 +209,7 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: AppColors.primary,
                       width: 2,
                     ),

@@ -1,73 +1,81 @@
 import 'package:flutter/material.dart';
 
+/// Soft Celestial palette — a calm, pastel Thai-astrology aesthetic.
+///
+/// Variable names are kept stable (primary, darkBackground, lightText, …) so the
+/// whole app re-themes by value change alone. For this LIGHT theme the historically
+/// "dark*" surfaces are remapped to soft cream/white and "lightText" becomes the
+/// deep ink used on pastel backgrounds.
 class AppColors {
-  // Primary Colors
-  static Color primary = const Color(0xFF9C27B0); // Purple
-  static Color secondary = const Color(0xFF673AB7); // Deep Purple
-  static Color tertiary = const Color(0xFF3F51B5); // Indigo
+  // Brand — lavender lead with peach/mint companions (no flat purple gradients).
+  static const Color primary = Color(0xFF8B6FE0); // soft lavender-violet
+  static const Color secondary = Color(0xFFFFB0A0); // warm peach
+  static const Color tertiary = Color(0xFF7FD6C2); // mint
 
-  // Background Colors
-  static Color lightBackground = const Color(0xFFF8F9FA);
-  static Color darkBackground = const Color(0xFF121212);
+  // Accent used for highlights / celestial sparkle.
+  static const Color accent = Color(0xFFF2C879); // soft gold star
 
-  // Surface Colors
-  static Color lightSurface = const Color(0xFFFFFFFF);
-  static Color darkSurface = const Color(0xFF1E1E1E);
+  // Background Colors — bg = celestial cream, "dark*" remapped to light surfaces.
+  static const Color lightBackground = Color(0xFFFBF7FF); // pastel sky
+  static const Color darkBackground = Color(0xFFFBF7FF); // (remapped) same cream
+  static const Color cream = Color(0xFFFFF7EC);
 
-  // Text Colors
-  static Color lightText = const Color(0xFFF5F5F5);
-  static Color darkText = const Color(0xFF212121);
+  // Surface Colors — clean white cards on the pastel canvas.
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color darkSurface = Color(0xFFFFFFFF); // (remapped) white cards
+  static const Color surfaceMuted = Color(0xFFF3ECFB); // very soft lavender wash
 
-  // Status Colors
-  static Color success = const Color(0xFF4CAF50);
-  static Color warning = const Color(0xFFFFC107);
-  static Color error = const Color(0xFFF44336);
-  static Color info = const Color(0xFF2196F3);
+  // Text Colors — deep plum-ink reads softly on pastel, not harsh black.
+  static const Color deepText = Color(0xFF2F2A40);
+  static const Color lightText = Color(0xFF2F2A40); // (remapped) deep ink for light UI
+  static const Color darkText = Color(0xFF2F2A40);
+  static const Color mutedText = Color(0xFF8A82A0);
 
-  // Gradient Colors
-  static List<Color> primaryGradient = [
-    const Color(0xFF9C27B0),
-    const Color(0xFF673AB7),
+  // Status Colors — kept pastel-friendly.
+  static const Color success = Color(0xFF5FB88E);
+  static const Color warning = Color(0xFFF2C879);
+  static const Color error = Color(0xFFE57C7C);
+  static const Color info = Color(0xFF7FB0E8);
+
+  // Gradient Colors — gentle multi-pastel blends, never a flat purple ramp.
+  static const List<Color> primaryGradient = [
+    Color(0xFFCDB7FF), // lavender
+    Color(0xFFFFD7C2), // peach
   ];
 
-  static List<Color> mysticalGradient = [
-    const Color(0xFF673AB7),
-    const Color(0xFF3F51B5),
+  static const List<Color> mysticalGradient = [
+    Color(0xFFB8A6F0), // lavender
+    Color(0xFFBEE8FF), // sky blue
   ];
 
-  static List<Color> cosmicGradient = [
-    const Color(0xFF3F51B5),
-    const Color(0xFF2196F3),
+  static const List<Color> cosmicGradient = [
+    Color(0xFFBEE8FF), // sky
+    Color(0xFFC8F2DC), // mint
   ];
 
-  // Zodiac Element Colors
-  static Color fireElement =
-      const Color(0xFFFF5722); // Fire (Aries, Leo, Sagittarius)
-  static Color earthElement =
-      const Color(0xFF8BC34A); // Earth (Taurus, Virgo, Capricorn)
-  static Color airElement =
-      const Color(0xFF03A9F4); // Air (Gemini, Libra, Aquarius)
-  static Color waterElement =
-      const Color(0xFF00BCD4); // Water (Cancer, Scorpio, Pisces)
+  // Zodiac Element Colors — softened to pastel.
+  static const Color fireElement = Color(0xFFFF9E80); // soft coral
+  static const Color earthElement = Color(0xFFA8D58F); // sage
+  static const Color airElement = Color(0xFF9CC9F0); // soft blue
+  static const Color waterElement = Color(0xFF8FD9D0); // aqua mint
 
-  // Tarot Card Colors
-  static Color majorArcana = const Color(0xFFE91E63); // Major Arcana
-  static Color suitWands = const Color(0xFFFF9800); // Wands
-  static Color suitCups = const Color(0xFF2196F3); // Cups
-  static Color suitSwords = const Color(0xFF607D8B); // Swords
-  static Color suitPentacles = const Color(0xFF4CAF50); // Pentacles
+  // Tarot Card Colors — pastel jewel tones.
+  static const Color majorArcana = Color(0xFFE79BB8); // rose
+  static const Color suitWands = Color(0xFFF2B873); // amber
+  static const Color suitCups = Color(0xFF9CC9F0); // blue
+  static const Color suitSwords = Color(0xFFA7B2C7); // slate
+  static const Color suitPentacles = Color(0xFFA8D58F); // green
 
   // Misc Colors
-  static Color divider = const Color(0xFFE0E0E0);
-  static Color disabled = const Color(0xFF9E9E9E);
-  static Color overlay = Colors.black.withValues(alpha: 0.5);
+  static const Color divider = Color(0xFFEDE6F7);
+  static const Color disabled = Color(0xFFC5BED4);
+  static final Color overlay = const Color(0xFF2F2A40).withValues(alpha: 0.35);
 
-  // Dashboard Feature Colors
-  static Color zodiacFire = const Color(0xFFFF5722); // Zodiac feature
-  static Color tarotMajor = const Color(0xFFE91E63); // Tarot feature
-  static Color chatBubble = const Color(0xFF2196F3); // Chat feature
-  static Color focusMeditation =
-      const Color(0xFF4CAF50); // Focus meditation feature
+  // Dashboard Feature Colors — pastel-coded per feature.
+  static const Color zodiacFire = Color(0xFFFF9E80);
+  static const Color tarotMajor = Color(0xFFE79BB8);
+  static const Color chatBubble = Color(0xFF9CC9F0);
+  static const Color focusMeditation = Color(0xFFA8D58F);
 
   // Get color for zodiac sign
   static Color getZodiacColor(String zodiacSign) {

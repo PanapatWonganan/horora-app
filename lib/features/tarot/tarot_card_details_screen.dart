@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,6 +8,7 @@ import '../../core/models/tarot_card_model.dart';
 import '../../core/repositories/tarot_repository.dart';
 import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/app_icons.dart';
 import '../shared/widgets/loading_indicator.dart';
 
 class TarotCardDetailsScreen extends StatefulWidget {
@@ -134,9 +136,19 @@ ${_reading!.interpretation}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text('รายละเอียดการอ่านไพ่'),
-        backgroundColor: AppColors.darkSurface,
+        title: Text(
+          'รายละเอียดการอ่านไพ่',
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        backgroundColor: AppColors.lightBackground,
+        foregroundColor: AppColors.deepText,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         actions: [
           if (_reading != null) ...[
             IconButton(
@@ -152,35 +164,64 @@ ${_reading!.interpretation}
           ],
         ],
       ),
-      body: _isLoading
-          ? const Center(child: LoadingIndicator())
-          : _errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _errorMessage!,
-                        style: TextStyle(color: AppColors.lightText),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: _loadReading,
-                        child: const Text('ลองใหม่'),
-                      ),
-                    ],
-                  ),
-                )
-              : _reading == null
-                  ? const Center(child: Text('ไม่พบข้อมูลการอ่านไพ่'))
-                  : _buildReadingDetails(),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.lightBackground,
+              AppColors.surfaceMuted,
+            ],
+          ),
+        ),
+        child: _isLoading
+            ? const Center(child: LoadingIndicator())
+            : _errorMessage != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.error,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage!,
+                          style: GoogleFonts.kanit(color: AppColors.deepText),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loadReading,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            'ลองใหม่',
+                            style: GoogleFonts.kanit(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : _reading == null
+                    ? Center(
+                        child: Text(
+                          'ไม่พบข้อมูลการอ่านไพ่',
+                          style: GoogleFonts.kanit(color: AppColors.deepText),
+                        ),
+                      )
+                    : _buildReadingDetails(),
+      ),
     );
   }
 
@@ -228,15 +269,26 @@ ${_reading!.interpretation}
 
   Widget _buildHeader(String spreadTypeText, String formattedDate) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.lightSurface,
+            AppColors.cream.withValues(alpha: 0.7),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.25),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: AppColors.primary.withValues(alpha: 0.1),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -245,30 +297,44 @@ ${_reading!.interpretation}
         children: [
           Row(
             children: [
-              Icon(
-                Icons.auto_awesome,
-                color: AppColors.primary,
-                size: 24,
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: AppColors.mysticalGradient,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Center(
+                  child: SvgIcon(
+                    AppIcons.divination,
+                    size: 24,
+                    color: Colors.white,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'การอ่านไพ่แบบ$spreadTypeText',
-                  style: TextStyle(
+                  style: GoogleFonts.kanit(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.lightText,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.deepText,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             'วันที่: $formattedDate',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.lightText.withValues(alpha: 0.7),
+            style: GoogleFonts.kanit(
+              fontSize: 13,
+              color: AppColors.mutedText,
             ),
           ),
         ],
@@ -276,31 +342,50 @@ ${_reading!.interpretation}
     );
   }
 
+  Widget _buildSectionTitle(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            color: AppColors.accent,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.deepText,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildQuestion() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'คำถามหรือประเด็นที่ต้องการคำตอบ',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ'),
+        const SizedBox(height: 10),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.darkSurface,
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.divider, width: 1),
           ),
           child: Text(
             _reading!.question ?? 'ไม่ระบุคำถาม',
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 16,
-              color: AppColors.lightText,
+              height: 1.5,
+              color: AppColors.deepText,
             ),
           ),
         ),
@@ -312,17 +397,10 @@ ${_reading!.interpretation}
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'ไพ่ที่ได้',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
+        _buildSectionTitle('ไพ่ที่ได้'),
         const SizedBox(height: 16),
         SizedBox(
-          height: 200,
+          height: 220,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _reading!.cards.length,
@@ -337,67 +415,89 @@ ${_reading!.interpretation}
 
   Widget _buildTarotCard(TarotCardPosition cardPosition) {
     return Container(
-      width: 120,
+      width: 124,
       margin: const EdgeInsets.only(right: 16),
       child: Column(
         children: [
           Container(
-            width: 120,
-            height: 160,
+            width: 124,
+            height: 168,
+            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              // Soft gold celestial frame.
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.accent.withValues(alpha: 0.9),
+                  AppColors.accent.withValues(alpha: 0.45),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: AppColors.primary.withValues(alpha: 0.16),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
-            child: Transform.rotate(
-              angle: cardPosition.isReversed ? 3.14159 : 0, // 180 degrees if reversed
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    color: AppColors.primary,
-                    size: 48,
-                  ),
-                  const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      cardPosition.card.nameTh,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.lightSurface,
+                    AppColors.surfaceMuted,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Transform.rotate(
+                angle: cardPosition.isReversed ? 3.14159 : 0, // 180 degrees if reversed
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SvgIcon(
+                      AppIcons.sparkle,
+                      color: AppColors.primary,
+                      size: 40,
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        cardPosition.card.nameTh,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.kanit(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepText,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             cardPosition.position,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.lightText,
+              fontWeight: FontWeight.w600,
+              color: AppColors.deepText,
             ),
           ),
           if (cardPosition.isReversed)
             Text(
               '(กลับหัว)',
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 fontSize: 12,
-                color: Colors.red[400],
+                color: AppColors.secondary,
               ),
             ),
         ],
@@ -409,28 +509,39 @@ ${_reading!.interpretation}
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'คำทำนาย',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _buildSectionTitle('คำทำนาย'),
+        const SizedBox(height: 10),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.darkSurface,
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.lightSurface,
+                AppColors.surfaceMuted.withValues(alpha: 0.7),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.3),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Text(
             _reading!.interpretation,
-            style: TextStyle(
+            style: GoogleFonts.kanit(
               fontSize: 16,
-              color: AppColors.lightText,
-              height: 1.5,
+              color: AppColors.deepText,
+              height: 1.65,
             ),
           ),
         ),
@@ -457,23 +568,23 @@ ${_reading!.interpretation}
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'อิทธิพลของราศี',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightText,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _buildSectionTitle('อิทธิพลของราศี'),
+        const SizedBox(height: 10),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.surfaceMuted,
+                AppColors.cream.withValues(alpha: 0.6),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.3),
+              color: AppColors.accent.withValues(alpha: 0.35),
               width: 1,
             ),
           ),
@@ -482,17 +593,17 @@ ${_reading!.interpretation}
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    color: AppColors.primary,
+                  const SvgIcon(
+                    AppIcons.sparkle,
+                    color: AppColors.accent,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'ราศีของคุณ',
-                    style: TextStyle(
+                    style: GoogleFonts.kanit(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.primary,
                     ),
                   ),
@@ -501,10 +612,10 @@ ${_reading!.interpretation}
               const SizedBox(height: 8),
               Text(
                 interpretationData['zodiac_influence'] as String,
-                style: TextStyle(
+                style: GoogleFonts.kanit(
                   fontSize: 14,
-                  color: AppColors.lightText,
-                  height: 1.5,
+                  color: AppColors.deepText,
+                  height: 1.55,
                 ),
               ),
             ],

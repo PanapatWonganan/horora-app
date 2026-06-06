@@ -67,7 +67,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back_ios,
             color: AppColors.lightText,
           ),
@@ -79,13 +79,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -131,7 +131,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               GradientButton(
                 text: 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
                 onPressed: _resetPassword,
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: AppColors.primaryGradient,
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -153,13 +153,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const SizedBox(height: 40),
-        Icon(
+        const Icon(
           Icons.check_circle_outline,
           size: 100,
           color: AppColors.success,
         ),
         const SizedBox(height: 32),
-        Text(
+        const Text(
           'ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว',
           style: TextStyle(
             color: AppColors.lightText,
@@ -183,7 +183,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onPressed: () {
             AppRouter.navigateToReplacement(context, AppRoutes.login);
           },
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: AppColors.primaryGradient,
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -198,7 +198,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               _emailController.clear();
             });
           },
-          child: Text(
+          child: const Text(
             'ลองใช้อีเมลอื่น',
             style: TextStyle(
               color: AppColors.primary,
@@ -215,7 +215,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'ลืมรหัสผ่าน?',
           style: TextStyle(
             color: AppColors.lightText,
@@ -251,7 +251,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.login);
           },
-          child: Text(
+          child: const Text(
             'เข้าสู่ระบบ',
             style: TextStyle(
               color: AppColors.primary,

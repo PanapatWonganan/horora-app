@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/routes/routes.dart';
@@ -105,85 +107,241 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.lightBackground,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildHeader(),
-                  const SizedBox(height: 20),
-                  _buildPromoBanners(),
-                  const SizedBox(height: 24),
-                  // ทำบุญออนไลน์ - Main Feature
-                  _buildMeritHighlight(),
-                  const SizedBox(height: 24),
-                  _buildDailyHoroscope(),
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 24),
-                  _buildFeatures(),
-                  const SizedBox(height: 32),
-                ],
+        child: Stack(
+          children: [
+            // Soft celestial wash — gentle pastel glows drifting behind content.
+            Positioned(
+              top: -90,
+              right: -70,
+              child: _softGlow(220, AppColors.primaryGradient.first),
+            ),
+            Positioned(
+              top: 160,
+              left: -90,
+              child: _softGlow(200, AppColors.mysticalGradient.last),
+            ),
+            // Faint scattered stars for atmosphere.
+            Positioned(
+              top: 70,
+              left: 30,
+              child: _starSpeck(AppIcons.star, 12, 0.35),
+            ),
+            Positioned(
+              top: 130,
+              right: 50,
+              child: _starSpeck(AppIcons.sparkle, 16, 0.4),
+            ),
+            Positioned(
+              top: 240,
+              left: 60,
+              child: _starSpeck(AppIcons.sparkle, 10, 0.3),
+            ),
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildHeader(),
+                      const SizedBox(height: 24),
+                      _buildPromoBanners(),
+                      const SizedBox(height: 28),
+                      // ทำบุญออนไลน์ - Main Feature
+                      _buildMeritHighlight(),
+                      const SizedBox(height: 28),
+                      _buildDailyHoroscope(),
+                      const SizedBox(height: 28),
+                      _buildFeatures(),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
       bottomNavigationBar: const AppBottomNavigation(currentIndex: 0),
     );
   }
 
+  /// A soft circular pastel glow used as ambient background atmosphere.
+  Widget _softGlow(double size, Color color) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color.withValues(alpha: 0.35),
+              color.withValues(alpha: 0.0),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// A faint decorative star/sparkle speck.
+  Widget _starSpeck(String asset, double size, double opacity) {
+    return IgnorePointer(
+      child: Opacity(
+        opacity: opacity,
+        child: SvgPicture.asset(
+          asset,
+          width: size,
+          height: size,
+          colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+        ),
+      ),
+    );
+  }
+
+  /// Display font used for English words / numerals in section headings.
+  TextStyle _displayStyle({
+    required double fontSize,
+    Color? color,
+    FontWeight fontWeight = FontWeight.w600,
+  }) {
+    return GoogleFonts.cormorantGaramond(
+      fontSize: fontSize,
+      color: color ?? AppColors.deepText,
+      fontWeight: fontWeight,
+      letterSpacing: 0.2,
+    );
+  }
+
+  /// A small section heading: Thai title (Kanit) with a gentle sparkle accent.
+  Widget _sectionTitle(String title) {
+    return Row(
+      children: [
+        SvgPicture.asset(
+          AppIcons.sparkleFilled,
+          width: 18,
+          height: 18,
+          colorFilter: const ColorFilter.mode(AppColors.accent, BlendMode.srcIn),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'สวัสดีคุณ, $_userName',
-              style: TextStyle(
-                color: AppColors.lightText,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'สวัสดีค่ะ',
+                    style: GoogleFonts.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SvgPicture.asset(
+                    AppIcons.sparkleFilled,
+                    width: 15,
+                    height: 15,
+                    colorFilter:
+                        const ColorFilter.mode(AppColors.accent, BlendMode.srcIn),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              DateFormat('EEEE, d MMMM yyyy', 'th_TH').format(_today),
-              style: TextStyle(
-                color: AppColors.lightText.withValues(alpha: 0.7),
-                fontSize: 14,
+              const SizedBox(height: 2),
+              Text(
+                'คุณ$_userName',
+                style: GoogleFonts.kanit(
+                  color: AppColors.deepText,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w600,
+                  height: 1.1,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+              const SizedBox(height: 6),
+              Text(
+                DateFormat('EEEE, d MMMM yyyy', 'th_TH').format(_today),
+                style: GoogleFonts.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 12),
         GestureDetector(
           onTap: () {
             _showProfileOptions(context);
           },
-          child: CircleAvatar(
-            radius: 24,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-            child: SvgIcon(
-              AppIcons.personFilled,
-              size: 24,
-              color: AppColors.primary,
+          child: Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                colors: AppColors.primaryGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.25),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(2.5),
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.lightSurface,
+              ),
+              child: const Center(
+                child: SvgIcon(
+                  AppIcons.personFilled,
+                  size: 24,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
           ),
         ),
@@ -194,39 +352,60 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showProfileOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.darkSurface,
+      backgroundColor: AppColors.lightSurface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                width: 44,
+                height: 5,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
               ListTile(
-                leading: SvgIcon(AppIcons.person, size: 24, color: Colors.white),
-                title: const Text('โปรไฟล์',
-                    style: TextStyle(color: Colors.white)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                leading: const SvgIcon(AppIcons.person,
+                    size: 24, color: AppColors.primary),
+                title: Text('โปรไฟล์',
+                    style: GoogleFonts.kanit(color: AppColors.deepText)),
                 onTap: () {
                   Navigator.pop(context);
                   AppRouter.navigateTo(context, AppRoutes.profile);
                 },
               ),
               ListTile(
-                leading: SvgIcon(AppIcons.settings, size: 24, color: Colors.white),
-                title: const Text('ตั้งค่า',
-                    style: TextStyle(color: Colors.white)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                leading: const SvgIcon(AppIcons.settings,
+                    size: 24, color: AppColors.primary),
+                title: Text('ตั้งค่า',
+                    style: GoogleFonts.kanit(color: AppColors.deepText)),
                 onTap: () {
                   Navigator.pop(context);
                   AppRouter.navigateTo(context, AppRoutes.settings);
                 },
               ),
-              const Divider(color: Colors.white24),
+              const Divider(color: AppColors.divider),
               ListTile(
-                leading: SvgIcon(AppIcons.logout, size: 24, color: Colors.redAccent),
-                title: const Text('ออกจากระบบ',
-                    style: TextStyle(color: Colors.redAccent)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                leading: const SvgIcon(AppIcons.logout,
+                    size: 24, color: AppColors.error),
+                title: Text('ออกจากระบบ',
+                    style: GoogleFonts.kanit(color: AppColors.error)),
                 onTap: () async {
                   Navigator.pop(context);
                   await _signOut();
@@ -268,13 +447,15 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'ดวงประจำวันของคุณ',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          'Today',
+          style: _displayStyle(
+            fontSize: 15,
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ).copyWith(letterSpacing: 1.5),
         ),
+        const SizedBox(height: 2),
+        _sectionTitle('ดวงประจำวันของคุณ'),
         const SizedBox(height: 16),
         DailyHoroscopeCard(
           zodiacSign: "", // Empty string since zodiac sign is removed
@@ -295,51 +476,51 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFFFD700),
-              Color(0xFFFF8C00),
-              Color(0xFFFF6B00),
+              Color(0xFFFFE6B8), // soft gold
+              Color(0xFFFFD0AE), // warm peach-gold
+              Color(0xFFFFC1B0), // blush peach
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.4),
-              blurRadius: 20,
-              spreadRadius: 2,
-              offset: const Offset(0, 8),
+              color: AppColors.accent.withValues(alpha: 0.35),
+              blurRadius: 24,
+              spreadRadius: 0,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         child: Stack(
           children: [
             // Background decoration
-            Positioned(
-              right: -30,
-              top: -30,
+            const Positioned(
+              right: -28,
+              top: -28,
               child: Opacity(
-                opacity: 0.15,
+                opacity: 0.18,
                 child: SvgIcon(
                   AppIcons.temple,
                   size: 150,
-                  color: Colors.white,
+                  color: Color(0xFFFF8C5A),
                 ),
               ),
             ),
-            Positioned(
-              left: -20,
-              bottom: -20,
+            const Positioned(
+              left: -18,
+              bottom: -18,
               child: Opacity(
-                opacity: 0.1,
+                opacity: 0.16,
                 child: SvgIcon(
                   AppIcons.sparkleFilled,
                   size: 80,
-                  color: Colors.white,
+                  color: Color(0xFFFF8C5A),
                 ),
               ),
             ),
@@ -352,13 +533,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFF8C5A).withValues(alpha: 0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: SvgIcon(
+                      child: const SvgIcon(
                         AppIcons.temple,
                         size: 32,
-                        color: Colors.white,
+                        color: Color(0xFFE07A4A),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -366,20 +554,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'ทำบุญออนไลน์',
-                            style: TextStyle(
-                              color: Colors.white,
+                            style: GoogleFonts.kanit(
+                              color: const Color(0xFF5C3A24),
                               fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             'สะดวก รวดเร็ว ได้บุญจริง',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 14,
+                            style: GoogleFonts.kanit(
+                              color: const Color(0xFF7A5238),
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -390,49 +578,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'ไหว้พระ ขอพร สถานที่ศักดิ์สิทธิ์ทั่วไทย\nเสริมดวง เรียกทรัพย์ ชีวิตรุ่งเรือง',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.95),
+                  style: GoogleFonts.kanit(
+                    color: const Color(0xFF6B4A33),
                     fontSize: 14,
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                        color: const Color(0xFFFF8C5A).withValues(alpha: 0.18),
+                        blurRadius: 12,
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgIcon(
+                      const SvgIcon(
                         AppIcons.heart,
                         size: 20,
-                        color: const Color(0xFFFF6B00),
+                        color: Color(0xFFE07A4A),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'เริ่มทำบุญเลย',
-                        style: TextStyle(
-                          color: Color(0xFFFF6B00),
+                        style: GoogleFonts.kanit(
+                          color: const Color(0xFFD4683A),
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      SvgIcon(
+                      const SvgIcon(
                         AppIcons.arrowForward,
                         size: 20,
-                        color: const Color(0xFFFF6B00),
+                        color: Color(0xFFE07A4A),
                       ),
                     ],
                   ),
@@ -449,22 +637,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'บริการอื่นๆ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _sectionTitle('บริการอื่นๆ'),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: _buildSmallFeatureCard(
                 title: 'ไพ่ทาโรต์',
                 svgIconPath: AppIcons.divination,
-                color: const Color(0xFFE91E63),
+                color: AppColors.secondary,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.tarot),
                 useIconColor: true,
               ),
@@ -474,7 +655,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _buildSmallFeatureCard(
                 title: 'พ่อหมอโหรา',
                 svgIconPath: AppIcons.chatFilled,
-                color: const Color(0xFF2196F3),
+                color: AppColors.primary,
                 onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.chat),
                 useIconColor: true,
               ),
@@ -484,14 +665,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _buildSmallFeatureCard(
                 title: 'โหราศาสตร์',
                 svgIconPath: AppIcons.starFilled,
-                color: const Color(0xFFFF9800),
+                color: AppColors.accent,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.horoscope),
                 useIconColor: true,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -506,37 +687,47 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withValues(alpha: 0.3),
-            width: 1,
-          ),
+          color: AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.18),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.2),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    color.withValues(alpha: 0.28),
+                    color.withValues(alpha: 0.14),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
               child: SvgIcon(
                 svgIconPath,
-                size: 22,
+                size: 24,
                 color: useIconColor ? null : color,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               title,
-              style: TextStyle(
-                color: AppColors.lightText,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
             ),

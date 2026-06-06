@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/services/ad_service.dart';
 import 'weekly_schedule_screen.dart';
 
 /// หน้าหลักบริการทำบุญออนไลน์ - redirect ไปหน้าตารางประจำสัปดาห์
@@ -14,8 +13,6 @@ class _MeritScreenState extends State<MeritScreen> {
   @override
   void initState() {
     super.initState();
-    // Disable ads during merit flow
-    AppOpenAdManager.adsDisabled = true;
 
     // Navigate to weekly schedule immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -30,8 +27,6 @@ class _MeritScreenState extends State<MeritScreen> {
 
   @override
   void dispose() {
-    // Re-enable ads when leaving merit flow
-    AppOpenAdManager.adsDisabled = false;
     super.dispose();
   }
 

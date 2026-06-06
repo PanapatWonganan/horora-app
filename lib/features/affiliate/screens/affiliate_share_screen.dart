@@ -89,7 +89,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: AppColors.primaryGradient,
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -165,11 +165,11 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               version: QrVersions.auto,
                               size: 200,
                               backgroundColor: Colors.white,
-                              eyeStyle: QrEyeStyle(
+                              eyeStyle: const QrEyeStyle(
                                 eyeShape: QrEyeShape.square,
                                 color: AppColors.primary,
                               ),
-                              dataModuleStyle: QrDataModuleStyle(
+                              dataModuleStyle: const QrDataModuleStyle(
                                 dataModuleShape: QrDataModuleShape.square,
                                 color: AppColors.secondary,
                               ),
@@ -229,7 +229,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           label: const Text('คัดลอกลิงก์', style: TextStyle(fontSize: 16)),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.primary,
-                            side: BorderSide(color: AppColors.primary),
+                            side: const BorderSide(color: AppColors.primary),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
@@ -245,13 +245,13 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
                                 Icon(Icons.lightbulb, color: AppColors.info, size: 20),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Text(
                                   'เทคนิคเพิ่มยอดขาย',
                                   style: TextStyle(
@@ -261,8 +261,8 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            const Text(
+                            SizedBox(height: 8),
+                            Text(
                               '1. แชร์ลิงก์ใน Social Media เช่น LINE, Facebook\n'
                               '2. โพสต์รีวิวพร้อมรูปหลักฐานการไหว้\n'
                               '3. แนะนำแพ็คเกจที่เหมาะกับความต้องการ\n'

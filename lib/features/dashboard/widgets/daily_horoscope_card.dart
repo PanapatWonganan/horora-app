@@ -132,7 +132,7 @@ class DailyHoroscopeCard extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      side: BorderSide(color: AppColors.primary),
+                      side: const BorderSide(color: AppColors.primary),
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                     ),
                     child: const Text('ดูดวงเพิ่มเติม'),

@@ -100,13 +100,13 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -170,7 +170,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
           ),
           const Expanded(
             child: Text(
@@ -212,7 +212,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               color: const Color(0xFFFFD700).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: SvgIcon(AppIcons.temple, size: 28),
+            child: const SvgIcon(AppIcons.temple, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -545,7 +545,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       fontSize: 16,
                     ),
                   ),
-                  SvgIcon(AppIcons.calendar, size: 20, color: Colors.white54),
+                  const SvgIcon(AppIcons.calendar, size: 20, color: Colors.white54),
                 ],
               ),
             ),
@@ -680,7 +680,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgIcon(AppIcons.heart, size: 22, color: Colors.white),
+            const SvgIcon(AppIcons.heart, size: 22, color: Colors.white),
             const SizedBox(width: 10),
             Text(
               'ยืนยันสั่งจอง ฿${_totalPrice.toStringAsFixed(0)}',

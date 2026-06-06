@@ -22,14 +22,25 @@ class ProgressIndicatorDots extends StatelessWidget {
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: isCurrent ? 24 : 8,
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 3.5),
+          width: isCurrent ? 26 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.primary
-                : Colors.white.withValues(alpha: 0.2),
+            gradient: isActive
+                ? const LinearGradient(colors: AppColors.primaryGradient)
+                : null,
+            color: isActive ? null : AppColors.divider,
             borderRadius: BorderRadius.circular(4),
+            boxShadow: isCurrent
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
         );
       }),
@@ -59,15 +70,15 @@ class ProgressIndicatorBar extends StatelessWidget {
           children: [
             Text(
               'ขั้นตอนที่ ${currentStep + 1}',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+              style: const TextStyle(
+                color: AppColors.mutedText,
                 fontSize: 12,
               ),
             ),
             Text(
               '${currentStep + 1}/$totalSteps',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+              style: const TextStyle(
+                color: AppColors.mutedText,
                 fontSize: 12,
               ),
             ),
@@ -78,8 +89,8 @@ class ProgressIndicatorBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.white.withValues(alpha: 0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            backgroundColor: AppColors.divider,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
             minHeight: 6,
           ),
         ),

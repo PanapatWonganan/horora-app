@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/merit_colors.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
 import 'merit_payment_screen.dart';
@@ -74,9 +75,9 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: AppColors.primary,
-              surface: AppColors.darkSurface,
+            colorScheme: const ColorScheme.dark(
+              primary: MeritColors.accent,
+              surface: MeritColors.cardBackground,
             ),
           ),
           child: child!,
@@ -124,13 +125,13 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -140,8 +141,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               _buildHeader(),
               Expanded(
                 child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(color: AppColors.primary),
+                    ? const Center(
+                        child: CircularProgressIndicator(color: MeritColors.accent),
                       )
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(20),
@@ -200,12 +201,12 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primary.withValues(alpha: 0.2),
-            AppColors.secondary.withValues(alpha: 0.2),
+            MeritColors.accent.withValues(alpha: 0.2),
+            MeritColors.accentDark.withValues(alpha: 0.2),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        border: Border.all(color: MeritColors.accent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -213,12 +214,12 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.3),
+              color: MeritColors.accent.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.temple_buddhist,
-              color: AppColors.primary,
+              color: MeritColors.accent,
               size: 28,
             ),
           ),
@@ -239,7 +240,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                   Text(
                     widget.location.belief!,
                     style: TextStyle(
-                      color: AppColors.primary.withValues(alpha: 0.9),
+                      color: MeritColors.accent.withValues(alpha: 0.9),
                       fontSize: 12,
                     ),
                   ),
@@ -279,11 +280,11 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : const Color(0xFF2D2D44),
+              ? MeritColors.accent.withValues(alpha: 0.2)
+              : MeritColors.inputBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
+            color: isSelected ? MeritColors.accent : Colors.transparent,
             width: 2,
           ),
         ),
@@ -296,7 +297,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                 Text(
                   package.nameTh,
                   style: TextStyle(
-                    color: isSelected ? AppColors.primary : Colors.white,
+                    color: isSelected ? MeritColors.accent : Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -305,7 +306,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     gradient: isSelected
-                        ? LinearGradient(colors: [AppColors.primary, AppColors.secondary])
+                        ? const LinearGradient(colors: MeritColors.accentGradient)
                         : null,
                     color: isSelected ? null : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -313,7 +314,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                   child: Text(
                     package.priceFormatted,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.primary,
+                      color: isSelected ? Colors.white : MeritColors.accent,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -325,7 +326,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               Text(
                 package.description!,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: Colors.white.withValues(alpha: 0.85),
                   fontSize: 12,
                 ),
               ),
@@ -342,7 +343,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                 child: Text(
                   item,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 10,
                   ),
                 ),
@@ -351,19 +352,19 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.photo_camera, size: 14, color: Colors.white.withValues(alpha: 0.6)),
+                Icon(Icons.photo_camera, size: 14, color: Colors.white.withValues(alpha: 0.75)),
                 const SizedBox(width: 4),
                 Text(
                   '${package.photoCount} รูป',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
                 ),
                 if (package.hasVideo) ...[
                   const SizedBox(width: 12),
-                  Icon(Icons.videocam, size: 14, color: Colors.white.withValues(alpha: 0.6)),
+                  Icon(Icons.videocam, size: 14, color: Colors.white.withValues(alpha: 0.75)),
                   const SizedBox(width: 4),
                   Text(
                     'วิดีโอ',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
                   ),
                 ],
                 if (package.hasLive) ...[
@@ -461,7 +462,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
+            color: Colors.white.withValues(alpha: 0.85),
             fontSize: 14,
           ),
         ),
@@ -474,9 +475,9 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
             filled: true,
-            fillColor: const Color(0xFF2D2D44),
+            fillColor: MeritColors.inputBackground,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -487,14 +488,14 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primary),
+              borderSide: const BorderSide(color: MeritColors.accent),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Colors.red),
             ),
             suffixIcon: suffixIcon != null
-                ? Icon(suffixIcon, color: Colors.white.withValues(alpha: 0.5))
+                ? Icon(suffixIcon, color: Colors.white.withValues(alpha: 0.65))
                 : null,
           ),
         ),
@@ -509,7 +510,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         onPressed: _proceedToPayment,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: AppColors.primary,
+          backgroundColor: MeritColors.accent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

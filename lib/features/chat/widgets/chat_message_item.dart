@@ -59,7 +59,7 @@ class ChatMessageItem extends StatelessWidget {
                         CircleAvatar(
                           radius: 12,
                           backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                          child: Icon(
+                          child: const Icon(
                             Icons.auto_awesome,
                             color: AppColors.primary,
                             size: 12,

@@ -40,13 +40,13 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
               AppColors.darkBackground,
-              const Color(0xFF1A1A2E),
+              Color(0xFF1A1A2E),
             ],
           ),
         ),
@@ -56,7 +56,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
               _buildHeader(),
               Expanded(
                 child: _isLoading
-                    ? Center(
+                    ? const Center(
                         child: CircularProgressIndicator(color: AppColors.primary),
                       )
                     : _orders.isEmpty
@@ -152,7 +152,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
               children: [
                 Text(
                   order.orderNumber ?? '-',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -171,7 +171,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                     color: AppColors.primary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.temple_buddhist,
                     color: AppColors.primary,
                     size: 24,
