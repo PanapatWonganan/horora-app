@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart' as path;
 import '../../../core/repositories/laravel_merit_repository.dart' as laravel;
 import '../../../core/services/laravel_auth_service.dart';
 import '../../affiliate/services/affiliate_service.dart';
 import '../models/merit_models.dart';
 
 /// Service สำหรับจัดการระบบทำบุญออนไลน์
-/// ใช้ Laravel API แทน Supabase
+/// ใช้ Laravel API
 class MeritService {
   static final MeritService _instance = MeritService._internal();
   static MeritService get instance => _instance;
@@ -19,13 +19,12 @@ class MeritService {
   final _apiClient = LaravelAuthService.instance.apiClient;
 
   // Telegram Bot Configuration
-  // TODO: ย้ายไป environment variables
-  static const String _telegramBotToken = '8396932278:AAGn4T0Uk74qoFqR7bS54oxTQWKGfZ8N8YY';
-  static const String _telegramChatId = '1443675295';
+  static String get _telegramBotToken => dotenv.env['TELEGRAM_BOT_TOKEN'] ?? '';
+  static String get _telegramChatId => dotenv.env['TELEGRAM_CHAT_ID'] ?? '';
 
   // PromptPay Configuration
-  static const String promptPayNumber = '0812345678'; // เบอร์ PromptPay
-  static const String promptPayName = 'บริษัท โหรา จำกัด'; // ชื่อบัญชี
+  static const String promptPayNumber = '225-1-63533-4'; // เลขบัญชีกสิกร
+  static const String promptPayName = 'ธ.กสิกรไทย'; // ชื่อบัญชี
 
   // ==================== Locations ====================
 
@@ -210,11 +209,14 @@ class MeritService {
     }
   }
 
-  /// อัพเดทคำสั่งซื้อ - ไม่รองรับใน Laravel API ปัจจุบัน
+  /// อัพเดทคำสั่งซื้อ
   Future<MeritOrder?> updateOrder(String orderId, Map<String, dynamic> updates) async {
     try {
-      // TODO: Implement update order in Laravel API
-      throw UnimplementedError('Update order not implemented yet');
+      final response = await _apiClient.put('/merit/orders/$orderId', data: updates);
+      if (response != null) {
+        return MeritOrder.fromJson(response);
+      }
+      return null;
     } catch (e) {
       debugPrint('Error updating order: $e');
       rethrow;
@@ -354,7 +356,7 @@ ${order.prayerWish ?? '-'}
   /// ส่งแจ้งเตือนทดสอบ
   Future<bool> sendTestNotification() async {
     try {
-      if (_telegramBotToken == 'YOUR_TELEGRAM_BOT_TOKEN') {
+      if (_telegramBotToken.isEmpty) {
         return false;
       }
 

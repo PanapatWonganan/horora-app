@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
 import '../../config/constants.dart';
-import 'thai_zodiac_service.dart';
 
 /// User model for Laravel API
 class LaravelUser {
@@ -99,7 +98,7 @@ class LaravelAuthResponse {
   }
 }
 
-/// Laravel Auth Service - replaces Supabase auth
+/// Laravel Auth Service
 class LaravelAuthService {
   static LaravelAuthService? _instance;
   final ApiClient _apiClient;
@@ -265,6 +264,13 @@ class LaravelAuthService {
   Future<void> _fetchCurrentUser() async {
     final response = await _apiClient.get('/auth/user');
     _currentUser = LaravelUser.fromJson(response);
+  }
+
+  // Get current auth token
+  Future<String?> getToken() async {
+    if (_token != null) return _token;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(StorageConstants.authToken);
   }
 
   // Get API client for other services

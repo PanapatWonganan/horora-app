@@ -2,6 +2,8 @@ import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter/material.dart' as material show TimeOfDay;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/routes/app_router.dart';
+import '../../../../core/services/guest_session_service.dart';
 import '../../../../core/utils/app_icons.dart';
 import '../../models/onboarding_models.dart';
 import '../../services/ab_test_service.dart';
@@ -714,15 +716,48 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
 
           const Spacer(),
 
-          // Continue to register
+          // Primary CTA: เริ่มใช้งานเลย (guest-first — ค่าเริ่มต้น)
           SizedBox(
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
+              onPressed: _startAsGuest,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 8,
+                shadowColor: AppColors.primary.withValues(alpha: 0.5),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'เริ่มใช้งานเลย',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  SvgIcon(AppIcons.arrowForward, size: 20, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Secondary CTA: สมัครเพื่อบันทึก (ไป RegisterScreen พร้อม onboarding data)
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: OutlinedButton(
               onPressed: () async {
                 await _abTest.completeOnboarding();
                 if (mounted) {
-                  // Pass onboarding data to register screen
+                  // ส่ง onboarding data ไป register screen เพื่อ prefill
                   Navigator.pushReplacementNamed(
                     context,
                     AppRoutes.register,
@@ -730,23 +765,26 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+              style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
+                side: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.6),
+                  width: 1.5,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: const Text(
-                'สมัครสมาชิกฟรี',
+                'สมัครเพื่อบันทึก',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Login option
           Center(
@@ -767,6 +805,18 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         ],
       ),
     );
+  }
+
+  /// เริ่มใช้งานแบบ guest: บันทึก onboarding ลง local แล้วเข้า Home เลย
+  /// (guest-first default — ไม่บังคับสมัครก่อน)
+  Future<void> _startAsGuest() async {
+    await _abTest.completeOnboarding();
+    // birthDate ถูกเก็บใน _data แล้วตอนเลือกวันเกิด (หน้า 3 / _selectDate)
+    await GuestSessionService.instance.saveOnboarding(_data);
+    await GuestSessionService.instance.markOnboardingCompleted();
+    if (mounted) {
+      AppRouter.navigateAndClearStack(context, AppRoutes.home);
+    }
   }
 
   Widget _buildBenefitItem({required String svgIconPath, required String text}) {

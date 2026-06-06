@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../onboarding/models/onboarding_models.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
 
@@ -31,6 +33,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
   final _authService = AuthService.instance;
+
+  bool _prefilled = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Prefill เพียงครั้งเดียว (context พร้อมใช้ ModalRoute ได้ที่นี่)
+    if (_prefilled) return;
+    _prefilled = true;
+
+    // 1) ถ้ามี OnboardingData ส่งมาทาง route arguments (จาก onboarding) ใช้ก่อน
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is OnboardingData) {
+      _applyPrefill(args);
+      return;
+    }
+
+    // 2) ไม่มี → fallback โหลด guest data จาก local (กรณีถูกเด้งมาจาก AuthGuard)
+    GuestSessionService.instance.loadOnboarding().then((data) {
+      if (data != null && mounted) {
+        setState(() => _applyPrefill(data));
+      }
+    });
+  }
+
+  /// เติมค่า name / birthDate จาก onboarding ลงฟอร์ม (ไม่ทับค่าที่ผู้ใช้พิมพ์เอง)
+  void _applyPrefill(OnboardingData data) {
+    if ((data.name?.isNotEmpty ?? false) && _nameController.text.isEmpty) {
+      _nameController.text = data.name!;
+    }
+    if (data.birthDate != null && _selectedDate == null) {
+      _selectedDate = data.birthDate;
+      _birthDateController.text =
+          DateFormat('dd/MM/yyyy').format(data.birthDate!);
+      _thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(data.birthDate!);
+    }
+  }
 
   @override
   void dispose() {
@@ -103,37 +142,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       try {
-        // Implement registration logic with Supabase
-        final response = await _authService.signUp(
+        // Implement registration logic with Laravel API
+        await _authService.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           name: _nameController.text.trim(),
           birthDate: _selectedDate,
         );
 
-        // Check if registration was successful
-        if (response.user != null) {
-          // ลงทะเบียนสำเร็จ
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่แอปพลิเคชัน'),
-                backgroundColor: Colors.green,
-              ),
-            );
+        // ลงทะเบียนสำเร็จ (signUp throws on failure) — sync เสร็จแล้ว ลบ guest data local ทิ้ง
+        await GuestSessionService.instance.clear();
 
-            // นำทางไปหน้า home ทันที (ไม่ต้องยืนยันอีเมล)
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ลงทะเบียนสำเร็จ! ยินดีต้อนรับสู่แอปพลิเคชัน'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // รองรับ 2 เส้นทางเข้า:
+          // - เด้งมาจาก AuthGuard (pushNamed) → มี route ให้ pop กลับ →
+          //   pop(true) เพื่อให้ AuthGuard return true แล้ว caller resume action เดิม
+          // - มาจาก onboarding flow (pushReplacement, ไม่มีใครรอผล) →
+          //   เคลียร์ stack ไป home ตามเดิม
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context, true);
+          } else {
             AppRouter.navigateAndClearStack(context, AppRoutes.home);
-          }
-        } else {
-          // Show error message if registration failed
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('ลงทะเบียนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
-                backgroundColor: AppColors.error,
-              ),
-            );
           }
         }
       } catch (e) {
@@ -154,175 +190,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }
       }
     }
-  }
-
-  Future<void> _registerWithGoogle() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithGoogle();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('ลงทะเบียนด้วย Google ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _registerWithFacebook() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithFacebook();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('ลงทะเบียนด้วย Facebook ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _registerWithApple() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithApple();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('ลงทะเบียนด้วย Apple ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  // เพิ่มฟังก์ชันแสดง popup เตือนให้ยืนยันอีเมล
-  void _showVerifyEmailDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.darkSurface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.email_outlined, color: AppColors.primary),
-              const SizedBox(width: 12),
-              Text(
-                'ยืนยันอีเมลของคุณ',
-                style: TextStyle(
-                  color: AppColors.lightText,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'เราได้ส่งลิงก์ยืนยันไปยังอีเมล ${_emailController.text}',
-                style: TextStyle(color: AppColors.lightText),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'โปรดยืนยันอีเมลของคุณเพื่อให้สามารถดูดวงในราศีของคุณได้อย่างเต็มที่',
-                style: TextStyle(color: AppColors.lightText.withValues(alpha: 0.8)),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'หากไม่พบอีเมล โปรดตรวจสอบในโฟลเดอร์สแปมของคุณ',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // นำทางไปยังหน้า home หลังจากปิด popup
-                AppRouter.navigateAndClearStack(context, AppRoutes.home);
-              },
-              child: Text(
-                'ฉันเข้าใจแล้ว',
-                style: TextStyle(color: AppColors.primary),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

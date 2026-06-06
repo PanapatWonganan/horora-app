@@ -108,7 +108,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
           Text(
             'ยังไม่มีประวัติการสั่งซื้อ',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withValues(alpha: 0.85),
               fontSize: 16,
             ),
           ),
@@ -193,7 +193,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                       Text(
                         order.package?.nameTh ?? order.packageId,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: Colors.white.withValues(alpha: 0.85),
                           fontSize: 12,
                         ),
                       ),
@@ -203,7 +203,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 Text(
                   order.priceFormatted,
                   style: const TextStyle(
-                    color: Colors.greenAccent,
+                    color: Color(0xFFFFD700),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -216,13 +216,13 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 Icon(
                   Icons.person_outline,
                   size: 14,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Colors.white.withValues(alpha: 0.65),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   order.prayerName,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 12,
                   ),
                 ),
@@ -230,7 +230,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 Icon(
                   Icons.access_time,
                   size: 14,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Colors.white.withValues(alpha: 0.65),
                 ),
                 const SizedBox(width: 4),
                 Text(
@@ -238,7 +238,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                       ? DateFormat('d MMM yyyy HH:mm', 'th').format(order.createdAt!)
                       : '-',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: Colors.white.withValues(alpha: 0.65),
                     fontSize: 12,
                   ),
                 ),
@@ -256,7 +256,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
       decoration: BoxDecoration(
         color: _getStatusColor(status).withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _getStatusColor(status).withValues(alpha: 0.5)),
+        border: Border.all(color: _getStatusColor(status).withValues(alpha: 0.7), width: 1.5),
       ),
       child: Text(
         status.displayName,
@@ -272,15 +272,15 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
   Color _getStatusColor(MeritOrderStatus status) {
     switch (status) {
       case MeritOrderStatus.pending:
-        return Colors.orange;
+        return const Color(0xFFFFC107);
       case MeritOrderStatus.paid:
-        return Colors.blue;
+        return const Color(0xFF00BCD4);
       case MeritOrderStatus.processing:
-        return Colors.purple;
+        return const Color(0xFFFFD700);
       case MeritOrderStatus.completed:
-        return Colors.green;
+        return const Color(0xFF4CAF50);
       case MeritOrderStatus.cancelled:
-        return Colors.red;
+        return const Color(0xFFF44336);
     }
   }
 
@@ -349,7 +349,7 @@ class _OrderDetailSheet extends StatelessWidget {
             Text(
               'คำขอพร',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
               ),
             ),
@@ -428,7 +428,7 @@ class _OrderDetailSheet extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withValues(alpha: 0.85),
               fontSize: 14,
             ),
           ),

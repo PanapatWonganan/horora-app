@@ -1,30 +1,25 @@
-// This is a basic Flutter widget test.
+// Smoke test for the guest-first app shell.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// The default `flutter create` counter test was removed because this app has no
+// counter. Instead we verify the app boots into the AuthWrapper gate, which
+// decides between the guest/onboarding flow and Home without crashing.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:astrology_app/app.dart';
+import 'package:astrology_app/features/auth/auth_wrapper.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('App boots into AuthWrapper without crashing',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+
     await tester.pumpWidget(const AstrologyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // First frame: AuthWrapper is mounted and shows its loading state while it
+    // resolves auth/onboarding status.
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(AuthWrapper), findsOneWidget);
   });
 }

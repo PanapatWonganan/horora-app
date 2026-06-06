@@ -42,28 +42,14 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        final response = await _authService.signIn(
+        await _authService.signIn(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
-        // Check if login was successful
-        if (response.user != null) {
-          // Navigate to home screen
-          if (mounted) {
-            AppRouter.navigateAndClearStack(context, AppRoutes.home);
-          }
-        } else {
-          // Show error message if login failed
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    const Text('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
+        // Login succeeded (signIn throws on failure); navigate to home
+        if (mounted) {
+          AppRouter.navigateAndClearStack(context, AppRoutes.home);
         }
       } catch (e) {
         // Show error message for other exceptions
@@ -81,88 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
         }
-      }
-    }
-  }
-
-  Future<void> _loginWithGoogle() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithGoogle();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('เข้าสู่ระบบด้วย Google ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _loginWithFacebook() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithFacebook();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('เข้าสู่ระบบด้วย Facebook ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _loginWithApple() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _authService.signInWithApple();
-
-      // Navigation will be handled by auth state listener
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('เข้าสู่ระบบด้วย Apple ไม่สำเร็จ: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/routes/routes.dart';
-import '../../core/services/ad_service.dart';
+import '../../core/services/auth_guard.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'viewmodels/chat_viewmodel.dart';
 import 'widgets/chat_message_item.dart';
@@ -25,10 +25,26 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     _viewModel = ChatViewModel();
-    _initializeChat();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeChat();
+    });
   }
 
   Future<void> _initializeChat() async {
+    // Chat AI ต้อง login (ทุก /chat/* ต้อง token) — gate ที่ทางเข้า
+    if (!mounted) return;
+    final allowed = await AuthGuard.requireAuth(context, intentLabel: 'chat');
+    if (!mounted) return;
+    if (!allowed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('เข้าสู่ระบบเพื่อพูดคุยกับนักพยากรณ์ได้นะ'),
+        ),
+      );
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      return;
+    }
+
     await _viewModel.initialize();
 
     // If no active session, show topic selection dialog
@@ -71,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              context.navigateReplacementWithAd(AppRoutes.home);
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
             },
           ),
           title: Consumer<ChatViewModel>(
@@ -209,7 +225,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 title: const Text('ประวัติการสนทนา'),
                 onTap: () {
                   Navigator.pop(context);
-                  context.navigateReplacementWithAd(AppRoutes.historyChat);
+                  Navigator.pushReplacementNamed(context, AppRoutes.historyChat);
                 },
               ),
               ListTile(

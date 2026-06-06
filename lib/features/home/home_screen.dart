@@ -4,11 +4,9 @@ import 'package:intl/intl.dart';
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
 import '../../core/services/auth_service.dart';
-import '../../core/services/ad_service.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/daily_horoscope_card.dart';
-import 'widgets/feature_card.dart';
 import 'widgets/promo_banner_slider.dart';
 import 'widgets/in_app_message_dialog.dart';
 
@@ -137,8 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 24),
                   _buildDailyHoroscope(),
                   const SizedBox(height: 24),
-                  // Native Ad
-                  const NativeAdWidget(height: 280),
                   const SizedBox(height: 24),
                   _buildFeatures(),
                   const SizedBox(height: 32),
@@ -284,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
           zodiacSign: "", // Empty string since zodiac sign is removed
           date: _today,
           onViewDetails: () {
-            context.navigateWithAd(AppRoutes.dailyHoroscope);
+            Navigator.pushNamed(context, AppRoutes.dailyHoroscope);
           },
         ),
       ],
@@ -469,7 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'ไพ่ทาโรต์',
                 svgIconPath: AppIcons.divination,
                 color: const Color(0xFFE91E63),
-                onTap: () => context.navigateWithAd(AppRoutes.tarot),
+                onTap: () => Navigator.pushNamed(context, AppRoutes.tarot),
                 useIconColor: true,
               ),
             ),
@@ -479,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'พ่อหมอโหรา',
                 svgIconPath: AppIcons.chatFilled,
                 color: const Color(0xFF2196F3),
-                onTap: () => context.navigateReplacementWithAd(AppRoutes.chat),
+                onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.chat),
                 useIconColor: true,
               ),
             ),
@@ -489,7 +485,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'โหราศาสตร์',
                 svgIconPath: AppIcons.starFilled,
                 color: const Color(0xFFFF9800),
-                onTap: () => context.navigateWithAd(AppRoutes.horoscope),
+                onTap: () => Navigator.pushNamed(context, AppRoutes.horoscope),
                 useIconColor: true,
               ),
             ),

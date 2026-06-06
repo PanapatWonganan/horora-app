@@ -4,7 +4,6 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/services/laravel_auth_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/api/api_client.dart';
-import '../../../config/constants.dart';
 import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 

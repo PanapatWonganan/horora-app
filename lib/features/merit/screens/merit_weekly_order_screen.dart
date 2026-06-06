@@ -41,32 +41,32 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   };
 
   final Map<String, String> _packageNames = {
-    'basic': 'แพ็คมงคล',
-    'standard': 'แพ็คเสริมดวง',
-    'premium': 'แพ็คพรีเมียม',
+    'basic': '🙏 แพ็คมงคล',
+    'standard': '⭐ แพ็คเสริมดวง',
+    'premium': '👑 แพ็คพรีเมียม',
   };
 
   final Map<String, List<String>> _packageFeatures = {
     'basic': [
-      'ชุดไหว้พื้นฐาน',
-      'รูปถ่าย 3 รูป',
-      'รายงานผล LINE',
+      '🪷 ชุดไหว้พื้นฐาน',
+      '📸 รูปถ่าย 3 รูป',
+      '💬 รายงานผล LINE',
     ],
     'standard': [
-      'ชุดไหว้พื้นฐาน',
-      'รูปถ่าย 5 รูป',
-      'วิดีโอสั้น 30 วินาที',
-      'รายงานผล LINE',
-      'ใบรับรองทำบุญ',
+      '🪷 ชุดไหว้พื้นฐาน',
+      '📸 รูปถ่าย 5 รูป',
+      '🎬 วิดีโอสั้น 30 วินาที',
+      '💬 รายงานผล LINE',
+      '📜 ใบรับรองทำบุญ',
     ],
     'premium': [
-      'ชุดไหว้พื้นฐาน',
-      'รูปถ่าย 10 รูป',
-      'วิดีโอเต็ม 3 นาที',
-      'Live สด (ถ้าพร้อม)',
-      'รายงานผล LINE',
-      'ใบรับรองทำบุญ',
-      'ของที่ระลึก',
+      '🪷 ชุดไหว้พื้นฐาน',
+      '📸 รูปถ่าย 10 รูป',
+      '🎬 วิดีโอเต็ม 3 นาที',
+      '📡 Live สด (ถ้าพร้อม)',
+      '💬 รายงานผล LINE',
+      '📜 ใบรับรองทำบุญ',
+      '🎁 ของที่ระลึก',
     ],
   };
 
@@ -127,19 +127,19 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         const SizedBox(height: 24),
 
                         // Package Selection
-                        _buildSectionTitle('เลือกแพ็คเกจ'),
+                        _buildSectionTitle('📦 เลือกแพ็คเกจ'),
                         const SizedBox(height: 12),
                         _buildPackageSelector(),
                         const SizedBox(height: 24),
 
                         // Add-ons
-                        _buildSectionTitle('เพิ่มของไหว้พิเศษ'),
+                        _buildSectionTitle('✨ เพิ่มของไหว้พิเศษ'),
                         const SizedBox(height: 12),
                         _buildAddonsSelector(),
                         const SizedBox(height: 24),
 
                         // Form Fields
-                        _buildSectionTitle('ข้อมูลผู้ขอพร'),
+                        _buildSectionTitle('🙏 ข้อมูลผู้ขอพร'),
                         const SizedBox(height: 12),
                         _buildFormFields(),
                         const SizedBox(height: 24),
@@ -192,6 +192,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
             const Color(0xFFFFD700).withValues(alpha: 0.2),
             const Color(0xFFFF8C00).withValues(alpha: 0.2),
@@ -229,7 +231,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 Text(
                   '${widget.schedule.day.displayName} - $dateStr',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 14,
                   ),
                 ),
@@ -272,6 +274,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             decoration: BoxDecoration(
               gradient: isSelected
                   ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                       colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
                     )
                   : null,
@@ -305,7 +309,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                             ),
                           ),
                           child: isSelected
-                              ? const Icon(Icons.check, size: 16, color: Color(0xFFFF8C00))
+                              ? const Icon(Icons.check, size: 16, color: Colors.black87)
                               : null,
                         ),
                         const SizedBox(width: 12),
@@ -360,6 +364,19 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     );
   }
 
+  String _getAddonEmoji(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('กระดาษ') || lower.contains('ไหว้เจ้า')) return '📜';
+    if (lower.contains('ส้ม') || lower.contains('ผลไม้')) return '🍊';
+    if (lower.contains('ธูป') || lower.contains('หอม')) return '🪔';
+    if (lower.contains('เทียน')) return '🕯️';
+    if (lower.contains('ดอกไม้') || lower.contains('มาลัย') || lower.contains('พวง')) return '💐';
+    if (lower.contains('น้ำ')) return '💧';
+    if (lower.contains('ข้าว')) return '🍚';
+    if (lower.contains('ขนม')) return '🍡';
+    return '🙏';
+  }
+
   Widget _buildAddonsSelector() {
     if (widget.schedule.addons.isEmpty) {
       return Container(
@@ -372,7 +389,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           child: Text(
             'ไม่มีของไหว้เพิ่มเติมสำหรับสถานที่นี้',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withValues(alpha: 0.65),
             ),
           ),
         ),
@@ -409,25 +426,30 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             child: Row(
               children: [
                 Container(
-                  width: 24,
-                  height: 24,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: isSelected
-                        ? const Color(0xFFFFD700)
-                        : Colors.transparent,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFFFFD700).withValues(alpha: isSelected ? 0.3 : 0.15),
+                        const Color(0xFFFF8C00).withValues(alpha: isSelected ? 0.3 : 0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFFFFD700)
-                          : Colors.white54,
-                      width: 2,
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
                     ),
                   ),
-                  child: isSelected
-                      ? const Icon(Icons.check, size: 16, color: Colors.black)
-                      : null,
+                  child: Center(
+                    child: Text(
+                      _getAddonEmoji(addon.name),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,7 +505,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           TextFormField(
             controller: _nameController,
             style: const TextStyle(color: Colors.white),
-            decoration: _inputDecoration('ชื่อ-นามสกุล ผู้ขอพร'),
+            decoration: _inputDecoration('👤 ชื่อ-นามสกุล ผู้ขอพร'),
             validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุชื่อ' : null,
           ),
           const SizedBox(height: 16),
@@ -506,7 +528,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: const Color(0xFF2D2D44),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -515,11 +537,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                   Text(
                     _birthDate != null
                         ? DateFormat('d MMMM yyyy', 'th_TH').format(_birthDate!)
-                        : 'วันเกิด (ไม่บังคับ)',
+                        : '📅 วันเกิด (ไม่บังคับ)',
                     style: TextStyle(
                       color: _birthDate != null
                           ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
+                          : Colors.white.withValues(alpha: 0.65),
                       fontSize: 16,
                     ),
                   ),
@@ -535,7 +557,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             controller: _phoneController,
             style: const TextStyle(color: Colors.white),
             keyboardType: TextInputType.phone,
-            decoration: _inputDecoration('เบอร์โทรศัพท์'),
+            decoration: _inputDecoration('📞 เบอร์โทรศัพท์'),
             validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุเบอร์โทร' : null,
           ),
           const SizedBox(height: 16),
@@ -545,7 +567,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             controller: _wishController,
             style: const TextStyle(color: Colors.white),
             maxLines: 3,
-            decoration: _inputDecoration('คำอธิษฐาน / สิ่งที่ต้องการขอ'),
+            decoration: _inputDecoration('🙏 คำอธิษฐาน / สิ่งที่ต้องการขอ'),
           ),
         ],
       ),
@@ -555,9 +577,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
       filled: true,
-      fillColor: Colors.white.withValues(alpha: 0.1),
+      fillColor: const Color(0xFF2D2D44),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -619,7 +641,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: Colors.white.withValues(alpha: 0.85),
             fontSize: 14,
           ),
         ),
@@ -642,6 +664,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
           ),
           borderRadius: BorderRadius.circular(16),
@@ -727,87 +751,6 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => MeritPaymentScreen(order: order),
-      ),
-    );
-  }
-
-  void _showSuccessDialog(Map<String, dynamic> orderData) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF2D2D44),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFFD700),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check,
-                size: 40,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'บันทึกคำสั่งสำเร็จ!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'ยอดชำระ ฿${_totalPrice.toStringAsFixed(0)}',
-              style: const TextStyle(
-                color: Color(0xFFFFD700),
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'กรุณาชำระเงินผ่าน LINE\nเพื่อยืนยันการจอง',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Back to schedule
-                Navigator.pop(context); // Back to merit screen
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'ตกลง',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

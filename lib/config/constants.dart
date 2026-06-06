@@ -32,6 +32,9 @@ class StorageConstants {
   static const String chatHistory = 'chat_history';
   static const String tarotReadings = 'tarot_readings';
   static const String focusSessions = 'focus_sessions';
+  // Guest-first onboarding (เก็บข้อมูล onboarding ของ guest แบบ local)
+  static const String guestOnboarding = 'guest_onboarding';
+  static const String onboardingCompleted = 'onboarding_completed';
 }
 
 // ค่าคงที่สำหรับราศี

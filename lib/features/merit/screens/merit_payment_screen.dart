@@ -174,7 +174,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             Text(
               'ทีมงานจะดำเนินการไหว้ให้ภายใน 24-48 ชั่วโมง',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -267,10 +267,10 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
   }
 
   void _copyPromptPayNumber() {
-    Clipboard.setData(const ClipboardData(text: MeritService.promptPayNumber));
+    Clipboard.setData(const ClipboardData(text: '2251635334'));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('คัดลอกเลขพร้อมเพย์แล้ว'),
+        content: Text('คัดลอกเลขบัญชีกสิกรแล้ว'),
         duration: Duration(seconds: 2),
       ),
     );
@@ -375,13 +375,13 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const Divider(color: Colors.white24, height: 24),
+          Divider(color: Colors.white.withValues(alpha: 0.3), height: 24),
           if (_createdOrder?.orderNumber != null)
             _buildSummaryRow('เลขที่', _createdOrder!.orderNumber!, isHighlight: true),
           _buildSummaryRow('สถานที่', widget.order.location?.nameTh ?? widget.order.locationId),
           _buildSummaryRow('แพ็คเกจ', widget.order.package?.nameTh ?? widget.order.packageId),
           _buildSummaryRow('ผู้ขอพร', widget.order.prayerName),
-          const Divider(color: Colors.white24, height: 24),
+          Divider(color: Colors.white.withValues(alpha: 0.3), height: 24),
           _buildSummaryRow('ยอดชำระ', widget.order.priceFormatted, isBold: true, isPrice: true),
         ],
       ),
@@ -397,14 +397,14 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Colors.white.withValues(alpha: 0.85),
               fontSize: 14,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: isHighlight ? AppColors.primary : (isPrice ? Colors.greenAccent : Colors.white),
+              color: isHighlight ? AppColors.primary : (isPrice ? const Color(0xFFFFD700) : Colors.white),
               fontSize: isPrice ? 18 : 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
             ),
@@ -420,12 +420,12 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.blue.withValues(alpha: 0.2),
-            Colors.purple.withValues(alpha: 0.2),
+            const Color(0xFFFFD700).withValues(alpha: 0.15),
+            const Color(0xFFFF8C00).withValues(alpha: 0.15),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+        border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -446,7 +446,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'PromptPay',
+                      'ธ.กสิกรไทย',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -454,7 +454,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                       ),
                     ),
                     Text(
-                      'โอนเงินผ่านพร้อมเพย์',
+                      'โอนเงินผ่านบัญชีธนาคาร',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -470,35 +470,26 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF2D2D44),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.3)),
             ),
             child: Column(
               children: [
-                // QR Placeholder - ใน production ใช้ QR generator
-                Container(
-                  width: 180,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.qr_code_2, size: 100, color: Colors.grey[600]),
-                      Text(
-                        'PromptPay QR',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                    ],
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/images/promptpay_qr.jpg',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: 16),
                 const Text(
                   MeritService.promptPayName,
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),

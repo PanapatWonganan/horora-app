@@ -5,7 +5,7 @@ import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../../core/services/auth_service.dart';
-import '../../core/services/ad_service.dart';
+import '../../core/services/auth_guard.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -42,6 +42,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _guardAndLoad();
+    });
+  }
+
+  /// โปรไฟล์ต้อง login (ดึงข้อมูลผู้ใช้) — gate ที่ทางเข้า
+  Future<void> _guardAndLoad() async {
+    if (!mounted) return;
+    final allowed = await AuthGuard.requireAuth(context, intentLabel: 'profile');
+    if (!mounted) return;
+    if (!allowed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('เข้าสู่ระบบเพื่อดูโปรไฟล์ของคุณได้นะ'),
+        ),
+      );
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      return;
+    }
     _loadUserProfile();
   }
 
@@ -70,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final currentUser = _authService.currentUser;
 
       if (currentUser != null) {
-        debugPrint('User: ${currentUser.name}, ${currentUser.email}');
+        debugPrint('User profile loaded (id: ${currentUser.id})');
 
         // อัปเดตข้อมูลเบื้องต้นจาก auth
         setState(() {
@@ -252,8 +271,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 32),
                             _buildMenuItems(),
                             const SizedBox(height: 24),
-                            // Native Ad
-                            const NativeAdWidget(height: 280),
                             const SizedBox(height: 24),
                             _buildLogoutButton(),
                             const SizedBox(height: 32),
@@ -325,7 +342,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: AppColors.lightText,
           ),
           onPressed: () {
-            context.navigateWithAd(AppRoutes.settings);
+            Navigator.pushNamed(context, AppRoutes.settings);
           },
         ),
       ],
@@ -513,15 +530,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             size: 20,
             color: Colors.amber,
           ),
-          onPressed: () {
-            context.executeWithAd(() async {
-              final result =
-                  await AppRouter.navigateTo(context, AppRoutes.editProfile);
-              if (result == true) {
-                // Reload profile if edit was successful
-                _loadUserProfile();
-              }
-            });
+          onPressed: () async {
+            final result =
+                await AppRouter.navigateTo(context, AppRoutes.editProfile);
+            if (result == true) {
+              // Reload profile if edit was successful
+              _loadUserProfile();
+            }
           },
         ),
       ],
@@ -855,14 +870,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           svgIconPath: AppIcons.info,
           title: 'ช่วยเหลือและสนับสนุน',
           onTap: () {
-            context.navigateWithAd(AppRoutes.help);
+            Navigator.pushNamed(context, AppRoutes.help);
           },
         ),
         ProfileMenuItem(
           svgIconPath: AppIcons.info,
           title: 'เกี่ยวกับแอป',
           onTap: () {
-            context.navigateWithAd(AppRoutes.about);
+            Navigator.pushNamed(context, AppRoutes.about);
           },
         ),
       ],
@@ -870,6 +885,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _navigateToAffiliate() async {
+    // ระบบตัวแทน (affiliate) ต้อง login — gate ก่อนเรียก getStatus()
+    if (!await AuthGuard.requireAuth(context, intentLabel: 'affiliate')) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('เข้าสู่ระบบเพื่อใช้ระบบตัวแทนได้นะ'),
+        ),
+      );
+      return;
+    }
+    if (!mounted) return;
+
     // Check if user is already an affiliate
     final affiliate = await AffiliateService().getStatus();
     if (!mounted) return;

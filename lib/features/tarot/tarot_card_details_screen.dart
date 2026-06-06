@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/models/tarot_card_model.dart';
 import '../../core/repositories/tarot_repository.dart';
+import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 import '../shared/widgets/loading_indicator.dart';
 
@@ -53,6 +54,17 @@ class _TarotCardDetailsScreenState extends State<TarotCardDetailsScreen> {
   }
 
   Future<void> _toggleSaved() async {
+    // บันทึก/ยกเลิกบันทึกการอ่านไพ่ต้อง login (POST /tarot/readings ต้อง token)
+    if (!await AuthGuard.requireAuth(context, intentLabel: 'tarot_save')) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('เข้าสู่ระบบเพื่อบันทึกการอ่านไพ่ได้นะ'),
+        ),
+      );
+      return;
+    }
+    if (!mounted) return;
     try {
       if (_isSaved) {
         await _tarotRepository.unsaveTarotReading(widget.readingId);

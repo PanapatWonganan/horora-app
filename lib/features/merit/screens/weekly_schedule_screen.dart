@@ -185,7 +185,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           Text(
             'ไม่มีรอบมูในวัน${_selectedDay?.displayName ?? "นี้"}',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withValues(alpha: 0.65),
               fontSize: 16,
             ),
           ),
@@ -223,8 +223,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
@@ -396,6 +396,19 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     );
   }
 
+  String _getAddonEmoji(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('กระดาษ') || lower.contains('ไหว้เจ้า')) return '📜';
+    if (lower.contains('ส้ม') || lower.contains('ผลไม้')) return '🍊';
+    if (lower.contains('ธูป') || lower.contains('หอม')) return '🪔';
+    if (lower.contains('เทียน')) return '🕯️';
+    if (lower.contains('ดอกไม้') || lower.contains('มาลัย') || lower.contains('พวง')) return '💐';
+    if (lower.contains('น้ำ')) return '💧';
+    if (lower.contains('ข้าว')) return '🍚';
+    if (lower.contains('ขนม')) return '🍡';
+    return '🙏';
+  }
+
   Widget _buildAddonCard(MeritAddon addon) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -414,16 +427,23 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             height: 50,
             decoration: BoxDecoration(
               gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFFFFD700).withValues(alpha: 0.3),
-                  const Color(0xFFFF8C00).withValues(alpha: 0.3),
+                  const Color(0xFFFFD700).withValues(alpha: 0.15),
+                  const Color(0xFFFF8C00).withValues(alpha: 0.15),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+              ),
             ),
-            child: SvgIcon(
-              AppIcons.sparkleFilled,
-              size: 24,
+            child: Center(
+              child: Text(
+                _getAddonEmoji(addon.name),
+                style: const TextStyle(fontSize: 24),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -491,6 +511,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
           ),
           borderRadius: BorderRadius.circular(16),
