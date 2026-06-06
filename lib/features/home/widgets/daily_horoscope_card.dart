@@ -8,7 +8,7 @@ import '../../../core/theme/theme.dart';
 import '../../../core/models/horoscope_model.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
-import '../../../core/utils/thai_zodiac_emoji.dart';
+import '../../../core/utils/app_icons.dart';
 import '../../shared/widgets/loading_indicator.dart';
 
 class DailyHoroscopeCard extends StatefulWidget {
@@ -413,24 +413,29 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                           ),
                         ],
                       ),
+                      // Thai zodiac illustration (consistent SVG language)
+                      // instead of an OS-rendered emoji. These zodiac SVGs ship
+                      // their own circular gradient background, so no tint or
+                      // white plate is needed — just a soft drop shadow.
                       Container(
                         width: 54,
                         height: 54,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.55),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.18),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                              color: AppColors.primary.withValues(alpha: 0.22),
+                              blurRadius: 12,
+                              offset: const Offset(0, 5),
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            _getZodiacEmoji(),
-                            style: const TextStyle(fontSize: 26),
+                        child: ClipOval(
+                          child: SvgIcon(
+                            AppIcons.getThaiZodiacIcon(
+                              _userZodiacSign ?? 'มะเมีย',
+                            ),
+                            size: 54,
                           ),
                         ),
                       ),
@@ -596,8 +601,4 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     );
   }
 
-  String _getZodiacEmoji() {
-    final thaiAnimal = _userZodiacSign ?? 'มะเมีย';
-    return ThaiZodiacEmoji.getEmoji(thaiAnimal);
-  }
-} 
+}

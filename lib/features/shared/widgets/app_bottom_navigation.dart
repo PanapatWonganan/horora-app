@@ -77,28 +77,43 @@ class AppBottomNavigation extends StatelessWidget {
     required String label,
   }) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? AppColors.primary : AppColors.mutedText;
+    // Stronger contrast: selected = brand lavender, unselected = a deeper
+    // muted ink (not the faint #8A82A0) so icons keep presence on white.
+    final color =
+        isSelected ? AppColors.primary : const Color(0xFF6E6688);
 
     return GestureDetector(
       onTap: () => _handleNavigation(context, index),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SvgIcon(
-              isSelected ? activeIconPath : iconPath,
-              size: 24,
-              color: color,
+            // Selected items sit on a soft lavender pill for a premium,
+            // clearly-active feel.
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.12)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: SvgIcon(
+                isSelected ? activeIconPath : iconPath,
+                size: 26,
+                color: color,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],
@@ -119,26 +134,47 @@ class AppBottomNavigation extends StatelessWidget {
           Transform.translate(
             offset: const Offset(0, -14),
             child: Container(
-              width: 54,
-              height: 54,
+              width: 58,
+              height: 58,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                // Deeper, richer gold ramp so a pure-white glyph reads with
+                // strong contrast (the old #F2C879→peach was too pale).
                 gradient: const LinearGradient(
-                  colors: [AppColors.accent, AppColors.secondary],
+                  colors: [Color(0xFFF6B544), Color(0xFFE89A3C)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 border: Border.all(color: AppColors.lightSurface, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.45),
-                    blurRadius: 14,
-                    offset: const Offset(0, 5),
+                    color: const Color(0xFFE89A3C).withValues(alpha: 0.50),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
-              child: const Center(
-                child: SvgIcon(AppIcons.pray, size: 26, color: Colors.white),
+              // Clean single-stroke temple glyph in pure white with a subtle
+              // shadow halo — clearly visible and intentional on the gold tab.
+              // (The old pray.svg was an 80x80 multi-colour illustration whose
+              // colorFilter flattened it into an invisible white blob.)
+              child: Center(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8A5A14).withValues(alpha: 0.30),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const SvgIcon(
+                    AppIcons.temple,
+                    size: 30,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),
@@ -147,8 +183,10 @@ class AppBottomNavigation extends StatelessWidget {
             child: Text(
               'ทำบุญ',
               style: TextStyle(
-                color: isSelected ? AppColors.accent : AppColors.deepText,
-                fontSize: 12,
+                color: isSelected
+                    ? const Color(0xFFD98A2B)
+                    : AppColors.deepText,
+                fontSize: 11.5,
                 fontWeight: FontWeight.w700,
               ),
             ),

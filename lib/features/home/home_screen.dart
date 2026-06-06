@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -680,8 +678,8 @@ class _HomeScreenState extends State<HomeScreen>
                         ],
                       ),
                       child: const SvgIcon(
-                        AppIcons.pray,
-                        size: 38,
+                        AppIcons.temple,
+                        size: 36,
                         color: Color(0xFFE07A4A),
                       ),
                     ),
@@ -770,7 +768,7 @@ class _HomeScreenState extends State<HomeScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SvgIcon(
-                        AppIcons.pray,
+                        AppIcons.temple,
                         size: 22,
                         color: Colors.white,
                       ),
@@ -890,7 +888,7 @@ class _HomeScreenState extends State<HomeScreen>
                 if (isToday) ...[
                   const SizedBox(width: 6),
                   const SvgIcon(
-                    AppIcons.pray,
+                    AppIcons.temple,
                     size: 14,
                     color: Color(0xFFE07A4A),
                   ),
@@ -927,11 +925,10 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: _buildSmallFeatureCard(
                 title: 'ไพ่ทาโรต์',
-                svgIconPath: AppIcons.divination,
-                color: AppColors.secondary,
+                svgIconPath: AppIcons.sparkleFilled,
+                // Tarot — rose → lavender.
+                tileGradient: const [Color(0xFFE79BB8), Color(0xFFB8A6F0)],
                 onTap: () => Navigator.pushNamed(context, AppRoutes.tarot),
-                useIconColor: true,
-                glass: true,
               ),
             ),
             const SizedBox(width: 12),
@@ -939,9 +936,10 @@ class _HomeScreenState extends State<HomeScreen>
               child: _buildSmallFeatureCard(
                 title: 'พ่อหมอโหรา',
                 svgIconPath: AppIcons.chatFilled,
-                color: AppColors.primary,
-                onTap: () => Navigator.pushReplacementNamed(context, AppRoutes.chat),
-                useIconColor: true,
+                // Chat — sky blue → lavender.
+                tileGradient: const [Color(0xFF9CC9F0), Color(0xFFB8A6F0)],
+                onTap: () =>
+                    Navigator.pushReplacementNamed(context, AppRoutes.chat),
               ),
             ),
             const SizedBox(width: 12),
@@ -949,9 +947,9 @@ class _HomeScreenState extends State<HomeScreen>
               child: _buildSmallFeatureCard(
                 title: 'โหราศาสตร์',
                 svgIconPath: AppIcons.starFilled,
-                color: AppColors.accent,
+                // Horoscope — gold → peach.
+                tileGradient: const [Color(0xFFF6CE7A), Color(0xFFFFB0A0)],
                 onTap: () => Navigator.pushNamed(context, AppRoutes.horoscope),
-                useIconColor: true,
               ),
             ),
           ],
@@ -961,90 +959,62 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Premium feature tile: a clean white glyph on a soft per-feature pastel
+  /// gradient chip (with a matching colored shadow) above a deep-ink label.
+  /// [tileGradient] is the 2-stop pastel ramp for this feature's icon chip.
   Widget _buildSmallFeatureCard({
     required String title,
     required String svgIconPath,
-    required Color color,
+    required List<Color> tileGradient,
     required VoidCallback onTap,
-    bool useIconColor = false, // ถ้า true จะไม่ใส่สีทับ (ใช้สีจาก SVG)
-    bool glass = false, // ถ้า true ใช้ glassmorphism surface
   }) {
     final borderRadius = BorderRadius.circular(20);
+    final shadowColor = tileGradient.last;
 
     final inner = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(13),
+          width: 56,
+          height: 56,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                color.withValues(alpha: 0.28),
-                color.withValues(alpha: 0.14),
-              ],
+              colors: tileGradient,
             ),
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: shadowColor.withValues(alpha: 0.40),
+                blurRadius: 14,
+                offset: const Offset(0, 7),
+              ),
+            ],
           ),
-          child: SvgIcon(
-            svgIconPath,
-            size: 24,
-            color: useIconColor ? null : color,
+          // Pure-white glyph reads crisply on the saturated pastel chip and
+          // unifies the visual language (was a mix of tinted line/illustration
+          // SVGs at size 24 in pale circles).
+          child: Center(
+            child: SvgIcon(
+              svgIconPath,
+              size: 30,
+              color: Colors.white,
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Text(
           title,
           style: GoogleFonts.kanit(
             color: AppColors.deepText,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w500,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
           ),
           textAlign: TextAlign.center,
         ),
       ],
     );
-
-    // Glassmorphism surface: blurred translucent white with a hairline border
-    // and layered shadow for real depth.
-    if (glass) {
-      return _pressable(
-        onTap: onTap,
-        borderRadius: borderRadius,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.16),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: borderRadius,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  borderRadius: borderRadius,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.75),
-                    width: 1,
-                  ),
-                ),
-                child: inner,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
 
     return _pressable(
       onTap: onTap,
@@ -1056,7 +1026,7 @@ class _HomeScreenState extends State<HomeScreen>
           borderRadius: borderRadius,
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.18),
+              color: shadowColor.withValues(alpha: 0.16),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
