@@ -366,15 +366,15 @@ class MeritLocation {
 
   factory MeritLocation.fromJson(Map<String, dynamic> json) {
     return MeritLocation(
-      id: json['id'] as String,
-      nameTh: json['name_th'] as String,
+      id: json['id']?.toString() ?? '',
+      nameTh: json['name_th']?.toString() ?? '',
       nameEn: json['name_en'] as String?,
       description: json['description'] as String?,
       belief: json['belief'] as String?,
       address: json['address'] as String?,
       imageUrl: json['image_url'] as String?,
       isActive: json['is_active'] as bool? ?? true,
-      sortOrder: json['sort_order'] as int? ?? 0,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -490,17 +490,17 @@ class MeritPackage {
 
   factory MeritPackage.fromJson(Map<String, dynamic> json) {
     return MeritPackage(
-      id: json['id'] as String,
-      nameTh: json['name_th'] as String,
+      id: json['id']?.toString() ?? '',
+      nameTh: json['name_th']?.toString() ?? '',
       nameEn: json['name_en'] as String?,
       description: json['description'] as String?,
-      items: (json['items'] as List<dynamic>?)?.cast<String>() ?? [],
-      price: (json['price'] as num).toDouble(),
-      photoCount: json['photo_count'] as int? ?? 3,
+      items: (json['items'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      price: MeritOrder._parsePrice(json['price']),
+      photoCount: (json['photo_count'] as num?)?.toInt() ?? 3,
       hasVideo: json['has_video'] as bool? ?? false,
       hasLive: json['has_live'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
-      sortOrder: json['sort_order'] as int? ?? 0,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -663,36 +663,26 @@ class MeritOrder {
 
   factory MeritOrder.fromJson(Map<String, dynamic> json) {
     return MeritOrder(
-      id: json['id'] as String?,
-      orderNumber: json['order_number'] as String?,
-      userId: json['user_id'] as String?,
-      locationId: json['location_id'] as String,
-      packageId: json['package_id'] as String,
-      prayerName: json['prayer_name'] as String,
-      prayerBirthdate: json['prayer_birthdate'] != null
-          ? DateTime.parse(json['prayer_birthdate'] as String)
-          : null,
+      id: json['id']?.toString(),
+      orderNumber: json['order_number']?.toString(),
+      userId: json['user_id']?.toString(),
+      locationId: json['location_id']?.toString() ?? '',
+      packageId: json['package_id']?.toString() ?? '',
+      prayerName: json['prayer_name']?.toString() ?? '',
+      prayerBirthdate: _tryParseDate(json['prayer_birthdate']),
       prayerWish: json['prayer_wish'] as String?,
       prayerPhone: json['prayer_phone'] as String?,
-      price: (json['price'] as num).toDouble(),
+      price: _parsePrice(json['price']),
       slipUrl: json['slip_url'] as String?,
       slipUploadToken: json['slip_upload_token'] as String?,
-      paidAt: json['paid_at'] != null
-          ? DateTime.parse(json['paid_at'] as String)
-          : null,
-      status: MeritOrderStatusX.fromString(json['status'] as String? ?? 'pending'),
-      proofUrls: (json['proof_urls'] as List<dynamic>?)?.cast<String>(),
+      paidAt: _tryParseDate(json['paid_at']),
+      status: MeritOrderStatusX.fromString(json['status']?.toString() ?? 'pending'),
+      proofUrls: (json['proof_urls'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
       proofVideoUrl: json['proof_video_url'] as String?,
-      completedAt: json['completed_at'] != null
-          ? DateTime.parse(json['completed_at'] as String)
-          : null,
+      completedAt: _tryParseDate(json['completed_at']),
       adminNote: json['admin_note'] as String?,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
+      createdAt: _tryParseDate(json['created_at']),
+      updatedAt: _tryParseDate(json['updated_at']),
       location: json['merit_locations'] != null
           ? MeritLocation.fromJson(json['merit_locations'] as Map<String, dynamic>)
           : null,
@@ -767,4 +757,21 @@ class MeritOrder {
   }
 
   String get priceFormatted => '฿${price.toStringAsFixed(0)}';
+
+  /// Parse a price value that the backend may send as a num, a numeric String,
+  /// or null. Never throws; defaults to 0.
+  static double _parsePrice(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0;
+    return 0;
+  }
+
+  /// Parse a date value that the backend may send as a String or null.
+  /// Never throws; returns null on missing/invalid input.
+  static DateTime? _tryParseDate(dynamic value) {
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+    return null;
+  }
 }

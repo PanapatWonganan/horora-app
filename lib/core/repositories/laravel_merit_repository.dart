@@ -36,7 +36,7 @@ class MeritLocation {
       address: json['address'],
       imageUrl: json['image_url'],
       isActive: json['is_active'] ?? true,
-      sortOrder: json['sort_order'] ?? 0,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -101,11 +101,11 @@ class MeritPackage {
       description: json['description'],
       items: itemsList,
       price: price,
-      photoCount: json['photo_count'] ?? 3,
+      photoCount: (json['photo_count'] as num?)?.toInt() ?? 3,
       hasVideo: json['has_video'] ?? false,
       hasLive: json['has_live'] ?? false,
       isActive: json['is_active'] ?? true,
-      sortOrder: json['sort_order'] ?? 0,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -185,8 +185,8 @@ class MeritOrder {
       slipUploadToken: json['slip_upload_token'],
       paidAt: json['paid_at'] != null ? DateTime.tryParse(json['paid_at']) : null,
       status: json['status'] ?? 'pending',
-      proofUrls: json['proof_urls'] != null
-          ? List<String>.from(json['proof_urls'])
+      proofUrls: json['proof_urls'] is List
+          ? (json['proof_urls'] as List).map((e) => e.toString()).toList()
           : null,
       proofVideoUrl: json['proof_video_url'],
       completedAt: json['completed_at'] != null
