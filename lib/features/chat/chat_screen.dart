@@ -196,7 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: const AppBottomNavigation(currentIndex: 2),
+        bottomNavigationBar: const AppBottomNavigation(currentIndex: 3),
       ),
     );
   }

@@ -15,13 +15,13 @@ class AppBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
+        color: AppColors.lightSurface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
+            color: AppColors.primary.withValues(alpha: 0.12),
+            blurRadius: 18,
             spreadRadius: 0,
-            offset: const Offset(0, -1),
+            offset: const Offset(0, -3),
           ),
         ],
       ),
@@ -30,6 +30,7 @@ class AppBottomNavigation extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _buildNavItem(
                 context: context,
@@ -43,18 +44,20 @@ class AppBottomNavigation extends StatelessWidget {
                 index: 1,
                 iconPath: AppIcons.sparkle,
                 activeIconPath: AppIcons.sparkleFilled,
-                label: 'ไพ่ทาโร่',
+                label: 'ดูดวง',
               ),
+              // ทำบุญ — core feature, raised center tab
+              _buildMeritTab(context),
               _buildNavItem(
                 context: context,
-                index: 2,
+                index: 3,
                 iconPath: AppIcons.chat,
                 activeIconPath: AppIcons.chatFilled,
                 label: 'สนทนา',
               ),
               _buildNavItem(
                 context: context,
-                index: 3,
+                index: 4,
                 iconPath: AppIcons.person,
                 activeIconPath: AppIcons.personFilled,
                 label: 'โปรไฟล์',
@@ -74,7 +77,7 @@ class AppBottomNavigation extends StatelessWidget {
     required String label,
   }) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? AppColors.primary : AppColors.lightText.withValues(alpha: 0.5);
+    final color = isSelected ? AppColors.primary : AppColors.mutedText;
 
     return GestureDetector(
       onTap: () => _handleNavigation(context, index),
@@ -104,11 +107,62 @@ class AppBottomNavigation extends StatelessWidget {
     );
   }
 
+  /// ทำบุญ — the core feature: a raised, gold-accented center tab.
+  Widget _buildMeritTab(BuildContext context) {
+    final isSelected = currentIndex == 2;
+    return GestureDetector(
+      onTap: () => _handleNavigation(context, 2),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Transform.translate(
+            offset: const Offset(0, -14),
+            child: Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [AppColors.accent, AppColors.secondary],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: AppColors.lightSurface, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.45),
+                    blurRadius: 14,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: SvgIcon(AppIcons.pray, size: 26, color: Colors.white),
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: const Offset(0, -10),
+            child: Text(
+              'ทำบุญ',
+              style: TextStyle(
+                color: isSelected ? AppColors.accent : AppColors.deepText,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleNavigation(BuildContext context, int index) {
     // ไม่ต้องนำทางถ้าอยู่ที่แท็บเดียวกันแล้ว
     if (index == currentIndex) return;
 
-    // ใช้เส้นทางที่เหมาะสมกับแต่ละแท็บ
+    // ใช้เส้นทางที่เหมาะสมกับแต่ละแท็บ (ทำบุญ = core, ตรงกลาง index 2)
     String route;
     switch (index) {
       case 0:
@@ -118,9 +172,12 @@ class AppBottomNavigation extends StatelessWidget {
         route = AppRoutes.tarot;
         break;
       case 2:
-        route = AppRoutes.chat;
+        route = AppRoutes.merit;
         break;
       case 3:
+        route = AppRoutes.chat;
+        break;
+      case 4:
         route = AppRoutes.profile;
         break;
       default:

@@ -11,6 +11,7 @@ import '../../core/theme/theme.dart';
 import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/utils/app_icons.dart';
+import '../merit/models/merit_models.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/daily_horoscope_card.dart';
 import 'widgets/promo_banner_slider.dart';
@@ -193,15 +194,20 @@ class _HomeScreenState extends State<HomeScreen>
                     children: [
                       const SizedBox(height: 20),
                       StaggeredReveal(index: 0, child: _buildHeader()),
-                      const SizedBox(height: 24),
-                      StaggeredReveal(index: 1, child: _buildPromoBanners()),
                       const SizedBox(height: 28),
-                      // ทำบุญออนไลน์ - Main Feature
-                      StaggeredReveal(index: 2, child: _buildMeritHighlight()),
-                      const SizedBox(height: 28),
+                      // ทำบุญออนไลน์ - HERO (core of the app)
+                      StaggeredReveal(index: 1, child: _buildMeritHero()),
+                      const SizedBox(height: 22),
+                      // ตารางฝากมูประจำสัปดาห์ (mini) - daily-return habit
+                      StaggeredReveal(index: 2, child: _buildMeritWeekStrip()),
+                      const SizedBox(height: 30),
+                      // ดูดวงประจำวัน - free hook (secondary)
                       StaggeredReveal(index: 3, child: _buildDailyHoroscope()),
                       const SizedBox(height: 28),
                       StaggeredReveal(index: 4, child: _buildFeatures()),
+                      const SizedBox(height: 30),
+                      // โปรโมชั่น - ลำดับท้ายสุด
+                      StaggeredReveal(index: 5, child: _buildPromoBanners()),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -358,6 +364,18 @@ class _HomeScreenState extends State<HomeScreen>
                         AppColors.accent, BlendMode.srcIn),
                   ),
                 ],
+              ),
+              const SizedBox(height: 6),
+              // Short daily-horoscope teaser — now just a small hook line.
+              Text(
+                'ดูดวงวันนี้ฟรี แตะด้านล่างได้เลย',
+                style: GoogleFonts.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -558,60 +576,80 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildMeritHighlight() {
+  /// Today's recommended merit place from the weekly schedule (read-only,
+  /// static const data). DateTime.weekday is 1=Mon..7=Sun.
+  WeeklyMeritSchedule get _todayMeritSchedule {
+    final today = MeritDayX.fromWeekday(_today.weekday);
+    return WeeklyMeritSchedule.defaultSchedule.firstWhere(
+      (s) => s.day == today,
+      orElse: () => WeeklyMeritSchedule.defaultSchedule.first,
+    );
+  }
+
+  /// 🙏 MERIT HERO — the core of the app. The most visually dominant element:
+  /// a large premium gold-peach card showing today's recommended merit place
+  /// with a strong gold CTA. Taps navigate to the existing merit route.
+  Widget _buildMeritHero() {
+    final schedule = _todayMeritSchedule;
+    final dayName = MeritDayX.fromWeekday(_today.weekday).displayName;
+
     return _pressable(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(28),
       onTap: () {
         // ไม่แสดงโฆษณาเพราะเป็น flow การซื้อของ
         Navigator.pushNamed(context, AppRoutes.merit);
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFFFE6B8), // soft gold
-              Color(0xFFFFD0AE), // warm peach-gold
-              Color(0xFFFFC1B0), // blush peach
+              Color(0xFFFFE9BE), // soft gold
+              Color(0xFFFFD3AE), // warm peach-gold
+              Color(0xFFFFBFB1), // blush peach
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.55),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accent.withValues(alpha: 0.35),
-              blurRadius: 24,
+              color: const Color(0xFFE07A4A).withValues(alpha: 0.38),
+              blurRadius: 32,
               spreadRadius: 0,
-              offset: const Offset(0, 10),
+              offset: const Offset(0, 14),
             ),
           ],
         ),
         child: Stack(
           children: [
-            // Background decoration
+            // Background decoration — big temple watermark + sparkle.
             const Positioned(
-              right: -28,
-              top: -28,
+              right: -34,
+              top: -34,
               child: Opacity(
-                opacity: 0.18,
+                opacity: 0.16,
                 child: SvgIcon(
                   AppIcons.temple,
-                  size: 150,
-                  color: Color(0xFFFF8C5A),
+                  size: 168,
+                  color: Color(0xFFE07A4A),
                 ),
               ),
             ),
             const Positioned(
-              left: -18,
-              bottom: -18,
+              left: -20,
+              bottom: -22,
               child: Opacity(
-                opacity: 0.16,
+                opacity: 0.14,
                 child: SvgIcon(
                   AppIcons.sparkleFilled,
-                  size: 80,
-                  color: Color(0xFFFF8C5A),
+                  size: 92,
+                  color: Color(0xFFE07A4A),
                 ),
               ),
             ),
@@ -619,24 +657,31 @@ class _HomeScreenState extends State<HomeScreen>
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Editorial overline — Fraunces display serif.
+                _overline('Merit of the Day',
+                    color: const Color(0xFFC25E2E)),
+                const SizedBox(height: 10),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Pray/temple icon coin — gold accent.
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(18),
+                        color: Colors.white.withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFF8C5A).withValues(alpha: 0.2),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color:
+                                const Color(0xFFFF8C5A).withValues(alpha: 0.22),
+                            blurRadius: 12,
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
                       child: const SvgIcon(
-                        AppIcons.temple,
-                        size: 32,
+                        AppIcons.pray,
+                        size: 38,
                         color: Color(0xFFE07A4A),
                       ),
                     ),
@@ -646,19 +691,24 @@ class _HomeScreenState extends State<HomeScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'ทำบุญออนไลน์',
+                            'ทำบุญออนไลน์วันนี้',
                             style: GoogleFonts.kanit(
                               color: const Color(0xFF5C3A24),
-                              fontSize: 22,
+                              fontSize: 26,
                               fontWeight: FontWeight.w700,
+                              height: 1.1,
+                              letterSpacing: -0.4,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
+                          // Today's recommended place from the weekly schedule.
                           Text(
-                            'สะดวก รวดเร็ว ได้บุญจริง',
+                            'ฝากมูประจำ$dayName · ${schedule.locationName}',
                             style: GoogleFonts.kanit(
                               color: const Color(0xFF7A5238),
-                              fontSize: 13,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w500,
+                              height: 1.35,
                             ),
                           ),
                         ],
@@ -667,26 +717,52 @@ class _HomeScreenState extends State<HomeScreen>
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'ไหว้พระ ขอพร สถานที่ศักดิ์สิทธิ์ทั่วไทย\nเสริมดวง เรียกทรัพย์ ชีวิตรุ่งเรือง',
-                  style: GoogleFonts.kanit(
-                    color: const Color(0xFF6B4A33),
-                    fontSize: 14,
-                    height: 1.5,
+                // Belief / benefit line for today's place.
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      const SvgIcon(
+                        AppIcons.sparkleFilled,
+                        size: 16,
+                        color: Color(0xFFE07A4A),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          schedule.belief,
+                          style: GoogleFonts.kanit(
+                            color: const Color(0xFF6B4A33),
+                            fontSize: 13.5,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 20),
+                // Prominent gold CTA.
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 17),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFE07A4A), Color(0xFFD4683A)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFF8C5A).withValues(alpha: 0.18),
-                        blurRadius: 12,
-                        offset: const Offset(0, 5),
+                        color: const Color(0xFFE07A4A).withValues(alpha: 0.45),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
@@ -694,29 +770,145 @@ class _HomeScreenState extends State<HomeScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SvgIcon(
-                        AppIcons.heart,
-                        size: 20,
-                        color: Color(0xFFE07A4A),
+                        AppIcons.pray,
+                        size: 22,
+                        color: Colors.white,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Text(
-                        'เริ่มทำบุญเลย',
+                        'ฝากมูเลย',
                         style: GoogleFonts.kanit(
-                          color: const Color(0xFFD4683A),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(width: 8),
                       const SvgIcon(
                         AppIcons.arrowForward,
                         size: 20,
-                        color: Color(0xFFE07A4A),
+                        color: Colors.white,
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 📅 Weekly merit schedule mini-strip — a horizontal row of 7 day chips,
+  /// each showing that day's merit place. Highlights today and drives the
+  /// daily-return habit. Reads the static const schedule; taps go to merit.
+  Widget _buildMeritWeekStrip() {
+    final todayWeekday = _today.weekday;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle('ตารางฝากมูประจำสัปดาห์', overline: 'Weekly Merit'),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 96,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: WeeklyMeritSchedule.defaultSchedule.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final s = WeeklyMeritSchedule.defaultSchedule[i];
+              final isToday = s.day.weekdayNumber == todayWeekday;
+              return _meritDayChip(s, isToday);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _meritDayChip(WeeklyMeritSchedule s, bool isToday) {
+    return _pressable(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => Navigator.pushNamed(context, AppRoutes.merit),
+      child: Container(
+        width: 118,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: isToday
+              ? const LinearGradient(
+                  colors: [Color(0xFFFFE9BE), Color(0xFFFFC9B2)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isToday ? null : AppColors.lightSurface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isToday
+                ? const Color(0xFFE07A4A).withValues(alpha: 0.55)
+                : AppColors.divider.withValues(alpha: 0.6),
+            width: isToday ? 1.4 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: (isToday
+                      ? const Color(0xFFE07A4A)
+                      : AppColors.primary)
+                  .withValues(alpha: isToday ? 0.22 : 0.10),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isToday
+                        ? const Color(0xFFE07A4A)
+                        : AppColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    s.day.shortName,
+                    style: GoogleFonts.kanit(
+                      color: isToday ? Colors.white : AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (isToday) ...[
+                  const SizedBox(width: 6),
+                  const SvgIcon(
+                    AppIcons.pray,
+                    size: 14,
+                    color: Color(0xFFE07A4A),
+                  ),
+                ],
+              ],
+            ),
+            Text(
+              s.locationName,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.kanit(
+                color: isToday
+                    ? const Color(0xFF5C3A24)
+                    : AppColors.deepText,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+                height: 1.25,
+              ),
             ),
           ],
         ),
