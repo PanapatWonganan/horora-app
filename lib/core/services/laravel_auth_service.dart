@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
@@ -118,7 +120,15 @@ class LaravelAuthService {
     return _instance!;
   }
 
-  LaravelAuthService._() : _apiClient = ApiClient();
+  LaravelAuthService._() : _apiClient = ApiClient() {
+    // เมื่อ API ตอบ 401 ที่ใดก็ตาม → เคลียร์ session ทันที (กัน stale login
+    // หลัง token ถูกเพิกถอนฝั่ง server). in-memory เคลียร์ทันที, storage แบบ async.
+    _apiClient.onUnauthorized = () {
+      _currentUser = null;
+      _token = null;
+      unawaited(_clearAuth());
+    };
+  }
 
   // Get current user
   LaravelUser? get currentUser => _currentUser;

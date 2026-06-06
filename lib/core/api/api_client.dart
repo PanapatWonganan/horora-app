@@ -11,10 +11,15 @@ class ApiClient {
   final http.Client _httpClient;
   final Map<String, String> _defaultHeaders;
 
+  /// เรียกเมื่อ server ตอบ 401 (token หมดอายุ/ถูกเพิกถอน)
+  /// ใช้ให้ฝั่ง auth เคลียร์ session โดยไม่ต้อง import กันเป็นวง
+  void Function()? onUnauthorized;
+
   ApiClient({
     String? baseUrl,
     http.Client? httpClient,
     Map<String, String>? defaultHeaders,
+    this.onUnauthorized,
   })  : baseUrl = baseUrl ?? ApiConstants.baseUrl,
         _httpClient = httpClient ?? http.Client(),
         _defaultHeaders =
@@ -267,6 +272,9 @@ class ApiClient {
       case 400:
         throw ex.ValidationException('Bad request: ${response.body}');
       case 401:
+        // token หมดอายุ/ถูกเพิกถอน → แจ้งให้ auth เคลียร์ session (กัน stale login)
+        clearAuthToken();
+        onUnauthorized?.call();
         throw ex.UnauthorizedException();
       case 403:
         throw ex.ForbiddenException('Access forbidden');
