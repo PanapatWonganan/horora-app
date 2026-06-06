@@ -105,7 +105,7 @@ class _ChatInputState extends State<ChatInput> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: SvgIcon(
                       AppIcons.send,
                       size: 22,

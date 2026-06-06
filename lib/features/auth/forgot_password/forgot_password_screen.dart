@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/api/api_client.dart';
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../shared/widgets/gradient_button.dart';
@@ -31,9 +32,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       });
 
       try {
-        // TODO: Implement password reset logic
-        await Future.delayed(const Duration(seconds: 2)); // Simulate network request
-        
+        final apiClient = ApiClient();
+        await apiClient.post('/auth/forgot-password', data: {
+          'email': _emailController.text.trim(),
+        });
+
         if (mounted) {
           setState(() {
             _emailSent = true;

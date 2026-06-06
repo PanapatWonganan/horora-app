@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_client.dart';
+import '../../config/constants.dart';
 import '../../core/repositories/horoscope_repository.dart';
 import '../../core/utils/thai_zodiac_emoji.dart';
 import 'daily_horoscope_screen.dart';
@@ -36,7 +37,7 @@ class HoroscopeDemoScreen extends StatelessWidget {
 
   Future<HoroscopeRepository> _setupHoroscopeRepository() async {
     final prefs = await SharedPreferences.getInstance();
-    final apiClient = ApiClient(baseUrl: 'https://api.astrology-app.com/api');
+    final apiClient = ApiClient(baseUrl: ApiConstants.baseUrl);
     return HoroscopeRepository(apiClient: apiClient, prefs: prefs);
   }
 

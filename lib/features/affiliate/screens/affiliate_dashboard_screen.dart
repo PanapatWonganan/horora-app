@@ -198,7 +198,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -228,14 +228,14 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: tierColor.withOpacity(0.3)),
+        border: Border.all(color: tierColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: tierColor.withOpacity(0.1),
+              color: tierColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(Icons.workspace_premium, color: tierColor, size: 32),
@@ -374,7 +374,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: statusColor.withOpacity(0.1),
+          backgroundColor: statusColor.withValues(alpha: 0.1),
           child: Icon(Icons.receipt, color: statusColor, size: 20),
         ),
         title: Text(

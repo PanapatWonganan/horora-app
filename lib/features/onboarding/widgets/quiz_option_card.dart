@@ -113,7 +113,7 @@ class QuizOptionCard extends StatelessWidget {
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
+                child: const Center(
                   child: SvgIcon(
                     AppIcons.check,
                     size: 18,

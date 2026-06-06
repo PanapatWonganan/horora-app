@@ -175,7 +175,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+          icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         const Text(
@@ -189,12 +189,12 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
         Row(
           children: [
             IconButton(
-              icon: SvgIcon(AppIcons.flag, size: 20, color: Colors.white),
+              icon: const SvgIcon(AppIcons.flag, size: 20, color: Colors.white),
               onPressed: () => _reportContent(),
               tooltip: 'รายงานเนื้อหา',
             ),
             IconButton(
-              icon: SvgIcon(AppIcons.share, size: 20, color: Colors.white),
+              icon: const SvgIcon(AppIcons.share, size: 20, color: Colors.white),
               onPressed: _shareHoroscope,
             ),
           ],
@@ -524,7 +524,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Center(
       child: ElevatedButton.icon(
         onPressed: _shareHoroscope,
-        icon: SvgIcon(AppIcons.share, size: 18, color: Colors.white),
+        icon: const SvgIcon(AppIcons.share, size: 18, color: Colors.white),
         label: const Text('แชร์ดวงของคุณ'),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.tertiary,

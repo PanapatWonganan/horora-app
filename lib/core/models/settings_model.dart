@@ -1,3 +1,5 @@
+import '../../config/constants.dart';
+
 class UserSettings {
   final int id;
   final int userId;
@@ -166,7 +168,7 @@ class AppSettings {
   // ค่าเริ่มต้นสำหรับการตั้งค่าแอปพลิเคชัน
   factory AppSettings.defaultSettings() {
     return AppSettings(
-      apiBaseUrl: 'https://api.astrology-app.com',
+      apiBaseUrl: ApiConstants.baseUrl,
       connectionTimeout: 30, // วินาที
       maxRetryAttempts: 3,
       analyticsEnabled: true,

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 /// Service for managing OneSignal push notifications
@@ -9,13 +11,17 @@ class NotificationService {
 
   bool _isInitialized = false;
 
-  /// Your OneSignal App ID - Replace with your actual App ID from OneSignal Dashboard
-  /// Get it from: https://app.onesignal.com/ -> Settings -> Keys & IDs
-  static const String oneSignalAppId = 'f43b01ec-789a-4639-8643-255c52849319';
+  /// OneSignal App ID - loaded from .env
+  static String get oneSignalAppId => dotenv.env['ONESIGNAL_APP_ID'] ?? '';
 
   /// Initialize OneSignal
   Future<void> initialize() async {
     if (_isInitialized) return;
+
+    if (oneSignalAppId.isEmpty) {
+      debugPrint('OneSignal App ID not configured, skipping initialization');
+      return;
+    }
 
     // Enable verbose logging for debugging (disable in production)
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -91,7 +97,7 @@ class NotificationService {
     await OneSignal.User.setLanguage(language);
   }
 
-  /// Set external user ID (e.g., Supabase user ID)
+  /// Set external user ID (e.g., Laravel user ID)
   Future<void> setExternalUserId(String userId) async {
     await OneSignal.login(userId);
     debugPrint('External user ID set: $userId');

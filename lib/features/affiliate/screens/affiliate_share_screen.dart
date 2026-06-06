@@ -108,7 +108,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -142,7 +142,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -166,11 +166,11 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               size: 200,
                               backgroundColor: Colors.white,
                               eyeStyle: QrEyeStyle(
-                                eyeShape: QrEyeShape.roundedOuter,
+                                eyeShape: QrEyeShape.square,
                                 color: AppColors.primary,
                               ),
                               dataModuleStyle: QrDataModuleStyle(
-                                dataModuleShape: QrDataModuleShape.roundedOuter,
+                                dataModuleShape: QrDataModuleShape.square,
                                 color: AppColors.secondary,
                               ),
                             ),
@@ -241,9 +241,9 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.info.withOpacity(0.05),
+                          color: AppColors.info.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.info.withOpacity(0.2)),
+                          border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

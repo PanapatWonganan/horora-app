@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/routes/app_routes.dart';
-import '../../../core/services/ad_service.dart';
 import '../../../core/utils/app_icons.dart';
 
 class AppBottomNavigation extends StatelessWidget {
@@ -129,6 +128,6 @@ class AppBottomNavigation extends StatelessWidget {
     }
 
     // นำทางไปยังเส้นทางที่กำหนด พร้อม interstitial ad (70% probability)
-    context.navigateReplacementWithAd(route);
+    Navigator.pushReplacementNamed(context, route);
   }
 }

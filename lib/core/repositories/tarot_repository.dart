@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
+import '../data/local_tarot_data.dart';
 import '../models/models.dart';
 import '../utils/exceptions.dart' as app_exceptions;
 
@@ -29,20 +31,27 @@ class TarotRepository {
         return decoded.map((item) => TarotCard.fromJson(item)).toList();
       }
 
-      // ถ้าไม่มีข้อมูลในแคช ให้ดึงจาก API
-      final response = await _apiClient.get('/tarot/cards');
+      // ถ้าไม่มีข้อมูลในแคช ให้ลองดึงจาก API
+      try {
+        final response = await _apiClient.get('/tarot/cards');
 
-      final List<TarotCard> tarotCards =
-          (response as List).map((item) => TarotCard.fromJson(item)).toList();
+        final List<TarotCard> tarotCards =
+            (response as List).map((item) => TarotCard.fromJson(item)).toList();
 
-      // บันทึกข้อมูลลงในแคช
-      await _prefs.setString(_tarotCardsKey,
-          jsonEncode(tarotCards.map((card) => card.toJson()).toList()));
+        // บันทึกข้อมูลลงในแคช
+        await _prefs.setString(_tarotCardsKey,
+            jsonEncode(tarotCards.map((card) => card.toJson()).toList()));
 
-      return tarotCards;
+        return tarotCards;
+      } catch (apiError) {
+        // ถ้า API ล้มเหลว ใช้ข้อมูล local fallback
+        debugPrint('API /tarot/cards failed, using local data: $apiError');
+        return LocalTarotData.getAllCards();
+      }
     } catch (e) {
-      throw app_exceptions.DataException(
-          'Failed to get tarot cards: ${e.toString()}');
+      // Fallback สุดท้าย - ใช้ local data เสมอ
+      debugPrint('getAllTarotCards error, using local data: $e');
+      return LocalTarotData.getAllCards();
     }
   }
 

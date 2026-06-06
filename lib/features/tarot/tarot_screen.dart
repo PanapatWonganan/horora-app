@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
-import '../../core/services/ad_service.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -80,7 +79,7 @@ class _TarotScreenState extends State<TarotScreen> {
             ),
           ],
         ),
-        SvgIcon(
+        const SvgIcon(
           AppIcons.divination,
           size: 48,
         ),
@@ -108,7 +107,7 @@ class _TarotScreenState extends State<TarotScreen> {
         children: [
           Row(
             children: [
-              SvgIcon(
+              const SvgIcon(
                 AppIcons.divination,
                 size: 24,
               ),
@@ -136,14 +135,14 @@ class _TarotScreenState extends State<TarotScreen> {
           GradientButton(
             text: 'เริ่มการอ่านไพ่',
             onPressed: () {
-              context.navigateWithAd(AppRoutes.tarotReading);
+              Navigator.pushNamed(context, AppRoutes.tarotReading);
             },
             gradient: LinearGradient(
               colors: AppColors.primaryGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            icon: SvgIcon(
+            icon: const SvgIcon(
               AppIcons.arrowForward,
               size: 20,
               color: Colors.white,
@@ -175,7 +174,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 description: 'คำตอบรวดเร็วสำหรับคำถามเฉพาะเจาะจง',
                 imagePath: 'assets/images/tarot/spread_single.webp',
                 onTap: () {
-                  context.navigateWithAd(AppRoutes.tarotReading,
+                  Navigator.pushNamed(context, AppRoutes.tarotReading,
                       arguments: {'spreadType': 'single'});
                 },
               ),
@@ -187,7 +186,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 description: 'อดีต ปัจจุบัน และอนาคต',
                 imagePath: 'assets/images/tarot/spread_three.webp',
                 onTap: () {
-                  context.navigateWithAd(AppRoutes.tarotReading,
+                  Navigator.pushNamed(context, AppRoutes.tarotReading,
                       arguments: {'spreadType': 'three'});
                 },
               ),
@@ -203,7 +202,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 description: 'การวิเคราะห์สถานการณ์อย่างละเอียด',
                 imagePath: 'assets/images/tarot/spread_cross.webp',
                 onTap: () {
-                  context.navigateWithAd(AppRoutes.tarotReading,
+                  Navigator.pushNamed(context, AppRoutes.tarotReading,
                       arguments: {'spreadType': 'cross'});
                 },
               ),
@@ -215,7 +214,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 description: 'การอ่านไพ่แบบครอบคลุมทุกด้าน',
                 imagePath: 'assets/images/tarot/spread_celtic.webp',
                 onTap: () {
-                  context.navigateWithAd(AppRoutes.tarotReading,
+                  Navigator.pushNamed(context, AppRoutes.tarotReading,
                       arguments: {'spreadType': 'celtic'});
                 },
               ),
@@ -283,14 +282,14 @@ class _TarotScreenState extends State<TarotScreen> {
                 OutlinedGradientButton(
                   text: 'เริ่มการอ่านไพ่ใหม่',
                   onPressed: () {
-                    context.navigateWithAd(AppRoutes.tarotReading);
+                    Navigator.pushNamed(context, AppRoutes.tarotReading);
                   },
                   gradient: LinearGradient(
                     colors: AppColors.primaryGradient,
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
-                  icon: SvgIcon(
+                  icon: const SvgIcon(
                     AppIcons.divination,
                     size: 20,
                   ),

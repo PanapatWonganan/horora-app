@@ -12,7 +12,9 @@ enum ChatViewState {
 
 class ChatViewModel extends ChangeNotifier {
   final ChatRepository _repository = ChatRepository();
-  
+
+  bool _disposed = false;
+
   // State variables
   ChatViewState _state = ChatViewState.idle;
   String? _errorMessage;
@@ -38,10 +40,11 @@ class ChatViewModel extends ChangeNotifier {
     try {
       await _loadChatHistory();
       await _loadUserZodiacSign();
-      _setState(ChatViewState.success);
     } catch (e) {
-      _setError('Failed to initialize chat: $e');
+      debugPrint('Chat initialize warning (non-fatal): $e');
     }
+    // เข้าหน้าแชทได้เสมอ แม้ API จะล้มเหลว
+    _setState(ChatViewState.success);
   }
   
   // Load chat history
@@ -222,7 +225,17 @@ $trait
       notifyListeners();
     } catch (e) {
       _isTyping = false;
-      _setError('Failed to send message: $e');
+      // แสดง error เป็นข้อความในแชท แทนที่จะเปลี่ยน state ทั้งหน้า
+      final errorMessage = ChatMessage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        content: 'ขออภัย ไม่สามารถเชื่อมต่อกับนักพยากรณ์ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง',
+        timestamp: DateTime.now(),
+        isUser: false,
+        isSystemMessage: true,
+      );
+      final errorMessages = [...updatedMessages, errorMessage];
+      _updateSessionMessages(errorMessages);
+      debugPrint('Failed to send message: $e');
     }
   }
   
@@ -290,4 +303,16 @@ $trait
     _errorMessage = message;
     notifyListeners();
   }
-} 
+
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+}
