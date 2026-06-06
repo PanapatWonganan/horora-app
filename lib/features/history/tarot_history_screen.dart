@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/models/tarot_card_model.dart';
 import '../../core/repositories/tarot_repository.dart';
 import '../../core/routes/routes.dart';
+import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 import '../shared/widgets/loading_indicator.dart';
 
@@ -25,6 +26,17 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
   void initState() {
     super.initState();
     _tarotRepository = Provider.of<TarotRepository>(context, listen: false);
+    // History เป็นข้อมูลส่วนตัว (token-gated) — guard ก่อนเรียก API
+    WidgetsBinding.instance.addPostFrameCallback((_) => _guardAndLoad());
+  }
+
+  Future<void> _guardAndLoad() async {
+    final ok = await AuthGuard.requireAuth(context);
+    if (!mounted) return;
+    if (!ok) {
+      Navigator.of(context).pop();
+      return;
+    }
     _loadReadings();
   }
 

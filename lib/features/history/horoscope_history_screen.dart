@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/api/api_client.dart';
+import '../../core/services/auth_guard.dart';
 import '../../core/theme/theme.dart';
 import '../../core/utils/zodiac_utils.dart';
 import '../shared/widgets/gradient_button.dart';
@@ -20,6 +22,17 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
   @override
   void initState() {
     super.initState();
+    // History เป็นข้อมูลส่วนตัว (token-gated) — guard ก่อนเรียก API
+    WidgetsBinding.instance.addPostFrameCallback((_) => _guardAndLoad());
+  }
+
+  Future<void> _guardAndLoad() async {
+    final ok = await AuthGuard.requireAuth(context);
+    if (!mounted) return;
+    if (!ok) {
+      Navigator.of(context).pop();
+      return;
+    }
     _loadHoroscopeHistory();
   }
 
@@ -30,13 +43,12 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
     });
 
     try {
-      // TODO: ดึงข้อมูลจาก API เมื่อ backend พร้อม
-      // final history = await _horoscopeRepository.getHoroscopeHistory();
-
-      await Future.delayed(const Duration(milliseconds: 500));
+      final apiClient = ApiClient();
+      final response = await apiClient.get('/horoscope/history');
+      final List<dynamic> data = response is List ? response : (response?['data'] ?? []);
 
       setState(() {
-        _horoscopeHistory = []; // ส่งคืนรายการว่างจนกว่า API จะพร้อม
+        _horoscopeHistory = data.map((e) => Map<String, dynamic>.from(e)).toList();
         _isLoading = false;
       });
     } catch (e) {

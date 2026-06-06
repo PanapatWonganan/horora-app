@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/api/api_client.dart';
+import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
@@ -15,6 +17,19 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   @override
   void initState() {
     super.initState();
+    // History เป็นข้อมูลส่วนตัว (token-gated) — guard ก่อนเรียก API
+    // เพื่อไม่ให้ guest เห็นหน้าว่างแบบงง ๆ และไม่ยิง request ที่จะถูก reject
+    WidgetsBinding.instance.addPostFrameCallback((_) => _guardAndLoad());
+  }
+
+  Future<void> _guardAndLoad() async {
+    final ok = await AuthGuard.requireAuth(context);
+    if (!mounted) return;
+    if (!ok) {
+      // guest ยกเลิกการสมัคร → ออกจากหน้า history (กลับไปหน้าก่อนหน้า)
+      Navigator.of(context).pop();
+      return;
+    }
     _loadChatHistory();
   }
 
@@ -24,11 +39,12 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     });
 
     try {
-      // TODO: ดึงข้อมูลจาก API เมื่อ backend พร้อม
-      await Future.delayed(const Duration(milliseconds: 500));
+      final apiClient = ApiClient();
+      final response = await apiClient.get('/chat/history');
+      final List<dynamic> data = response is List ? response : (response?['data'] ?? []);
 
       setState(() {
-        _chatHistory = []; // ส่งคืนรายการว่างจนกว่า API จะพร้อม
+        _chatHistory = data.map((e) => Map<String, dynamic>.from(e)).toList();
         _isLoading = false;
       });
     } catch (e) {

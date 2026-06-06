@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import '../../../core/repositories/laravel_merit_repository.dart' as laravel;
 import '../../../core/services/laravel_auth_service.dart';
 import '../../affiliate/services/affiliate_service.dart';
@@ -18,9 +16,8 @@ class MeritService {
   final _meritRepo = laravel.LaravelMeritRepository.instance;
   final _apiClient = LaravelAuthService.instance.apiClient;
 
-  // Telegram Bot Configuration
-  static String get _telegramBotToken => dotenv.env['TELEGRAM_BOT_TOKEN'] ?? '';
-  static String get _telegramChatId => dotenv.env['TELEGRAM_CHAT_ID'] ?? '';
+  // หมายเหตุ: Telegram bot token ถูกย้ายไปอยู่ฝั่ง backend แล้ว
+  // (backend ส่งแจ้งเตือนเองตอนสร้าง order / อัปโหลดสลิป) เพื่อไม่ให้ secret หลุดใน client
 
   // PromptPay Configuration
   static const String promptPayNumber = '225-1-63533-4'; // เลขบัญชีกสิกร
@@ -198,10 +195,8 @@ class MeritService {
     try {
       final order = await _meritRepo.uploadWeeklySlip(orderId, slipFile.path);
 
-      // Send Telegram notification พร้อมรูป slip
-      final meritOrder = _convertLaravelOrderToMeritOrder(order);
-      await sendTelegramNotification(meritOrder, slipUrl: order.slipUrl, slipImage: slipFile);
-
+      // หมายเหตุ: การแจ้งเตือน Telegram ทำที่ฝั่ง backend แล้ว
+      // (token อยู่ที่ server เท่านั้น เพื่อไม่ให้ secret หลุดไปอยู่ใน client)
       return order.slipUrl;
     } catch (e) {
       debugPrint('Error uploading weekly slip: $e');
@@ -262,118 +257,11 @@ class MeritService {
 
       final order = await _meritRepo.uploadSlip(orderId, slipFile.path);
 
-      // Send Telegram notification พร้อมรูป slip
-      final meritOrder = _convertLaravelOrderToMeritOrder(order);
-      await sendTelegramNotification(meritOrder, slipUrl: order.slipUrl, slipImage: slipFile);
-
+      // หมายเหตุ: การแจ้งเตือน Telegram ทำที่ฝั่ง backend แล้ว
       return order.slipUrl;
     } catch (e) {
       debugPrint('Error uploading slip: $e');
       rethrow;
-    }
-  }
-
-  // ==================== Telegram Notification ====================
-
-  /// ส่งแจ้งเตือนไปยัง Telegram (public method)
-  Future<void> sendTelegramNotification(MeritOrder order, {String? slipUrl, File? slipImage}) async {
-    debugPrint('=== TELEGRAM: Starting notification ===');
-    debugPrint('Order: ${order.prayerName}, Price: ${order.price}');
-
-    try {
-      final locationName = order.location?.nameTh ?? order.locationId;
-      final packageName = order.package?.nameTh ?? order.packageId;
-
-      final message = '''
-🔔 คำสั่งซื้อใหม่!
-
-📋 Order: ${order.orderNumber ?? 'N/A'}
-🏛️ สถานที่: $locationName
-📦 แพ็คเกจ: $packageName
-💰 ราคา: ${order.priceFormatted}
-
-👤 ผู้ขอพร: ${order.prayerName}
-📅 วันเกิด: ${order.prayerBirthdate != null ? _formatDate(order.prayerBirthdate!) : '-'}
-📱 เบอร์โทร: ${order.prayerPhone ?? '-'}
-
-🙏 คำขอพร:
-${order.prayerWish ?? '-'}
-
-⏰ ${_formatDateTime(DateTime.now())}
-''';
-
-      debugPrint('=== TELEGRAM: Sending message ===');
-
-      // ส่งข้อความ
-      final msgUrl = Uri.parse(
-        'https://api.telegram.org/bot$_telegramBotToken/sendMessage',
-      );
-
-      final response = await http.post(msgUrl, body: {
-        'chat_id': _telegramChatId,
-        'text': message,
-      });
-
-      debugPrint('=== TELEGRAM: Response status: ${response.statusCode} ===');
-      debugPrint('=== TELEGRAM: Response body: ${response.body} ===');
-
-      // ถ้ามีรูป slip ส่งรูปตามมา
-      if (slipImage != null && await slipImage.exists()) {
-        debugPrint('=== TELEGRAM: Sending photo ===');
-        await _sendTelegramPhoto(slipImage);
-      }
-
-      debugPrint('=== TELEGRAM: Done ===');
-    } catch (e, stack) {
-      debugPrint('=== TELEGRAM ERROR: $e ===');
-      debugPrint('=== TELEGRAM STACK: $stack ===');
-    }
-  }
-
-  /// ส่งรูปไปยัง Telegram
-  Future<void> _sendTelegramPhoto(File photo) async {
-    try {
-      final url = Uri.parse(
-        'https://api.telegram.org/bot$_telegramBotToken/sendPhoto',
-      );
-
-      final request = http.MultipartRequest('POST', url);
-      request.fields['chat_id'] = _telegramChatId;
-      request.fields['caption'] = '🧾 รูป Slip การโอนเงิน';
-      request.files.add(await http.MultipartFile.fromPath('photo', photo.path));
-
-      final response = await request.send();
-      if (response.statusCode == 200) {
-        debugPrint('Telegram photo sent successfully');
-      } else {
-        debugPrint('Telegram photo failed: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Error sending Telegram photo: $e');
-    }
-  }
-
-  /// ส่งแจ้งเตือนทดสอบ
-  Future<bool> sendTestNotification() async {
-    try {
-      if (_telegramBotToken.isEmpty) {
-        return false;
-      }
-
-      final url = Uri.parse(
-        'https://api.telegram.org/bot$_telegramBotToken/sendMessage',
-      );
-
-      final response = await http.post(url, body: {
-        'chat_id': _telegramChatId,
-        'text': '🧪 ทดสอบการแจ้งเตือนจาก Horora App\n\n✅ การเชื่อมต่อสำเร็จ!',
-        'parse_mode': 'Markdown',
-      });
-
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Error sending test notification: $e');
-      return false;
     }
   }
 
@@ -451,18 +339,6 @@ ${order.prayerWish ?? '-'}
       default:
         return MeritOrderStatus.pending;
     }
-  }
-
-  String _formatDate(DateTime date) {
-    final thaiMonths = [
-      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
-      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
-    ];
-    return '${date.day} ${thaiMonths[date.month - 1]} ${date.year + 543}';
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return '${_formatDate(dateTime)} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   /// Generate PromptPay QR data
