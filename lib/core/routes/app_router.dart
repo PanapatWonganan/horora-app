@@ -111,8 +111,10 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => HoroscopeDetailScreen(
             horoscope: args['horoscope'],
-            zodiacSignThai: args['zodiacSignThai'],
-            zodiacSignEn: args['zodiacSignEn'],
+            // zodiacSignThai/En are required non-nullable Strings. Guard
+            // against missing keys to avoid a runtime TypeError (null -> String).
+            zodiacSignThai: (args['zodiacSignThai'] as String?) ?? '',
+            zodiacSignEn: (args['zodiacSignEn'] as String?) ?? '',
           ),
         );
       case AppRoutes.tarot:

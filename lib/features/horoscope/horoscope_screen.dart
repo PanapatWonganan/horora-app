@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
 import '../../core/utils/zodiac_utils.dart';
 import '../../core/api/api_client.dart';
+import '../../config/constants.dart';
 import '../../core/repositories/horoscope_repository.dart';
 import '../../core/models/horoscope_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,14 +38,22 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    _initRepository();
-    _loadUserZodiacSign();
+    _init();
+  }
+
+  Future<void> _init() async {
+    // Initialize the repository before loading any horoscope data to avoid
+    // a LateInitializationError race between _initRepository and
+    // _loadUserZodiacSign (which depends on _horoscopeRepository).
+    await _initRepository();
+    await _loadUserZodiacSign();
   }
 
   Future<void> _initRepository() async {
     final prefs = await SharedPreferences.getInstance();
-    final apiClient = ApiClient(baseUrl: 'https://api.astrology-app.com/api');
+    final apiClient = ApiClient(baseUrl: ApiConstants.baseUrl);
 
+    if (!mounted) return;
     setState(() {
       _horoscopeRepository = HoroscopeRepository(
         apiClient: apiClient,

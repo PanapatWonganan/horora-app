@@ -200,7 +200,10 @@ class HoroscopeRepository {
   // ฟังก์ชันสร้างข้อมูลตัวอย่างสำหรับคะแนนด้านต่างๆ
   int _getMockRating(String zodiacSign, String aspect) {
     // สร้างคะแนนสุ่มระหว่าง 1-5 แต่ให้มีความคงที่สำหรับราศีและด้านเดียวกัน
-    final int seed = zodiacSign.codeUnitAt(0) + aspect.codeUnitAt(0);
+    // ป้องกัน RangeError เมื่อ zodiacSign หรือ aspect เป็นค่าว่าง
+    final int signSeed = zodiacSign.isNotEmpty ? zodiacSign.codeUnitAt(0) : 0;
+    final int aspectSeed = aspect.isNotEmpty ? aspect.codeUnitAt(0) : 0;
+    final int seed = signSeed + aspectSeed;
     return (seed % 5) + 1; // คะแนน 1-5
   }
 

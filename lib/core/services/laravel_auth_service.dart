@@ -91,9 +91,16 @@ class LaravelAuthResponse {
   });
 
   factory LaravelAuthResponse.fromJson(Map<String, dynamic> json) {
+    final user = json['user'];
+    final token = json['token'];
+    if (user is! Map<String, dynamic> || token is! String) {
+      // Surface a clear error instead of an opaque TypeError when the API
+      // returns an unexpected body (e.g. an error payload) for an auth call.
+      throw const FormatException('Invalid auth response: missing user or token');
+    }
     return LaravelAuthResponse(
-      user: LaravelUser.fromJson(json['user']),
-      token: json['token'],
+      user: LaravelUser.fromJson(user),
+      token: token,
     );
   }
 }
@@ -263,7 +270,17 @@ class LaravelAuthService {
   // Private: Fetch current user from server
   Future<void> _fetchCurrentUser() async {
     final response = await _apiClient.get('/auth/user');
-    _currentUser = LaravelUser.fromJson(response);
+    // Some APIs wrap the user under a `user`/`data` key; unwrap if needed.
+    final dynamic payload =
+        (response is Map<String, dynamic> && response['user'] is Map)
+            ? response['user']
+            : (response is Map<String, dynamic> && response['data'] is Map)
+                ? response['data']
+                : response;
+    if (payload is! Map<String, dynamic>) {
+      throw const FormatException('Invalid /auth/user response');
+    }
+    _currentUser = LaravelUser.fromJson(payload);
   }
 
   // Get current auth token

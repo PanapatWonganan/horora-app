@@ -410,10 +410,15 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
     _ => 'Bronze',
   };
 
-  String _getNextTierMessage(String tier, int monthlyOrders) => switch (tier) {
-    'platinum' => 'คุณอยู่ระดับสูงสุดแล้ว!',
-    'gold' => 'อีก ${50 - monthlyOrders} ออเดอร์ถึง Platinum',
-    'silver' => 'อีก ${31 - monthlyOrders} ออเดอร์ถึง Gold',
-    _ => 'อีก ${11 - monthlyOrders} ออเดอร์ถึง Silver',
-  };
+  String _getNextTierMessage(String tier, int monthlyOrders) {
+    // Clamp at 0 so users who already exceeded the threshold (but haven't been
+    // promoted yet) don't see a negative "remaining orders" count.
+    int remaining(int target) => (target - monthlyOrders).clamp(0, target);
+    return switch (tier) {
+      'platinum' => 'คุณอยู่ระดับสูงสุดแล้ว!',
+      'gold' => 'อีก ${remaining(50)} ออเดอร์ถึง Platinum',
+      'silver' => 'อีก ${remaining(31)} ออเดอร์ถึง Gold',
+      _ => 'อีก ${remaining(11)} ออเดอร์ถึง Silver',
+    };
+  }
 }

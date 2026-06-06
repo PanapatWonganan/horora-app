@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'app.dart';
 import 'core/repositories/horoscope_repository.dart';
 import 'core/api/api_client.dart';
-import 'core/services/ad_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/laravel_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,12 +26,15 @@ void main() async {
     debugPrint('Warning: Firebase not initialized: $e');
   }
 
-  // Initialize Laravel Auth Service
-  await LaravelAuthService.instance.initialize();
-
-  // Initialize AdMob - ปิดชั่วคราวสำหรับการทดสอบ
-  // TODO: เปิดใช้งานเมื่อ production
-  // await AdService().initialize();
+  // Initialize Laravel Auth Service.
+  // Guard against unexpected platform errors (e.g. SharedPreferences) so a
+  // failure here cannot crash the app before runApp(). Network/token issues
+  // are already handled internally by initialize().
+  try {
+    await LaravelAuthService.instance.initialize();
+  } catch (e) {
+    debugPrint('Warning: Auth service not initialized: $e');
+  }
 
   // Initialize OneSignal Push Notifications
   try {
