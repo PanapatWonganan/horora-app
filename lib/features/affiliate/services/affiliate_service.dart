@@ -26,7 +26,7 @@ class AffiliateService {
   Future<AffiliateModel?> getStatus() async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/affiliate/status'),
+        Uri.parse('$_baseUrl/affiliate/status'),
         headers: await _headers,
       );
 
@@ -52,7 +52,7 @@ class AffiliateService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/api/affiliate/register'),
+        Uri.parse('$_baseUrl/affiliate/register'),
         headers: await _headers,
         body: json.encode({
           if (bankName != null) 'bank_name': bankName,
@@ -62,7 +62,8 @@ class AffiliateService {
         }),
       );
 
-      if (response.statusCode == 201) {
+      debugPrint('Affiliate register response: ${response.statusCode}'); // response body removed (may contain bank account info)
+      if (response.statusCode == 201 || response.statusCode == 200) {
         final data = json.decode(response.body);
         return AffiliateModel.fromJson(data['affiliate']);
       }
@@ -77,7 +78,7 @@ class AffiliateService {
   Future<AffiliateDashboard?> getDashboard() async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/affiliate/dashboard'),
+        Uri.parse('$_baseUrl/affiliate/dashboard'),
         headers: await _headers,
       );
 
@@ -96,7 +97,7 @@ class AffiliateService {
   Future<List<AffiliateCommissionModel>> getCommissions({int page = 1}) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/affiliate/commissions?page=$page'),
+        Uri.parse('$_baseUrl/affiliate/commissions?page=$page'),
         headers: await _headers,
       );
 
@@ -118,7 +119,7 @@ class AffiliateService {
   Future<AffiliateReferralLink?> getReferralLink() async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/affiliate/referral-link'),
+        Uri.parse('$_baseUrl/affiliate/referral-link'),
         headers: await _headers,
       );
 
@@ -140,7 +141,7 @@ class AffiliateService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/api/affiliate/withdraw'),
+        Uri.parse('$_baseUrl/affiliate/withdraw'),
         headers: await _headers,
         body: json.encode({
           'amount': amount,
@@ -175,7 +176,7 @@ class AffiliateService {
   Future<List<AffiliateWithdrawalModel>> getWithdrawals({int page = 1}) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/api/affiliate/withdrawals?page=$page'),
+        Uri.parse('$_baseUrl/affiliate/withdrawals?page=$page'),
         headers: await _headers,
       );
 
@@ -202,7 +203,7 @@ class AffiliateService {
   }) async {
     try {
       final response = await http.put(
-        Uri.parse('$_baseUrl/api/affiliate/payment-info'),
+        Uri.parse('$_baseUrl/affiliate/payment-info'),
         headers: await _headers,
         body: json.encode({
           'bank_name': bankName,
@@ -223,7 +224,7 @@ class AffiliateService {
   Future<bool> trackReferral(String referralCode, {String? source}) async {
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/api/affiliate/track'),
+        Uri.parse('$_baseUrl/affiliate/track'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

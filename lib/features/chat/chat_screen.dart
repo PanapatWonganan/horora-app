@@ -46,10 +46,12 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     await _viewModel.initialize();
+    if (!mounted) return;
 
     // If no active session, show topic selection dialog
     if (_viewModel.currentSession == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         _showTopicSelectionDialog();
       });
     }

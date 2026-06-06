@@ -63,7 +63,7 @@ class ChatRepository {
       // ถ้าไม่มีข้อมูลใน currentUser ให้ลองดึงจาก API
       final profile = await _authService.getUserProfile();
 
-      debugPrint("ChatRepository: profile = $profile");
+      debugPrint("ChatRepository: profile fetched (keys: ${profile?.keys.join(', ')})"); // PII removed
 
       if (profile != null) {
         // ลองหา thai_animal ในโปรไฟล์ก่อน

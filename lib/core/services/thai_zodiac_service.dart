@@ -202,11 +202,15 @@ class ThaiZodiacService {
     final careerScore = ((day + month * 2) % 5) + 1;
     final healthScore = ((day + month + weekday * 2) % 5) + 1;
     
-    // เลขมงคลประจำวัน
-    final todayLuckyNumber = zodiac.luckyNumbers[(day % zodiac.luckyNumbers.length)];
-    
-    // สีมงคลประจำวัน
-    final todayLuckyColor = zodiac.luckyColors[(weekday - 1) % zodiac.luckyColors.length];
+    // เลขมงคลประจำวัน (ป้องกัน modulo by zero หาก list ว่าง)
+    final todayLuckyNumber = zodiac.luckyNumbers.isNotEmpty
+        ? zodiac.luckyNumbers[day % zodiac.luckyNumbers.length]
+        : 0;
+
+    // สีมงคลประจำวัน (ป้องกัน modulo by zero หาก list ว่าง)
+    final todayLuckyColor = zodiac.luckyColors.isNotEmpty
+        ? zodiac.luckyColors[(weekday - 1) % zodiac.luckyColors.length]
+        : '';
     
     return {
       'overall_luck': luckScore,

@@ -146,9 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _userData['thai_element'] = thaiZodiac.element;
                 _userData['thai_element_full'] = thaiZodiac.elementThai;
                 
-                debugPrint('Updated Thai Zodiac from database birth date ${_userData['birth_date']}:');
-                debugPrint('Animal: ${thaiZodiac.animalName}, Thai Name: ${thaiZodiac.thaiName}');
-                debugPrint('Element: ${thaiZodiac.element}, Element Thai: ${thaiZodiac.elementThai}');
+                debugPrint('Updated Thai Zodiac from database birth date.'); // birth_date value removed from log
               } catch (e) {
                 debugPrint('Error parsing birth date from profile: $e');
               }

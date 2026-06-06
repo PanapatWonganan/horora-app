@@ -262,7 +262,7 @@ class OpenAIClient {
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
+        RegExp('สีนำโชค.*?[:]?([฀-๿\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;
@@ -325,14 +325,14 @@ class OpenAIClient {
     }
 
     final luckyDayMatch =
-        RegExp(r'วันนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
+        RegExp('วันนำโชค.*?[:]?([฀-๿\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyDayMatch != null) {
       luckyDay = luckyDayMatch.group(1)?.trim() ?? luckyDay;
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
+        RegExp('สีนำโชค.*?[:]?([฀-๿\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;
@@ -413,7 +413,7 @@ class OpenAIClient {
     }
 
     final luckyColorMatch =
-        RegExp(r'สีนำโชค.*?[:]?([\\u0E00-\\u0E7F\\s,]+)', unicode: true)
+        RegExp('สีนำโชค.*?[:]?([฀-๿\\s,]+)', unicode: true)
             .firstMatch(response);
     if (luckyColorMatch != null) {
       luckyColor = luckyColorMatch.group(1)?.trim() ?? luckyColor;

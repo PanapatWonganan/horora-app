@@ -8,6 +8,7 @@ import '../../core/services/auth_service.dart';
 import '../../core/services/openai_service.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/api/api_client.dart';
+import '../../config/constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
@@ -64,7 +65,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     try {
       final prefs = await SharedPreferences.getInstance();
       _tarotRepository = TarotRepository(
-        apiClient: ApiClient(baseUrl: 'https://api.astrology-app.com/api'),
+        apiClient: ApiClient(baseUrl: ApiConstants.baseUrl),
         prefs: prefs,
       );
 
@@ -362,10 +363,12 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       // );
 
       // แสดงข้อความว่าบันทึกสำเร็จ
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('บันทึกการอ่านไพ่เรียบร้อยแล้ว')),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text('ไม่สามารถบันทึกการอ่านไพ่ได้: ${e.toString()}')),
