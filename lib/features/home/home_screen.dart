@@ -1,10 +1,14 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -27,10 +31,15 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   String _userName = "คุณ"; // จะถูกอัพเดทจาก user repository
   final DateTime _today = DateTime.now();
   final _authService = AuthService.instance;
+
+  // Slow, continuous rotation for the celestial Lottie accent (the home
+  // signature moment). Driven once — not rebuilt per frame in the tree.
+  late final AnimationController _celestialRotation;
 
   // รายการแบนเนอร์โปรโมชั่น - สามารถแก้ไขได้ตามต้องการ
   final List<PromoBanner> _promoBanners = [
@@ -62,6 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _celestialRotation = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 60),
+    )..repeat();
     _loadUserName();
 
     // แสดง In-App Message ทุกครั้งที่เข้าหน้า Home
@@ -70,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _celestialRotation.dispose();
     // บันทึกว่าออกจากหน้า Home แล้ว
     HomeScreenState.hasLeftHome = true;
     super.dispose();
@@ -111,29 +125,48 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: celestialBackdrop),
         child: Stack(
           children: [
-            // Soft celestial wash — gentle pastel glows drifting behind content.
-            Positioned(
-              top: -90,
-              right: -70,
-              child: _softGlow(220, AppColors.primaryGradient.first),
-            ),
-            Positioned(
-              top: 160,
+            // ── Gradient-mesh atmosphere: layered pastel glows at the corners.
+            const Positioned(
+              top: -120,
               left: -90,
-              child: _softGlow(200, AppColors.mysticalGradient.last),
+              child: CelestialGlow(
+                size: 300,
+                color: AppColors.primary,
+                intensity: 0.30,
+              ),
             ),
+            const Positioned(
+              top: -80,
+              right: -100,
+              child: CelestialGlow(
+                size: 280,
+                color: AppColors.secondary,
+                intensity: 0.28,
+              ),
+            ),
+            const Positioned(
+              bottom: -110,
+              left: -60,
+              child: CelestialGlow(
+                size: 320,
+                color: AppColors.tertiary,
+                intensity: 0.22,
+              ),
+            ),
+            const Positioned(
+              bottom: 120,
+              right: -120,
+              child: CelestialGlow(
+                size: 260,
+                color: AppColors.accent,
+                intensity: 0.18,
+              ),
+            ),
+            // ── Grain to kill the flat-digital look, low in the stack.
+            const Positioned.fill(child: GrainOverlay(opacity: 0.030)),
             // Faint scattered stars for atmosphere.
             Positioned(
               top: 70,
@@ -159,16 +192,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      _buildHeader(),
+                      StaggeredReveal(index: 0, child: _buildHeader()),
                       const SizedBox(height: 24),
-                      _buildPromoBanners(),
+                      StaggeredReveal(index: 1, child: _buildPromoBanners()),
                       const SizedBox(height: 28),
                       // ทำบุญออนไลน์ - Main Feature
-                      _buildMeritHighlight(),
+                      StaggeredReveal(index: 2, child: _buildMeritHighlight()),
                       const SizedBox(height: 28),
-                      _buildDailyHoroscope(),
+                      StaggeredReveal(index: 3, child: _buildDailyHoroscope()),
                       const SizedBox(height: 28),
-                      _buildFeatures(),
+                      StaggeredReveal(index: 4, child: _buildFeatures()),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -179,25 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: const AppBottomNavigation(currentIndex: 0),
-    );
-  }
-
-  /// A soft circular pastel glow used as ambient background atmosphere.
-  Widget _softGlow(double size, Color color) {
-    return IgnorePointer(
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [
-              color.withValues(alpha: 0.35),
-              color.withValues(alpha: 0.0),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -216,38 +230,81 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Display font used for English words / numerals in section headings.
+  /// Display font (characterful serif) for English accents / numerals — the
+  /// editorial counterpoint to the Thai Kanit headings.
   TextStyle _displayStyle({
     required double fontSize,
     Color? color,
     FontWeight fontWeight = FontWeight.w600,
+    double letterSpacing = 0.2,
   }) {
-    return GoogleFonts.cormorantGaramond(
+    return GoogleFonts.fraunces(
       fontSize: fontSize,
       color: color ?? AppColors.deepText,
       fontWeight: fontWeight,
-      letterSpacing: 0.2,
+      letterSpacing: letterSpacing,
+      height: 1.0,
     );
   }
 
-  /// A small section heading: Thai title (Kanit) with a gentle sparkle accent.
-  Widget _sectionTitle(String title) {
-    return Row(
+  /// Small uppercase letter-spaced English overline for an editorial feel above
+  /// Thai section titles.
+  Widget _overline(String text, {Color? color}) {
+    return Text(
+      text.toUpperCase(),
+      style: _displayStyle(
+        fontSize: 11.5,
+        color: color ?? AppColors.primary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 2.6,
+      ),
+    );
+  }
+
+  /// Gentle press feedback: scales the child down slightly while tapped, with a
+  /// soft splash. Visual-only wrapper around the original onTap.
+  Widget _pressable({
+    required Widget child,
+    required VoidCallback onTap,
+    BorderRadius? borderRadius,
+  }) {
+    return _PressScale(
+      onTap: onTap,
+      borderRadius: borderRadius ?? BorderRadius.circular(20),
+      child: child,
+    );
+  }
+
+  /// A section heading with an editorial overline + Thai title (Kanit) and a
+  /// gentle sparkle accent. [overline] optional for the small inline use.
+  Widget _sectionTitle(String title, {String? overline}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SvgPicture.asset(
-          AppIcons.sparkleFilled,
-          width: 18,
-          height: 18,
-          colorFilter: const ColorFilter.mode(AppColors.accent, BlendMode.srcIn),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.kanit(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        if (overline != null) ...[
+          _overline(overline),
+          const SizedBox(height: 5),
+        ],
+        Row(
+          children: [
+            SvgPicture.asset(
+              AppIcons.sparkleFilled,
+              width: 18,
+              height: 18,
+              colorFilter:
+                  const ColorFilter.mode(AppColors.accent, BlendMode.srcIn),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontSize: 21,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -262,39 +319,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'สวัสดีค่ะ',
-                    style: GoogleFonts.kanit(
-                      color: AppColors.mutedText,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  SvgPicture.asset(
-                    AppIcons.sparkleFilled,
-                    width: 15,
-                    height: 15,
-                    colorFilter:
-                        const ColorFilter.mode(AppColors.accent, BlendMode.srcIn),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'คุณ$_userName',
-                style: GoogleFonts.kanit(
-                  color: AppColors.deepText,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                  height: 1.1,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
+              // Editorial English overline + the date in the display serif.
+              _overline('Today', color: AppColors.primary),
+              const SizedBox(height: 4),
               Text(
                 DateFormat('EEEE, d MMMM yyyy', 'th_TH').format(_today),
                 style: GoogleFonts.kanit(
@@ -303,45 +330,117 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              const SizedBox(height: 10),
+              // Dramatic Thai greeting — big, tight, intentional.
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'สวัสดีค่ะ คุณ$_userName',
+                      style: GoogleFonts.kanit(
+                        color: AppColors.deepText,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w700,
+                        height: 1.05,
+                        letterSpacing: -0.6,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SvgPicture.asset(
+                    AppIcons.sparkleFilled,
+                    width: 18,
+                    height: 18,
+                    colorFilter: const ColorFilter.mode(
+                        AppColors.accent, BlendMode.srcIn),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
         const SizedBox(width: 12),
+        // ── SIGNATURE MOMENT: a slowly-rotating celestial horoscope wheel,
+        // haloed in pastel light, sitting beside a tappable profile avatar.
         GestureDetector(
           onTap: () {
             _showProfileOptions(context);
           },
-          child: Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: AppColors.primaryGradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
+          child: SizedBox(
+            width: 64,
+            height: 64,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                // Soft halo behind the wheel.
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppColors.primary.withValues(alpha: 0.22),
+                        AppColors.primary.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+                // Slowly rotating celestial wheel — alive but subtle.
+                IgnorePointer(
+                  child: RotationTransition(
+                    turns: _celestialRotation,
+                    child: Opacity(
+                      opacity: 0.9,
+                      child: Lottie.asset(
+                        'assets/animations/horowheel.json',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.contain,
+                        animate: false,
+                      ),
+                    ),
+                  ),
+                ),
+                // Avatar coin in the centre.
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: AppColors.primaryGradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.30),
+                        blurRadius: 12,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(2.5),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.lightSurface,
+                    ),
+                    child: const Center(
+                      child: SvgIcon(
+                        AppIcons.personFilled,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
                 ),
               ],
-            ),
-            padding: const EdgeInsets.all(2.5),
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.lightSurface,
-              ),
-              child: const Center(
-                child: SvgIcon(
-                  AppIcons.personFilled,
-                  size: 24,
-                  color: AppColors.primary,
-                ),
-              ),
             ),
           ),
         ),
@@ -446,16 +545,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Today',
-          style: _displayStyle(
-            fontSize: 15,
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600,
-          ).copyWith(letterSpacing: 1.5),
-        ),
-        const SizedBox(height: 2),
-        _sectionTitle('ดวงประจำวันของคุณ'),
+        _sectionTitle('ดวงประจำวันของคุณ', overline: 'Daily Reading'),
         const SizedBox(height: 16),
         DailyHoroscopeCard(
           zodiacSign: "", // Empty string since zodiac sign is removed
@@ -469,7 +559,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMeritHighlight() {
-    return GestureDetector(
+    return _pressable(
+      borderRadius: BorderRadius.circular(24),
       onTap: () {
         // ไม่แสดงโฆษณาเพราะเป็น flow การซื้อของ
         Navigator.pushNamed(context, AppRoutes.merit);
@@ -637,7 +728,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionTitle('บริการอื่นๆ'),
+        _sectionTitle('บริการอื่นๆ', overline: 'Explore'),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -648,6 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppColors.secondary,
                 onTap: () => Navigator.pushNamed(context, AppRoutes.tarot),
                 useIconColor: true,
+                glass: true,
               ),
             ),
             const SizedBox(width: 12),
@@ -683,14 +775,93 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
     bool useIconColor = false, // ถ้า true จะไม่ใส่สีทับ (ใช้สีจาก SVG)
+    bool glass = false, // ถ้า true ใช้ glassmorphism surface
   }) {
-    return GestureDetector(
+    final borderRadius = BorderRadius.circular(20);
+
+    final inner = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withValues(alpha: 0.28),
+                color.withValues(alpha: 0.14),
+              ],
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: SvgIcon(
+            svgIconPath,
+            size: 24,
+            color: useIconColor ? null : color,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+
+    // Glassmorphism surface: blurred translucent white with a hairline border
+    // and layered shadow for real depth.
+    if (glass) {
+      return _pressable(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.16),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.55),
+                  borderRadius: borderRadius,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    width: 1,
+                  ),
+                ),
+                child: inner,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return _pressable(
       onTap: onTap,
+      borderRadius: borderRadius,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
         decoration: BoxDecoration(
           color: AppColors.lightSurface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: borderRadius,
           boxShadow: [
             BoxShadow(
               color: color.withValues(alpha: 0.18),
@@ -699,40 +870,48 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(13),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    color.withValues(alpha: 0.28),
-                    color.withValues(alpha: 0.14),
-                  ],
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: SvgIcon(
-                svgIconPath,
-                size: 24,
-                color: useIconColor ? null : color,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: GoogleFonts.kanit(
-                color: AppColors.deepText,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+        child: inner,
+      ),
+    );
+  }
+}
+
+/// Gentle press-scale + soft splash wrapper. Tasteful micro-interaction for
+/// tappable cards — scales down briefly on press, then springs back.
+class _PressScale extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final BorderRadius borderRadius;
+
+  const _PressScale({
+    required this.child,
+    required this.onTap,
+    required this.borderRadius,
+  });
+
+  @override
+  State<_PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<_PressScale> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (mounted && _pressed != value) setState(() => _pressed = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: (_) => _setPressed(true),
+      onTapUp: (_) => _setPressed(false),
+      onTapCancel: () => _setPressed(false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: widget.child,
       ),
     );
   }

@@ -10,10 +10,14 @@ import '../../core/services/laravel_auth_service.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/api/api_client.dart';
 import '../../config/constants.dart';
+import 'dart:ui' show ImageFilter;
+
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/celestial_effects.dart';
 import '../../core/utils/app_icons.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
+import 'widgets/reveal_burst.dart';
 
 class TarotReadingScreen extends StatefulWidget {
   final String? spreadType;
@@ -49,6 +53,12 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   late AnimationController _loadingAnimationController;
   late Animation<double> _loadingAnimation;
   late Animation<double> _pulseAnimation;
+
+  // Signature reveal: a one-shot glow/sparkle burst when a card is flipped.
+  late AnimationController _revealBurstController;
+  int? _lastRevealedIndex;
+  // Ambient, looping float for the selected cards + interpretation shimmer.
+  late AnimationController _ambientController;
 
   @override
   void initState() {
@@ -118,6 +128,18 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         curve: Curves.easeInOut,
       ),
     );
+
+    // One-shot burst played each time a card is revealed (the signature moment).
+    _revealBurstController = AnimationController(
+      duration: const Duration(milliseconds: 1100),
+      vsync: this,
+    );
+
+    // Slow ambient loop powering the gentle card float + interpretation shimmer.
+    _ambientController = AnimationController(
+      duration: const Duration(seconds: 4),
+      vsync: this,
+    )..repeat();
   }
 
   Future<void> _loadCards() async {
@@ -174,6 +196,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       _isCardRevealed = [];
       _isCardReversed = [];
       _interpretation = null;
+      _lastRevealedIndex = null;
     });
 
     _shuffleAnimationController.forward().then((_) {
@@ -228,9 +251,20 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   void _revealCard(int index) {
     if (index >= _isCardRevealed.length) return;
 
+    // Skip the burst if this card is already revealed (no re-trigger).
+    final alreadyRevealed = _isCardRevealed[index];
+
     setState(() {
       _isCardRevealed[index] = true;
+      if (!alreadyRevealed) {
+        _lastRevealedIndex = index;
+      }
     });
+
+    // Signature: fire the one-shot glow/sparkle burst on a fresh reveal.
+    if (!alreadyRevealed) {
+      _revealBurstController.forward(from: 0);
+    }
 
     // Check if all cards are revealed
     if (_isCardRevealed.every((revealed) => revealed)) {
@@ -376,6 +410,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     _questionController.dispose();
     _shuffleAnimationController.dispose();
     _loadingAnimationController.dispose();
+    _revealBurstController.dispose();
+    _ambientController.dispose();
     super.dispose();
   }
 
@@ -383,6 +419,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           'การอ่านไพ่ทาโร่',
@@ -391,7 +428,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             fontWeight: FontWeight.w700,
           ),
         ),
-        backgroundColor: AppColors.lightBackground,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.deepText,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -399,62 +436,109 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.surfaceMuted,
-            ],
-          ),
-        ),
-        child: _isLoading
-            ? _buildLoadingAnimation()
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSpreadTypeSelector(),
-                    const SizedBox(height: 16),
-                    _buildQuestionInput(),
-                    const SizedBox(height: 16),
-                    if (_userThaiZodiac != null) _buildZodiacInfo(),
-                    const SizedBox(height: 24),
-                    if (!_hasSelectedCards && !_isSelectingCards)
-                      _buildStartButton(),
-                    if (_isShuffling) _buildShufflingAnimation(),
-                    if (_isSelectingCards) _buildSelectCardsButton(),
-                    if (_hasSelectedCards) _buildSelectedCards(),
-                    const SizedBox(height: 24),
-                    if (_interpretation != null) _buildInterpretation(),
-                  ],
-                ),
+        decoration: const BoxDecoration(gradient: celestialBackdrop),
+        child: Stack(
+          children: [
+            // Layered celestial atmosphere.
+            const Positioned(
+              top: -110,
+              right: -80,
+              child: CelestialGlow(
+                size: 250,
+                color: AppColors.primary,
+                intensity: 0.26,
               ),
+            ),
+            const Positioned(
+              top: 240,
+              left: -100,
+              child: CelestialGlow(
+                size: 230,
+                color: AppColors.secondary,
+                intensity: 0.2,
+              ),
+            ),
+            const Positioned(
+              bottom: -70,
+              right: -50,
+              child: CelestialGlow(
+                size: 220,
+                color: AppColors.tertiary,
+                intensity: 0.18,
+              ),
+            ),
+            const Positioned.fill(child: GrainOverlay(opacity: 0.03)),
+            _isLoading
+                ? _buildLoadingAnimation()
+                : SafeArea(
+                    child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSpreadTypeSelector(),
+                        const SizedBox(height: 16),
+                        _buildQuestionInput(),
+                        const SizedBox(height: 16),
+                        if (_userThaiZodiac != null) _buildZodiacInfo(),
+                        const SizedBox(height: 24),
+                        if (!_hasSelectedCards && !_isSelectingCards)
+                          _buildStartButton(),
+                        if (_isShuffling) _buildShufflingAnimation(),
+                        if (_isSelectingCards) _buildSelectCardsButton(),
+                        if (_hasSelectedCards) _buildSelectedCards(),
+                        const SizedBox(height: 24),
+                        if (_interpretation != null) _buildInterpretation(),
+                      ],
+                    ),
+                  ),
+                  ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, {String? overline}) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 4,
-          height: 20,
+          height: overline != null ? 30 : 20,
           decoration: BoxDecoration(
-            color: AppColors.accent,
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.accent, AppColors.secondary],
+            ),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          title,
-          style: GoogleFonts.kanit(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (overline != null)
+              Text(
+                overline,
+                style: GoogleFonts.fraunces(
+                  color: AppColors.primary.withValues(alpha: 0.75),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 2.5,
+                ),
+              ),
+            Text(
+              title,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -464,7 +548,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('เลือกรูปแบบการอ่านไพ่'),
+        _buildSectionTitle('เลือกรูปแบบการอ่านไพ่', overline: 'THE SPREAD'),
         const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -557,7 +641,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ'),
+        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ',
+            overline: 'YOUR QUESTION'),
         const SizedBox(height: 12),
         TextField(
           controller: _questionController,
@@ -713,6 +798,16 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           ),
           const SizedBox(height: 16),
           Text(
+            'SHUFFLING',
+            style: GoogleFonts.fraunces(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 3,
+              color: AppColors.primary.withValues(alpha: 0.75),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
             'กำลังสับไพ่...',
             style: GoogleFonts.kanit(
               fontSize: 18,
@@ -748,7 +843,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('ไพ่ของคุณ'),
+        _buildSectionTitle('ไพ่ของคุณ', overline: 'YOUR CARDS'),
         const SizedBox(height: 16),
         Center(
           child: Wrap(
@@ -765,154 +860,274 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     );
   }
 
+  // Roman-numeral arcana label for the editorial overline.
+  String _romanNumeral(int n) {
+    if (n < 0 || n > 21) return '';
+    const numerals = [
+      '0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI',
+      'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI'
+    ];
+    return numerals[n];
+  }
+
+  // English editorial overline e.g. "THE FOOL · 0" — display feel for the card.
+  String _cardOverline(TarotCard card) {
+    final name = card.name.toUpperCase();
+    final isMajor = card.suit.toLowerCase() == 'major arcana';
+    final num = isMajor ? _romanNumeral(card.number) : '${card.number}';
+    return num.isEmpty ? name : '$name · $num';
+  }
+
   Widget _buildTarotCard(int index) {
     final isRevealed = _isCardRevealed[index];
     final isReversed = _isCardReversed[index];
+    final isJustRevealed = _lastRevealedIndex == index;
 
-    return GestureDetector(
-      onTap: () => _revealCard(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-        width: 124,
-        height: 204,
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          // Soft gold celestial frame around every card.
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.accent.withValues(alpha: 0.9),
-              AppColors.accent.withValues(alpha: 0.45),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.18),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
+    // Gentle continuous float; each card offset by index so they bob out of sync.
+    return AnimatedBuilder(
+      animation: _ambientController,
+      builder: (context, child) {
+        final t = _ambientController.value * 2 * pi + index * 1.1;
+        final dy = isRevealed ? sin(t) * 3.0 : 0.0;
+        return Transform.translate(offset: Offset(0, dy), child: child);
+      },
+      child: GestureDetector(
+        onTap: () => _revealCard(index),
+        // Reveal glow pulse: a soft halo blooms behind a freshly revealed card.
+        child: AnimatedBuilder(
+          animation: _revealBurstController,
+          builder: (context, child) {
+            final p = isJustRevealed ? _revealBurstController.value : 0.0;
+            final glow = (sin(p * pi)).clamp(0.0, 1.0);
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                  width: 124,
+                  height: 204,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    // Soft gold celestial frame — catches light on reveal.
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.accent
+                            .withValues(alpha: (0.9 + glow * 0.1).clamp(0.0, 1.0)),
+                        Color.lerp(
+                          AppColors.accent.withValues(alpha: 0.45),
+                          Colors.white,
+                          glow * 0.6,
+                        )!,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.18),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                      // Reveal glow halo.
+                      BoxShadow(
+                        color: AppColors.accent.withValues(alpha: 0.55 * glow),
+                        blurRadius: 26 * glow,
+                        spreadRadius: 4 * glow,
+                      ),
+                    ],
+                  ),
+                  child: child,
+                ),
+                // Signature sparkle burst overlaid on the freshly revealed card.
+                if (isJustRevealed && p > 0 && p < 1)
+                  Positioned.fill(
+                    child: RevealBurst(progress: p),
+                  ),
+              ],
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isRevealed ? Colors.white : AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(14),
             ),
-          ],
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isRevealed
-                ? Colors.white
-                : AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: isRevealed
-              ? Transform.rotate(
-                  angle: isReversed ? pi : 0,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Image.asset(
-                            _selectedCards[index].imagePath,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
-                              return const Center(
-                                child: SvgIcon(
-                                  AppIcons.sparkle,
-                                  size: 32,
-                                  color: AppColors.primary,
-                                ),
-                              );
-                            },
+            child: isRevealed
+                ? Transform.rotate(
+                    angle: isReversed ? pi : 0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Image.asset(
+                              _selectedCards[index].imagePath,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
+                                return const Center(
+                                  child: SvgIcon(
+                                    AppIcons.sparkle,
+                                    size: 32,
+                                    color: AppColors.primary,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          color: AppColors.surfaceMuted,
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Column(
-                            children: [
-                              Text(
-                                _selectedCards[index].nameTh,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.kanit(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.deepText,
-                                ),
-                              ),
-                              if (isReversed)
+                          Container(
+                            width: double.infinity,
+                            color: AppColors.surfaceMuted,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 6),
+                            child: Column(
+                              children: [
+                                // English editorial overline (display font).
                                 Text(
-                                  '(กลับหัว)',
-                                  style: GoogleFonts.kanit(
-                                    fontSize: 12,
-                                    color: AppColors.secondary,
+                                  _cardOverline(_selectedCards[index]),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.fraunces(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.4,
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.8),
                                   ),
                                 ),
-                            ],
+                                const SizedBox(height: 2),
+                                Text(
+                                  _selectedCards[index].nameTh,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.kanit(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.deepText,
+                                  ),
+                                ),
+                                if (isReversed)
+                                  Text(
+                                    '(กลับหัว)',
+                                    style: GoogleFonts.kanit(
+                                      fontSize: 12,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Center(
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: AppColors.mysticalGradient,
+                        ],
                       ),
                     ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          top: 14,
-                          left: 14,
-                          child: SvgIcon(
-                            AppIcons.star,
-                            size: 12,
-                            color: Colors.white.withValues(alpha: 0.8),
-                          ),
+                  )
+                : Center(
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        // Deeper, more mystical card back gradient.
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF6C5BD0), // deep lavender
+                            Color(0xFF8B6FE0),
+                            Color(0xFFB8A6F0),
+                          ],
                         ),
-                        const Positioned(
-                          bottom: 16,
-                          right: 16,
-                          child: SvgIcon(
-                            AppIcons.sparkle,
-                            size: 14,
-                            color: AppColors.accent,
-                          ),
-                        ),
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.25),
-                            border: Border.all(
-                              color: AppColors.accent.withValues(alpha: 0.8),
-                              width: 1.5,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Faint inner top sheen for depth.
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.circular(14),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.22),
+                                    Colors.white.withValues(alpha: 0.0),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          child: const Center(
+                          // Scattered star/sparkle accents on the back.
+                          Positioned(
+                            top: 14,
+                            left: 14,
+                            child: SvgIcon(
+                              AppIcons.star,
+                              size: 12,
+                              color: Colors.white.withValues(alpha: 0.85),
+                            ),
+                          ),
+                          Positioned(
+                            top: 30,
+                            right: 18,
+                            child: SvgIcon(
+                              AppIcons.star,
+                              size: 8,
+                              color: Colors.white.withValues(alpha: 0.55),
+                            ),
+                          ),
+                          const Positioned(
+                            bottom: 16,
+                            right: 16,
                             child: SvgIcon(
                               AppIcons.sparkle,
-                              size: 28,
-                              color: Colors.white,
+                              size: 14,
+                              color: AppColors.accent,
                             ),
                           ),
-                        ),
-                      ],
+                          Positioned(
+                            bottom: 26,
+                            left: 20,
+                            child: SvgIcon(
+                              AppIcons.sparkle,
+                              size: 9,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.32),
+                                  Colors.white.withValues(alpha: 0.1),
+                                ],
+                              ),
+                              border: Border.all(
+                                color: AppColors.accent
+                                    .withValues(alpha: 0.85),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: const Center(
+                              child: SvgIcon(
+                                AppIcons.sparkle,
+                                size: 28,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+          ),
         ),
       ),
     );
@@ -922,75 +1137,137 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำทำนาย'),
+        _buildSectionTitle('คำทำนาย', overline: 'THE READING'),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.lightSurface,
-                AppColors.surfaceMuted.withValues(alpha: 0.7),
-              ],
-            ),
+        // The cards "speaking": a gentle fade + a one-time shimmer sweep over a
+        // glassmorphic panel as the interpretation appears.
+        StaggeredReveal(
+          index: 0,
+          duration: const Duration(milliseconds: 700),
+          offsetY: 20,
+          child: ClipRRect(
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: AppColors.accent.withValues(alpha: 0.3),
-              width: 1,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  // Translucent white glass over the celestial backdrop.
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.78),
+                      Colors.white.withValues(alpha: 0.55),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  // Gold hairline border.
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.45),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const SvgIcon(
+                              AppIcons.sparkle,
+                              size: 18,
+                              color: AppColors.accent,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'ดวงใจของไพ่บอกว่า',
+                              style: GoogleFonts.kanit(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'THE CARDS SPEAK',
+                          style: GoogleFonts.fraunces(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 2.5,
+                            color: AppColors.mutedText.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        if (_userThaiZodiac != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              'สำหรับผู้ที่เกิด$_userThaiZodiac',
+                              style: GoogleFonts.kanit(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.deepText,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _interpretation ?? '',
+                          style: GoogleFonts.kanit(
+                            fontSize: 16,
+                            color: AppColors.deepText,
+                            height: 1.7,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // One-time diagonal shimmer sweep across the panel.
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0, end: 1),
+                          duration: const Duration(milliseconds: 1400),
+                          curve: Curves.easeInOut,
+                          builder: (context, t, _) {
+                            return ShaderMask(
+                              blendMode: BlendMode.srcATop,
+                              shaderCallback: (rect) {
+                                final dx = (t * 2 - 0.5) * rect.width;
+                                return LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.0),
+                                    Colors.white
+                                        .withValues(alpha: 0.35 * (1 - t)),
+                                    Colors.white.withValues(alpha: 0.0),
+                                  ],
+                                  stops: const [0.35, 0.5, 0.65],
+                                ).createShader(
+                                  Rect.fromLTWH(
+                                      dx, 0, rect.width, rect.height),
+                                );
+                              },
+                              child: const SizedBox.expand(),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const SvgIcon(
-                    AppIcons.sparkle,
-                    size: 18,
-                    color: AppColors.accent,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'ดวงใจของไพ่บอกว่า',
-                    style: GoogleFonts.kanit(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              if (_userThaiZodiac != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    'สำหรับผู้ที่เกิด$_userThaiZodiac',
-                    style: GoogleFonts.kanit(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.deepText,
-                    ),
-                  ),
-                ),
-              const SizedBox(height: 12),
-              Text(
-                _interpretation ?? '',
-                style: GoogleFonts.kanit(
-                  fontSize: 16,
-                  color: AppColors.deepText,
-                  height: 1.65,
-                ),
-              ),
-            ],
           ),
         ),
         const SizedBox(height: 24),
@@ -1107,6 +1384,16 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             ],
           ),
           const SizedBox(height: 24),
+          Text(
+            'THE CARDS SPEAK',
+            style: GoogleFonts.fraunces(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 3,
+              color: AppColors.primary.withValues(alpha: 0.75),
+            ),
+          ),
+          const SizedBox(height: 4),
           Text(
             'กำลังตีความไพ่...',
             style: GoogleFonts.kanit(

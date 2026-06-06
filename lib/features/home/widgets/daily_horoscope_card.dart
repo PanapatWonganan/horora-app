@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -291,18 +293,25 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
+        // Layered shadow for real depth (ambient + tinted lift).
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.28),
-            blurRadius: 22,
+            color: AppColors.primary.withValues(alpha: 0.30),
+            blurRadius: 30,
             spreadRadius: 0,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 16),
+          ),
+          BoxShadow(
+            color: AppColors.secondary.withValues(alpha: 0.18),
+            blurRadius: 22,
+            spreadRadius: -4,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         child: Stack(
           children: [
             // Soft celestial highlight glow in the corner.
@@ -310,22 +319,57 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
               top: -40,
               right: -30,
               child: Container(
-                width: 160,
-                height: 160,
+                width: 180,
+                height: 180,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      Colors.white.withValues(alpha: 0.35),
+                      Colors.white.withValues(alpha: 0.45),
                       Colors.white.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
               ),
             ),
+            // Second soft glow lower-left for the gradient-mesh feel.
+            Positioned(
+              bottom: -50,
+              left: -40,
+              child: Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.tertiary.withValues(alpha: 0.28),
+                      AppColors.tertiary.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Glassmorphism wash + hairline border over the whole card so the
+            // content sits on frosted glass, not a flat pastel fill.
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.55),
+                      width: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             // Content
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -335,20 +379,36 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Editorial English overline in the display serif.
+                          Text(
+                            'YOUR SIGN',
+                            style: GoogleFonts.fraunces(
+                              color: AppColors.primary.withValues(alpha: 0.85),
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 2.4,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
                           Text(
                             _userZodiacSignThai ?? widget.zodiacSign,
                             style: GoogleFonts.kanit(
                               color: AppColors.deepText,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.4,
+                              height: 1.05,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            DateFormat('d MMMM yyyy', 'th_TH').format(horoscope.date),
-                            style: GoogleFonts.kanit(
-                              color: AppColors.deepText.withValues(alpha: 0.85),
-                              fontSize: 13,
+                            DateFormat('d MMMM yyyy', 'th_TH')
+                                .format(horoscope.date),
+                            style: GoogleFonts.fraunces(
+                              color: AppColors.deepText.withValues(alpha: 0.78),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.2,
                             ),
                           ),
                         ],
@@ -525,10 +585,11 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.kanit(
+          style: GoogleFonts.fraunces(
             color: AppColors.primary,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
           ),
         ),
       ],
