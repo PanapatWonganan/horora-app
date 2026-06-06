@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/merit_colors.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import 'merit_payment_screen.dart';
@@ -105,8 +106,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -170,13 +171,13 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.deepText),
           ),
           const Expanded(
             child: Text(
               'สั่งจองฝากมู',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -195,13 +196,13 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFFFFD700).withValues(alpha: 0.2),
-            const Color(0xFFFF8C00).withValues(alpha: 0.2),
+            MeritColors.accent.withValues(alpha: 0.25),
+            AppColors.secondary.withValues(alpha: 0.25),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+          color: MeritColors.accent.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -209,10 +210,10 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+              color: Colors.white.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const SvgIcon(AppIcons.temple, size: 28),
+            child: const SvgIcon(AppIcons.temple, size: 28, color: AppColors.deepText),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -222,7 +223,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 Text(
                   widget.schedule.locationName,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.deepText,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -231,7 +232,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 Text(
                   '${widget.schedule.day.displayName} - $dateStr',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: AppColors.deepText.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -247,7 +248,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     return Text(
       title,
       style: const TextStyle(
-        color: Colors.white,
+        color: AppColors.deepText,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
@@ -276,14 +277,22 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                   ? const LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+                      colors: MeritColors.accentGradient,
                     )
                   : null,
-              color: isSelected ? null : const Color(0xFF2D2D44),
+              color: isSelected ? null : MeritColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: isSelected
                   ? null
-                  : Border.all(color: Colors.white24),
+                  : Border.all(color: AppColors.divider),
+              boxShadow: [
+                BoxShadow(
+                  color: (isSelected ? MeritColors.accent : AppColors.primary)
+                      .withValues(alpha: isSelected ? 0.3 : 0.06),
+                  blurRadius: isSelected ? 14 : 8,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,19 +313,19 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                             border: Border.all(
                               color: isSelected
                                   ? Colors.transparent
-                                  : Colors.white54,
+                                  : AppColors.mutedText,
                               width: 2,
                             ),
                           ),
                           child: isSelected
-                              ? const Icon(Icons.check, size: 16, color: Colors.black87)
+                              ? const Icon(Icons.check, size: 16, color: AppColors.deepText)
                               : null,
                         ),
                         const SizedBox(width: 12),
                         Text(
                           name,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white,
+                          style: const TextStyle(
+                            color: AppColors.deepText,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -326,7 +335,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                     Text(
                       '฿${price.toStringAsFixed(0)}',
                       style: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFFFFD700),
+                        color: isSelected ? AppColors.deepText : MeritColors.accentDark,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -342,14 +351,14 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.white.withValues(alpha: 0.2)
-                            : Colors.white.withValues(alpha: 0.1),
+                            ? Colors.white.withValues(alpha: 0.45)
+                            : AppColors.surfaceMuted,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         f,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white70,
+                          color: isSelected ? AppColors.deepText : AppColors.mutedText,
                           fontSize: 12,
                         ),
                       ),
@@ -382,14 +391,15 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2D2D44),
+          color: MeritColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.divider),
         ),
-        child: Center(
+        child: const Center(
           child: Text(
             'ไม่มีของไหว้เพิ่มเติมสำหรับสถานที่นี้',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.65),
+              color: AppColors.mutedText,
             ),
           ),
         ),
@@ -414,14 +424,21 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF2D2D44),
+              color: MeritColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
-                    ? const Color(0xFFFFD700)
-                    : Colors.transparent,
+                    ? MeritColors.accentDark
+                    : AppColors.divider,
                 width: 2,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -433,13 +450,13 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color(0xFFFFD700).withValues(alpha: isSelected ? 0.3 : 0.15),
-                        const Color(0xFFFF8C00).withValues(alpha: isSelected ? 0.3 : 0.15),
+                        MeritColors.accent.withValues(alpha: isSelected ? 0.4 : 0.25),
+                        AppColors.secondary.withValues(alpha: isSelected ? 0.4 : 0.25),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                      color: MeritColors.accent.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Center(
@@ -457,7 +474,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       Text(
                         addon.name,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.deepText,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -466,8 +483,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         const SizedBox(height: 4),
                         Text(
                           addon.description!,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                          style: const TextStyle(
+                            color: AppColors.mutedText,
                             fontSize: 13,
                           ),
                         ),
@@ -479,7 +496,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 Text(
                   '+${addon.priceFormatted}',
                   style: TextStyle(
-                    color: isSelected ? const Color(0xFFFFD700) : Colors.white70,
+                    color: isSelected ? MeritColors.accentDark : AppColors.mutedText,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -496,15 +513,23 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D44),
+        color: MeritColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
           // Name
           TextFormField(
             controller: _nameController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.deepText),
             decoration: _inputDecoration('👤 ชื่อ-นามสกุล ผู้ขอพร'),
             validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุชื่อ' : null,
           ),
@@ -528,7 +553,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFF2D2D44),
+                color: MeritColors.inputBackground,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -540,12 +565,12 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         : '📅 วันเกิด (ไม่บังคับ)',
                     style: TextStyle(
                       color: _birthDate != null
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.65),
+                          ? AppColors.deepText
+                          : AppColors.mutedText,
                       fontSize: 16,
                     ),
                   ),
-                  const SvgIcon(AppIcons.calendar, size: 20, color: Colors.white54),
+                  const SvgIcon(AppIcons.calendar, size: 20, color: AppColors.mutedText),
                 ],
               ),
             ),
@@ -555,7 +580,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           // Phone
           TextFormField(
             controller: _phoneController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.deepText),
             keyboardType: TextInputType.phone,
             decoration: _inputDecoration('📞 เบอร์โทรศัพท์'),
             validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุเบอร์โทร' : null,
@@ -565,7 +590,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           // Wish
           TextFormField(
             controller: _wishController,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.deepText),
             maxLines: 3,
             decoration: _inputDecoration('🙏 คำอธิษฐาน / สิ่งที่ต้องการขอ'),
           ),
@@ -577,12 +602,20 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
+      hintStyle: const TextStyle(color: AppColors.mutedText),
       filled: true,
-      fillColor: const Color(0xFF2D2D44),
+      fillColor: MeritColors.inputBackground,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.divider),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: MeritColors.accentDark),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
@@ -592,11 +625,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D44),
+        color: MeritColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+          color: MeritColors.accent.withValues(alpha: 0.4),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: MeritColors.accent.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -606,7 +646,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             _buildPriceRow('ของไหว้เพิ่มเติม', _addonsPrice),
           ],
           const SizedBox(height: 12),
-          const Divider(color: Colors.white24),
+          const Divider(color: AppColors.divider),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -614,7 +654,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               const Text(
                 'รวมทั้งหมด',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.deepText,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -622,7 +662,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               Text(
                 '฿${_totalPrice.toStringAsFixed(0)}',
                 style: const TextStyle(
-                  color: Color(0xFFFFD700),
+                  color: MeritColors.accentDark,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -640,15 +680,15 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.85),
+          style: const TextStyle(
+            color: AppColors.mutedText,
             fontSize: 14,
           ),
         ),
         Text(
           '฿${price.toStringAsFixed(0)}',
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.deepText,
             fontSize: 16,
           ),
         ),
@@ -666,12 +706,12 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+            colors: MeritColors.accentGradient,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+              color: MeritColors.accent.withValues(alpha: 0.45),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -680,12 +720,12 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SvgIcon(AppIcons.heart, size: 22, color: Colors.white),
+            const SvgIcon(AppIcons.heart, size: 22, color: AppColors.deepText),
             const SizedBox(width: 10),
             Text(
               'ยืนยันสั่งจอง ฿${_totalPrice.toStringAsFixed(0)}',
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),

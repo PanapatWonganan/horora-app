@@ -64,13 +64,13 @@ class AuthTextField extends StatelessWidget {
       textInputAction: textInputAction,
       onFieldSubmitted: onFieldSubmitted,
       style: const TextStyle(
-        color: AppColors.lightText,
+        color: AppColors.deepText,
         fontSize: 16,
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(
-          color: AppColors.lightText.withValues(alpha: 0.5),
+        hintStyle: const TextStyle(
+          color: AppColors.mutedText,
           fontSize: 16,
         ),
         prefixIcon: svgIconPath != null
@@ -79,29 +79,29 @@ class AuthTextField extends StatelessWidget {
                 child: SvgIcon(
                   svgIconPath!,
                   size: 20,
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                  color: AppColors.mutedText,
                 ),
               )
             : icon != null
                 ? Icon(
                     icon,
-                    color: AppColors.lightText.withValues(alpha: 0.7),
+                    color: AppColors.mutedText,
                   )
                 : null,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.1),
+        fillColor: AppColors.lightSurface,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.divider, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.divider, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

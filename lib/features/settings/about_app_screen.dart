@@ -31,8 +31,8 @@ class AboutAppScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),

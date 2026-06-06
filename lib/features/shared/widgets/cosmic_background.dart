@@ -67,40 +67,46 @@ class CosmicPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw deep space background
+    // Soft Celestial backdrop — a gentle light pastel sky.
     final Paint backgroundPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color(0xFF0E0B16),
-          Color(0xFF1A1025),
-          Color(0xFF2C1B47),
+          Color(0xFFFBF7FF), // pastel sky (lightBackground)
+          Color(0xFFF3ECFB), // soft lavender wash (surfaceMuted)
+          Color(0xFFFFF7EC), // warm cream
         ],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
-    // Draw stars
+    // Draw soft pastel / gold star specks
     for (var star in _stars) {
       final starX = star.x * size.width;
       final starY = star.y * size.height;
-      
+
       // Calculate twinkle effect
       final twinkle = (math.sin((animationValue * star.twinkleSpeed * 10) + star.twinkleOffset) + 1) / 2;
-      final starOpacity = 0.3 + (twinkle * 0.7);
+      // Gentle, low-opacity specks so they read as subtle sparkle on light.
+      final starOpacity = 0.12 + (twinkle * 0.28);
       final starSize = star.size * (0.7 + (twinkle * 0.3));
-      
+
+      // Alternate between soft gold and lavender specks.
+      final speckColor = star.twinkleSpeed > 2
+          ? const Color(0xFFF2C879) // soft gold star
+          : const Color(0xFF8B6FE0); // soft lavender
+
       final starPaint = Paint()
-        ..color = Colors.white.withValues(alpha: starOpacity)
+        ..color = speckColor.withValues(alpha: starOpacity)
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawCircle(Offset(starX, starY), starSize, starPaint);
-      
-      // Draw glow effect for larger stars
+
+      // Draw a tender glow for larger specks.
       if (star.size > 1.5) {
         final glowPaint = Paint()
-          ..color = Colors.white.withValues(alpha: starOpacity * 0.3)
+          ..color = speckColor.withValues(alpha: starOpacity * 0.4)
           ..style = PaintingStyle.fill
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.0);
 
@@ -108,28 +114,28 @@ class CosmicPainter extends CustomPainter {
       }
     }
 
-    // Draw nebula effects
+    // Draw soft pastel aura clouds
     _drawNebula(canvas, size, animationValue);
   }
 
   void _drawNebula(Canvas canvas, Size size, double animationValue) {
-    // Draw a few colorful nebula clouds
+    // Soft pastel aura clouds — gentle peach / lavender / mint / sky blooms.
     final nebulaColors = [
-      const Color(0x15A239A3), // Purple
-      const Color(0x154B0082), // Indigo
-      const Color(0x15FF1493), // Pink
-      const Color(0x154169E1), // Blue
+      const Color(0x14CDB7FF), // lavender
+      const Color(0x14FFD7C2), // peach
+      const Color(0x14C8F2DC), // mint
+      const Color(0x14BEE8FF), // sky blue
     ];
-    
+
     for (int i = 0; i < 4; i++) {
       final centerX = size.width * (0.2 + (i * 0.2));
       final centerY = size.height * (0.3 + (math.sin(animationValue * 0.5 + i) * 0.1));
       final radius = size.width * 0.3;
-      
+
       final nebulaPaint = Paint()
         ..color = nebulaColors[i]
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 50.0);
-      
+
       canvas.drawCircle(Offset(centerX, centerY), radius, nebulaPaint);
     }
   }

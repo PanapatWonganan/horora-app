@@ -240,8 +240,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -555,19 +555,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF2A2A4A),
-            Color(0xFF1A1A3A),
+            AppColors.lightSurface,
+            AppColors.surfaceMuted,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
+            color: AppColors.primary.withValues(alpha: 0.10),
+            blurRadius: 16,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -579,7 +580,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SvgIcon(
                 AppIcons.starFilled,
                 size: 24,
-                color: Colors.amber,
+                color: AppColors.accent,
               ),
               SizedBox(width: 12),
               Text(

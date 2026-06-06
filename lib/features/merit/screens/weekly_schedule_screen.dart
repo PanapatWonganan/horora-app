@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/merit_colors.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import 'merit_weekly_order_screen.dart';
@@ -43,8 +44,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -72,13 +73,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: Colors.white),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.deepText),
           ),
           const Expanded(
             child: Text(
               'ตารางฝากมูประจำสัปดาห์',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -119,16 +120,28 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                        colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+                        colors: MeritColors.accentGradient,
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       )
                     : null,
-                color: isSelected ? null : const Color(0xFF2D2D44),
+                color: isSelected ? null : MeritColors.cardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: isToday && !isSelected
-                    ? Border.all(color: AppColors.primary, width: 2)
-                    : null,
+                border: isSelected
+                    ? null
+                    : Border.all(
+                        color: isToday
+                            ? AppColors.primary
+                            : AppColors.divider,
+                        width: isToday ? 2 : 1,
+                      ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +149,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   Text(
                     day.shortName,
                     style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white70,
+                      color: isSelected
+                          ? AppColors.deepText
+                          : AppColors.mutedText,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -145,7 +160,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   Text(
                     date.day.toString(),
                     style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white,
+                      color: isSelected
+                          ? AppColors.deepText
+                          : AppColors.deepText,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -156,7 +173,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.black : const Color(0xFFFFD700),
+                        color: isSelected
+                            ? AppColors.deepText
+                            : MeritColors.accentDark,
                         shape: BoxShape.circle,
                       ),
                     )
@@ -176,24 +195,24 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SvgIcon(
+          SvgIcon(
             AppIcons.calendar,
             size: 80,
-            color: Colors.white24,
+            color: AppColors.mutedText.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 16),
           Text(
             'ไม่มีรอบมูในวัน${_selectedDay?.displayName ?? "นี้"}',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.65),
+            style: const TextStyle(
+              color: AppColors.deepText,
               fontSize: 16,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'กรุณาเลือกวันที่มีจุดสีทอง',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
@@ -222,14 +241,14 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+                colors: MeritColors.accentGradient,
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+                  color: MeritColors.accent.withValues(alpha: 0.35),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -243,13 +262,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.55),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const SvgIcon(
                         AppIcons.temple,
                         size: 28,
-                        color: Colors.white,
+                        color: AppColors.deepText,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -260,14 +279,14 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                           Text(
                             schedule.day.displayName,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: AppColors.deepText.withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
                           Text(
                             schedule.locationName,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.deepText,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -281,18 +300,18 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withValues(alpha: 0.55),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const SvgIcon(AppIcons.sparkle, size: 16, color: Colors.white),
+                      const SvgIcon(AppIcons.sparkle, size: 16, color: AppColors.deepText),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           schedule.belief,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.deepText,
                             fontSize: 14,
                           ),
                         ),
@@ -304,7 +323,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 Text(
                   'รอบถัดไป: $dateStr',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: AppColors.deepText.withValues(alpha: 0.85),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -342,7 +361,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     return Text(
       title,
       style: const TextStyle(
-        color: Colors.white,
+        color: AppColors.deepText,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
@@ -353,11 +372,18 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D44),
+        color: MeritColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
+          color: AppColors.divider,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         children: items.map((item) {
@@ -369,7 +395,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFFFD700),
+                    color: MeritColors.accentDark,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -378,7 +404,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   child: Text(
                     item.name,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.deepText,
                       fontSize: 16,
                     ),
                   ),
@@ -386,7 +412,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 const SvgIcon(
                   AppIcons.checkCircle,
                   size: 20,
-                  color: Colors.green,
+                  color: AppColors.success,
                 ),
               ],
             ),
@@ -414,11 +440,18 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D44),
+        color: MeritColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+          color: MeritColors.accent.withValues(alpha: 0.4),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -430,13 +463,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  const Color(0xFFFFD700).withValues(alpha: 0.15),
-                  const Color(0xFFFF8C00).withValues(alpha: 0.15),
+                  MeritColors.accent.withValues(alpha: 0.25),
+                  AppColors.secondary.withValues(alpha: 0.25),
                 ],
               ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+                color: MeritColors.accent.withValues(alpha: 0.3),
               ),
             ),
             child: Center(
@@ -454,7 +487,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 Text(
                   addon.name,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.deepText,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -463,8 +496,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   const SizedBox(height: 4),
                   Text(
                     addon.description!,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                    style: const TextStyle(
+                      color: AppColors.mutedText,
                       fontSize: 13,
                     ),
                   ),
@@ -476,13 +509,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.2),
+              color: MeritColors.accent.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               '+${addon.priceFormatted}',
               style: const TextStyle(
-                color: Color(0xFFFFD700),
+                color: MeritColors.accentDark,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
@@ -513,12 +546,12 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFD700), Color(0xFFFF8C00)],
+            colors: MeritColors.accentGradient,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+              color: MeritColors.accent.withValues(alpha: 0.45),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -527,12 +560,12 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgIcon(AppIcons.heart, size: 20, color: Colors.white),
+            SvgIcon(AppIcons.heart, size: 20, color: AppColors.deepText),
             SizedBox(width: 8),
             Text(
               'สั่งจองฝากมู',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),

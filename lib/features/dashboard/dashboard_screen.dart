@@ -48,6 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.lightBackground,
       body: Stack(
         children: [
           // Cosmic background
@@ -62,35 +63,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 expandedHeight: 120.0,
                 floating: false,
                 pinned: true,
-                backgroundColor: AppColors.darkSurface.withValues(alpha: _showAppBarTitle ? 1.0 : 0.0),
-                elevation: _showAppBarTitle ? 4.0 : 0.0,
+                backgroundColor: AppColors.lightSurface.withValues(alpha: _showAppBarTitle ? 1.0 : 0.0),
+                elevation: _showAppBarTitle ? 2.0 : 0.0,
+                shadowColor: AppColors.primary.withValues(alpha: 0.15),
+                foregroundColor: AppColors.deepText,
+                iconTheme: const IconThemeData(color: AppColors.deepText),
                 title: AnimatedOpacity(
                   opacity: _showAppBarTitle ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 200),
-                  child: const Text('แดชบอร์ด'),
+                  child: const Text(
+                    'แดชบอร์ด',
+                    style: TextStyle(
+                      color: AppColors.deepText,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     padding: const EdgeInsets.fromLTRB(16.0, 80.0, 16.0, 8.0),
                     alignment: Alignment.bottomLeft,
-                    child: SingleChildScrollView(
+                    child: const SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
+                          Text(
                             'สวัสดี, คุณเมษ',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.deepText,
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4.0),
+                          SizedBox(height: 4.0),
                           Text(
                             'ยินดีต้อนรับกลับมา',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: AppColors.mutedText,
                               fontSize: 16.0,
                             ),
                           ),
@@ -153,7 +163,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const Text(
                       'บริการของเรา',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.deepText,
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                       ),
@@ -208,7 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const Text(
                           'กิจกรรมล่าสุด',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.deepText,
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),

@@ -113,15 +113,15 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ยอดคงเหลือ',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
           ),
           const SizedBox(height: 8),
           Text(
             '฿${stats.availableBalance.toStringAsFixed(0)}',
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.deepText,
               fontSize: 36,
               fontWeight: FontWeight.bold,
             ),
@@ -130,7 +130,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
           if (stats.pendingCommission > 0)
             Text(
               'รอดำเนินการ ฿${stats.pendingCommission.toStringAsFixed(0)}',
-              style: const TextStyle(color: Colors.white60, fontSize: 13),
+              style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.6), fontSize: 13),
             ),
           const SizedBox(height: 16),
           Row(
@@ -152,8 +152,8 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                   icon: const Icon(Icons.account_balance_wallet, size: 18),
                   label: const Text('ถอนเงิน'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white54),
+                    foregroundColor: AppColors.deepText,
+                    side: BorderSide(color: AppColors.deepText.withValues(alpha: 0.35)),
                   ),
                 ),
               ),
@@ -167,8 +167,8 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                   icon: const Icon(Icons.share, size: 18),
                   label: const Text('แชร์ลิงก์'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white54),
+                    foregroundColor: AppColors.deepText,
+                    side: BorderSide(color: AppColors.deepText.withValues(alpha: 0.35)),
                   ),
                 ),
               ),

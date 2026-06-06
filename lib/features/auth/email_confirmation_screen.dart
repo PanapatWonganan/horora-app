@@ -74,8 +74,8 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -124,6 +124,7 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 32,
                             vertical: 12,

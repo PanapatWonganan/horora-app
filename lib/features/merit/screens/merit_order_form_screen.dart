@@ -74,10 +74,12 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
       lastDate: DateTime.now(),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: MeritColors.accent,
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: MeritColors.accentDark,
+              onPrimary: Colors.white,
               surface: MeritColors.cardBackground,
+              onSurface: AppColors.deepText,
             ),
           ),
           child: child!,
@@ -130,8 +132,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -178,13 +180,13 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.deepText),
           ),
           const Expanded(
             child: Text(
               'กรอกข้อมูล',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -231,7 +233,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                 Text(
                   widget.location.nameTh,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.deepText,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -239,8 +241,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                 if (widget.location.belief != null)
                   Text(
                     widget.location.belief!,
-                    style: TextStyle(
-                      color: MeritColors.accent.withValues(alpha: 0.9),
+                    style: const TextStyle(
+                      color: MeritColors.accentDark,
                       fontSize: 12,
                     ),
                   ),
@@ -259,7 +261,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         const Text(
           'เลือกแพ็คเกจ',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.deepText,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -280,11 +282,11 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? MeritColors.accent.withValues(alpha: 0.2)
+              ? MeritColors.accent.withValues(alpha: 0.18)
               : MeritColors.inputBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? MeritColors.accent : Colors.transparent,
+            color: isSelected ? MeritColors.accentDark : AppColors.divider,
             width: 2,
           ),
         ),
@@ -297,7 +299,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                 Text(
                   package.nameTh,
                   style: TextStyle(
-                    color: isSelected ? MeritColors.accent : Colors.white,
+                    color: isSelected ? MeritColors.accentDark : AppColors.deepText,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -308,13 +310,13 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                     gradient: isSelected
                         ? const LinearGradient(colors: MeritColors.accentGradient)
                         : null,
-                    color: isSelected ? null : Colors.white.withValues(alpha: 0.1),
+                    color: isSelected ? null : AppColors.surfaceMuted,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     package.priceFormatted,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : MeritColors.accent,
+                      color: isSelected ? AppColors.deepText : MeritColors.accentDark,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -325,8 +327,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             if (package.description != null)
               Text(
                 package.description!,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.85),
+                style: const TextStyle(
+                  color: AppColors.mutedText,
                   fontSize: 12,
                 ),
               ),
@@ -337,13 +339,13 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               children: package.items.map((item) => Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: AppColors.surfaceMuted,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   item,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                  style: const TextStyle(
+                    color: AppColors.deepText,
                     fontSize: 10,
                   ),
                 ),
@@ -352,28 +354,28 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.photo_camera, size: 14, color: Colors.white.withValues(alpha: 0.75)),
+                const Icon(Icons.photo_camera, size: 14, color: AppColors.mutedText),
                 const SizedBox(width: 4),
                 Text(
                   '${package.photoCount} รูป',
-                  style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
+                  style: const TextStyle(color: AppColors.mutedText, fontSize: 12),
                 ),
                 if (package.hasVideo) ...[
                   const SizedBox(width: 12),
-                  Icon(Icons.videocam, size: 14, color: Colors.white.withValues(alpha: 0.75)),
+                  const Icon(Icons.videocam, size: 14, color: AppColors.mutedText),
                   const SizedBox(width: 4),
-                  Text(
+                  const Text(
                     'วิดีโอ',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 12),
+                    style: TextStyle(color: AppColors.mutedText, fontSize: 12),
                   ),
                 ],
                 if (package.hasLive) ...[
                   const SizedBox(width: 12),
-                  Icon(Icons.live_tv, size: 14, color: Colors.red.withValues(alpha: 0.8)),
+                  Icon(Icons.live_tv, size: 14, color: AppColors.error.withValues(alpha: 0.9)),
                   const SizedBox(width: 4),
                   Text(
                     'Live',
-                    style: TextStyle(color: Colors.red.withValues(alpha: 0.8), fontSize: 12),
+                    style: TextStyle(color: AppColors.error.withValues(alpha: 0.9), fontSize: 12),
                   ),
                 ],
               ],
@@ -391,7 +393,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         const Text(
           'ข้อมูลผู้ขอพร',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.deepText,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -461,8 +463,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.85),
+          style: const TextStyle(
+            color: AppColors.deepText,
             fontSize: 14,
           ),
         ),
@@ -472,10 +474,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
           maxLines: maxLines,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppColors.deepText),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
+            hintStyle: const TextStyle(color: AppColors.mutedText),
             filled: true,
             fillColor: MeritColors.inputBackground,
             border: OutlineInputBorder(
@@ -484,18 +486,18 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              borderSide: const BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: MeritColors.accent),
+              borderSide: const BorderSide(color: MeritColors.accentDark),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: const BorderSide(color: AppColors.error),
             ),
             suffixIcon: suffixIcon != null
-                ? Icon(suffixIcon, color: Colors.white.withValues(alpha: 0.65))
+                ? Icon(suffixIcon, color: AppColors.mutedText)
                 : null,
           ),
         ),
@@ -511,6 +513,9 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
           backgroundColor: MeritColors.accent,
+          foregroundColor: AppColors.deepText,
+          elevation: 2,
+          shadowColor: MeritColors.accent.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -520,7 +525,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               ? 'ดำเนินการต่อ ${_selectedPackage!.priceFormatted}'
               : 'เลือกแพ็คเกจก่อน',
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.deepText,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),

@@ -85,8 +85,8 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.surfaceMuted,
             ],
           ),
         ),

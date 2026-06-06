@@ -102,12 +102,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: Colors.white,
-              surface: AppColors.darkSurface,
-              onSurface: AppColors.lightText,
-            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.darkSurface),
+              surface: AppColors.lightSurface,
+              onSurface: AppColors.deepText,
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.lightSurface),
           ),
           child: child!,
         );
@@ -203,8 +203,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -425,7 +425,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.darkSurface.withValues(alpha: 0.5),
+                      color: AppColors.surfaceMuted,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(

@@ -93,23 +93,23 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.handshake, color: Colors.white, size: 40),
-                    SizedBox(height: 12),
-                    Text(
+                    const Icon(Icons.handshake, color: AppColors.deepText, size: 40),
+                    const SizedBox(height: 12),
+                    const Text(
                       'เป็นตัวแทน Horora',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.deepText,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       'แชร์ลิงก์ให้เพื่อน เมื่อเพื่อนสั่งฝากบุญ\nคุณได้รับค่าแนะนำสูงสุด 23%',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                      style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
                     ),
                   ],
                 ),

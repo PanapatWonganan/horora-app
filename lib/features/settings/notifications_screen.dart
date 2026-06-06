@@ -47,8 +47,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -269,12 +269,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: Colors.white,
-              surface: AppColors.darkSurface,
-              onSurface: AppColors.lightText,
-            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.darkSurface),
+              surface: AppColors.lightSurface,
+              onSurface: AppColors.deepText,
+            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.lightSurface),
           ),
           child: child!,
         );

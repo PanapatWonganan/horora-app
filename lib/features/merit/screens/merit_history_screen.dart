@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/merit_colors.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
 
@@ -45,8 +46,8 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.darkBackground,
-              Color(0xFF1A1A2E),
+              AppColors.lightBackground,
+              AppColors.cream,
             ],
           ),
         ),
@@ -77,13 +78,13 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_ios, color: AppColors.deepText),
           ),
           const Expanded(
             child: Text(
               'ประวัติการสั่งซื้อ',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -102,13 +103,13 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
           Icon(
             Icons.history,
             size: 80,
-            color: Colors.white.withValues(alpha: 0.3),
+            color: AppColors.mutedText.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'ยังไม่มีประวัติการสั่งซื้อ',
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: AppColors.mutedText,
               fontSize: 16,
             ),
           ),
@@ -138,11 +139,18 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF2D2D44),
+          color: MeritColors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _getStatusColor(order.status).withValues(alpha: 0.3),
+            color: _getStatusColor(order.status).withValues(alpha: 0.4),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,15 +193,15 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                       Text(
                         order.location?.nameTh ?? order.locationId,
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.deepText,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         order.package?.nameTh ?? order.packageId,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.85),
+                        style: const TextStyle(
+                          color: AppColors.mutedText,
                           fontSize: 12,
                         ),
                       ),
@@ -203,7 +211,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 Text(
                   order.priceFormatted,
                   style: const TextStyle(
-                    color: Color(0xFFFFD700),
+                    color: MeritColors.accentDark,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -213,32 +221,32 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.person_outline,
                   size: 14,
-                  color: Colors.white.withValues(alpha: 0.65),
+                  color: AppColors.mutedText,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   order.prayerName,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                  style: const TextStyle(
+                    color: AppColors.mutedText,
                     fontSize: 12,
                   ),
                 ),
                 const Spacer(),
-                Icon(
+                const Icon(
                   Icons.access_time,
                   size: 14,
-                  color: Colors.white.withValues(alpha: 0.65),
+                  color: AppColors.mutedText,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   order.createdAt != null
                       ? DateFormat('d MMM yyyy HH:mm', 'th').format(order.createdAt!)
                       : '-',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.65),
+                  style: const TextStyle(
+                    color: AppColors.mutedText,
                     fontSize: 12,
                   ),
                 ),
@@ -303,7 +311,7 @@ class _OrderDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF2D2D44),
+        color: MeritColors.cardBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.all(24),
@@ -316,7 +324,7 @@ class _OrderDetailSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -325,7 +333,7 @@ class _OrderDetailSheet extends StatelessWidget {
           const Text(
             'รายละเอียดคำสั่งซื้อ',
             style: TextStyle(
-              color: Colors.white,
+              color: AppColors.deepText,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -335,7 +343,7 @@ class _OrderDetailSheet extends StatelessWidget {
           _buildDetailRow('สถานที่', order.location?.nameTh ?? order.locationId),
           _buildDetailRow('แพ็คเกจ', order.package?.nameTh ?? order.packageId),
           _buildDetailRow('ราคา', order.priceFormatted),
-          const Divider(color: Colors.white24, height: 32),
+          const Divider(color: AppColors.divider, height: 32),
           _buildDetailRow('ผู้ขอพร', order.prayerName),
           if (order.prayerBirthdate != null)
             _buildDetailRow(
@@ -346,10 +354,10 @@ class _OrderDetailSheet extends StatelessWidget {
             _buildDetailRow('เบอร์โทร', order.prayerPhone!),
           if (order.prayerWish != null && order.prayerWish!.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text(
+            const Text(
               'คำขอพร',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: AppColors.mutedText,
                 fontSize: 14,
               ),
             ),
@@ -357,17 +365,17 @@ class _OrderDetailSheet extends StatelessWidget {
             Text(
               order.prayerWish!,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 14,
               ),
             ),
           ],
           if (order.proofUrls != null && order.proofUrls!.isNotEmpty) ...[
-            const Divider(color: Colors.white24, height: 32),
+            const Divider(color: AppColors.divider, height: 32),
             const Text(
               'หลักฐานการไหว้',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.deepText,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -427,15 +435,15 @@ class _OrderDetailSheet extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.85),
+            style: const TextStyle(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
           Text(
             value,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.deepText,
               fontSize: 14,
             ),
           ),

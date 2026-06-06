@@ -98,9 +98,9 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         ),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'รหัสแนะนำของคุณ',
-                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                              style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
                             ),
                             const SizedBox(height: 8),
                             GestureDetector(
@@ -108,7 +108,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: AppColors.lightSurface.withValues(alpha: 0.7),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -117,14 +117,14 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                                     Text(
                                       _referralLink!.referralCode,
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: AppColors.deepText,
                                         fontSize: 28,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 4,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
-                                    const Icon(Icons.copy, color: Colors.white70, size: 20),
+                                    Icon(Icons.copy, color: AppColors.deepText.withValues(alpha: 0.6), size: 20),
                                   ],
                                 ),
                               ),
