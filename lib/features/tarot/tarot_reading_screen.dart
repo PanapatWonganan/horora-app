@@ -979,9 +979,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             'SHUFFLING THE DECK',
             style: GoogleFonts.fraunces(
               fontSize: 11,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               letterSpacing: 3,
-              color: AppColors.primary.withValues(alpha: 0.75),
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(height: 6),
