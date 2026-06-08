@@ -9,6 +9,7 @@ import '../../core/services/auth_service.dart';
 import '../../core/services/laravel_auth_service.dart';
 import '../../core/services/rating_service.dart';
 import '../../core/api/api_client.dart';
+import '../../core/utils/exceptions.dart' as ex;
 import '../../config/constants.dart';
 import 'dart:ui' show ImageFilter;
 
@@ -77,7 +78,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     try {
       final prefs = await SharedPreferences.getInstance();
       _tarotRepository = TarotRepository(
-        apiClient: ApiClient(baseUrl: ApiConstants.baseUrl),
+        apiClient: _apiClient,
         prefs: prefs,
       );
 
@@ -165,7 +166,6 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     }
   }
 
-
   Future<void> _loadUserZodiacSign() async {
     final user = _authService.currentUser;
     if (user != null) {
@@ -180,7 +180,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         });
       } else if (user.birthDate != null) {
         // คำนวณปีนักษัตรจากวันเกิด
-        final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
+        final thaiZodiac =
+            ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
         setState(() {
           _userThaiZodiac = thaiZodiac.thaiName;
         });
@@ -291,21 +292,52 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         return '${card.nameTh} (${isReversed ? "คว่ำ" : "หงาย"}): $meaning';
       }).toList();
 
-      // AI ถูกพร็อกซีผ่าน backend แล้ว (OpenAI key อยู่ฝั่ง server เท่านั้น)
-      // หมายเหตุการออกแบบ: หน้าจอนี้ยังคงสุ่ม/เปิดไพ่ฝั่ง client เพื่อรักษา UX
-      // การโต้ตอบ (สับไพ่/เลือกไพ่/พลิกไพ่) ส่วน "คำทำนาย" เราเรียก backend
-      // POST /tarot/readings (auth-only) แล้วใช้ค่า `interpretation` เป็นข้อความคำทำนาย
-      // backend จะสุ่มไพ่ของตัวเอง แต่เรายังคงแสดงไพ่ที่ผู้ใช้เปิดไว้ตามเดิม
-      final response = Map<String, dynamic>.from(
-        await _apiClient.post(
-          ApiConstants.tarotReadingsPath,
-          data: {
-            'spread_type': _backendSpreadType(),
-            if (_questionController.text.trim().isNotEmpty)
-              'question': _questionController.text.trim(),
-          },
-        ),
-      );
+      // AI ถูกพร็อกซีผ่าน backend แล้ว (provider key อยู่ฝั่ง server เท่านั้น)
+      // ถ้า login แล้วจะบันทึกลงประวัติผ่าน /tarot/readings; ถ้าเป็น guest จะเรียก
+      // /tarot/guest เพื่อให้เปิดไพ่/ตีความได้โดยไม่เจอ 401 Unauthorized.
+      final revealedCardsPayload = _selectedCards.asMap().entries.map((entry) {
+        final index = entry.key;
+        final card = entry.value;
+        final isReversed = _isCardReversed[index];
+        return {
+          'name': card.name,
+          'name_th': card.nameTh,
+          'meaning':
+              isReversed ? card.reversedMeaningTh : card.uprightMeaningTh,
+          'is_reversed': isReversed,
+        };
+      }).toList();
+
+      final requestData = {
+        'spread_type': _backendSpreadType(),
+        'cards': revealedCardsPayload,
+        if (_questionController.text.trim().isNotEmpty)
+          'question': _questionController.text.trim(),
+      };
+
+      // ถ้า login แล้วยิง /tarot/readings (บันทึกประวัติ); ถ้าเป็น guest หรือ token
+      // หมดอายุ จะ fallback ไป /tarot/guest อัตโนมัติ เพื่อให้ตีความไพ่ได้เสมอ
+      // โดยไม่ค้างที่ 401 Unauthorized.
+      Map<String, dynamic> response;
+      final isLoggedIn = await LaravelAuthService.instance.isLoggedIn();
+      try {
+        response = Map<String, dynamic>.from(
+          await _apiClient.post(
+            isLoggedIn
+                ? ApiConstants.tarotReadingsPath
+                : ApiConstants.tarotGuestPath,
+            data: requestData,
+          ),
+        );
+      } on ex.UnauthorizedException {
+        // token ใช้ไม่ได้จริง → retry เป็น guest (public endpoint)
+        response = Map<String, dynamic>.from(
+          await _apiClient.post(
+            ApiConstants.tarotGuestPath,
+            data: requestData,
+          ),
+        );
+      }
 
       // ใช้ข้อความคำทำนายจาก backend
       final content = (response['interpretation'] as String?) ?? '';
@@ -424,12 +456,12 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         title: Text(
           'การอ่านไพ่ทาโร่',
           style: GoogleFonts.kanit(
-            color: AppColors.deepText,
+            color: AppColors.onBackdrop,
             fontWeight: FontWeight.w700,
           ),
         ),
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.deepText,
+        foregroundColor: AppColors.onBackdrop,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
@@ -472,27 +504,27 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                 ? _buildLoadingAnimation()
                 : SafeArea(
                     child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSpreadTypeSelector(),
-                        const SizedBox(height: 16),
-                        _buildQuestionInput(),
-                        const SizedBox(height: 16),
-                        if (_userThaiZodiac != null) _buildZodiacInfo(),
-                        const SizedBox(height: 24),
-                        if (!_hasSelectedCards && !_isSelectingCards)
-                          _buildStartButton(),
-                        if (_isShuffling) _buildShufflingAnimation(),
-                        if (_isSelectingCards) _buildSelectCardsButton(),
-                        if (_hasSelectedCards) _buildSelectedCards(),
-                        const SizedBox(height: 24),
-                        if (_interpretation != null) _buildInterpretation(),
-                      ],
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSpreadTypeSelector(),
+                          const SizedBox(height: 16),
+                          _buildQuestionInput(),
+                          const SizedBox(height: 16),
+                          if (_userThaiZodiac != null) _buildZodiacInfo(),
+                          const SizedBox(height: 24),
+                          if (!_hasSelectedCards && !_isSelectingCards)
+                            _buildStartButton(),
+                          if (_isShuffling) _buildShufflingAnimation(),
+                          if (_isSelectingCards) _buildSelectCardsButton(),
+                          if (_hasSelectedCards) _buildSelectedCards(),
+                          const SizedBox(height: 24),
+                          if (_interpretation != null) _buildInterpretation(),
+                        ],
+                      ),
                     ),
-                  ),
                   ),
           ],
         ),
@@ -524,7 +556,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
               Text(
                 overline,
                 style: GoogleFonts.fraunces(
-                  color: AppColors.primary.withValues(alpha: 0.75),
+                  color: AppColors.candleGold.withValues(alpha: 0.82),
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2.5,
@@ -533,7 +565,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             Text(
               title,
               style: GoogleFonts.kanit(
-                color: AppColors.deepText,
+                color: AppColors.onBackdrop,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
@@ -586,51 +618,85 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: isSelected
-              ? const LinearGradient(
+              ? LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: AppColors.primaryGradient,
+                  colors: [
+                    AppColors.lightSurface,
+                    AppColors.cream.withValues(alpha: 0.94),
+                  ],
                 )
               : null,
           color: isSelected ? null : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
-                ? AppColors.accent.withValues(alpha: 0.7)
+                ? AppColors.candleGold.withValues(alpha: 0.92)
                 : AppColors.divider,
-            width: isSelected ? 1.5 : 1,
+            width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: (isSelected ? AppColors.primary : AppColors.deepText)
-                  .withValues(alpha: isSelected ? 0.18 : 0.05),
-              blurRadius: 12,
+              color: (isSelected ? AppColors.candleGold : AppColors.deepText)
+                  .withValues(alpha: isSelected ? 0.24 : 0.05),
+              blurRadius: isSelected ? 18 : 12,
               offset: const Offset(0, 6),
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Text(
-              title,
-              style: GoogleFonts.kanit(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: isSelected ? AppColors.deepText : AppColors.deepText,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.kanit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.deepText,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: GoogleFonts.kanit(
+                    fontSize: 12,
+                    height: 1.3,
+                    color: isSelected
+                        ? AppColors.deepText.withValues(alpha: 0.72)
+                        : AppColors.mutedText,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: GoogleFonts.kanit(
-                fontSize: 12,
-                height: 1.3,
-                color: isSelected
-                    ? AppColors.deepText.withValues(alpha: 0.7)
-                    : AppColors.mutedText,
+            if (isSelected)
+              Positioned(
+                top: -6,
+                right: -6,
+                child: Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.candleGold,
+                    border: Border.all(color: AppColors.lightSurface, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.deepGoldBrown.withValues(alpha: 0.25),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    size: 13,
+                    color: AppColors.deepText,
+                  ),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -657,7 +723,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+              borderSide:
+                  const BorderSide(color: AppColors.primary, width: 1.5),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -864,8 +931,28 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   String _romanNumeral(int n) {
     if (n < 0 || n > 21) return '';
     const numerals = [
-      '0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI',
-      'XII', 'XIII', 'XIV', 'XV', 'XVI', 'XVII', 'XVIII', 'XIX', 'XX', 'XXI'
+      '0',
+      'I',
+      'II',
+      'III',
+      'IV',
+      'V',
+      'VI',
+      'VII',
+      'VIII',
+      'IX',
+      'X',
+      'XI',
+      'XII',
+      'XIII',
+      'XIV',
+      'XV',
+      'XVI',
+      'XVII',
+      'XVIII',
+      'XIX',
+      'XX',
+      'XXI'
     ];
     return numerals[n];
   }
@@ -915,8 +1002,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.accent
-                            .withValues(alpha: (0.9 + glow * 0.1).clamp(0.0, 1.0)),
+                        AppColors.accent.withValues(
+                            alpha: (0.9 + glow * 0.1).clamp(0.0, 1.0)),
                         Color.lerp(
                           AppColors.accent.withValues(alpha: 0.45),
                           Colors.white,
@@ -1048,8 +1135,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                           Positioned.fill(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(14),
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
@@ -1110,8 +1196,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                                 ],
                               ),
                               border: Border.all(
-                                color: AppColors.accent
-                                    .withValues(alpha: 0.85),
+                                color: AppColors.accent.withValues(alpha: 0.85),
                                 width: 1.5,
                               ),
                             ),
@@ -1254,8 +1339,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                                   ],
                                   stops: const [0.35, 0.5, 0.65],
                                 ).createShader(
-                                  Rect.fromLTWH(
-                                      dx, 0, rect.width, rect.height),
+                                  Rect.fromLTWH(dx, 0, rect.width, rect.height),
                                 );
                               },
                               child: const SizedBox.expand(),
@@ -1357,8 +1441,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.primary.withValues(alpha: 0.3),
-                                          AppColors.secondary.withValues(alpha: 0.3),
+                                          AppColors.primary
+                                              .withValues(alpha: 0.3),
+                                          AppColors.secondary
+                                              .withValues(alpha: 0.3),
                                         ],
                                       ),
                                     ),
