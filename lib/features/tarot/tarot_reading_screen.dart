@@ -20,6 +20,7 @@ import '../../core/utils/app_icons.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
 import 'widgets/reveal_burst.dart';
+import 'widgets/riffle_shuffle.dart';
 
 class TarotReadingScreen extends StatefulWidget {
   final String? spreadType;
@@ -75,6 +76,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   // Per-card transient press-scale on tap-down (before the flip starts).
   final List<bool> _isPressed = List<bool>.filled(_maxSpread, false);
 
+  // One-shot guard so the riffle's tactile haptic fires once per shuffle, at
+  // the interleave peak. Purely cosmetic — no draw/select/save logic reads it.
+  bool _riffleHapticFired = false;
+
   @override
   void initState() {
     super.initState();
@@ -113,7 +118,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
   void _setupAnimations() {
     _shuffleAnimationController = AnimationController(
-      duration: const Duration(seconds: 2),
+      // Longer than a plain spin so the riffle (split → interleave → settle)
+      // has room to read as a satisfying two-half shuffle. Drives
+      // _shuffleAnimation 0→1 — _shuffleCards logic/dispose are unchanged.
+      duration: const Duration(milliseconds: 1300),
       vsync: this,
     );
 
@@ -924,39 +932,28 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AnimatedBuilder(
-            animation: _shuffleAnimation,
-            builder: (context, child) {
-              return Transform.rotate(
-                angle: _shuffleAnimation.value * 2 * pi,
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: AppColors.mysticalGradient,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.25),
-                        blurRadius: 16,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: SvgIcon(
-                      AppIcons.sparkle,
-                      size: 34,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              );
-            },
+          // A REAL riffle shuffle: a single stacked deck splits into a left +
+          // right half, the halves arc back and interleave/zip together, then
+          // the merged deck settles. Driven off _shuffleAnimation (0→1) so
+          // timing + dispose are untouched. Scoped AnimatedBuilder keeps it
+          // cheap (only this subtree rebuilds per frame).
+          SizedBox(
+            height: 110,
+            child: AnimatedBuilder(
+              animation: _shuffleAnimation,
+              builder: (context, child) {
+                final v = _shuffleAnimation.value;
+                // Arm at the start of the riffle, fire a single tasteful
+                // tactile tick at the interleave peak.
+                if (v < 0.1) {
+                  _riffleHapticFired = false;
+                } else if (!_riffleHapticFired && v >= 0.55) {
+                  _riffleHapticFired = true;
+                  HapticFeedback.lightImpact();
+                }
+                return Center(child: RiffleShuffle(progress: v));
+              },
+            ),
           ),
           const SizedBox(height: 16),
           Text(
