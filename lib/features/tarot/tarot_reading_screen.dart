@@ -76,9 +76,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   // Per-card transient press-scale on tap-down (before the flip starts).
   final List<bool> _isPressed = List<bool>.filled(_maxSpread, false);
 
-  // One-shot guard so the riffle's tactile haptic fires once per shuffle, at
-  // the interleave peak. Purely cosmetic — no draw/select/save logic reads it.
-  bool _riffleHapticFired = false;
+  // Tracks how many riffle haptic "ticks" have fired this shuffle so each of
+  // the three interleave peaks gives one light tick and the final flare gives a
+  // stronger one. Purely cosmetic — no draw/select/save logic reads it.
+  int _riffleHapticStage = 0;
 
   @override
   void initState() {
@@ -118,10 +119,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
   void _setupAnimations() {
     _shuffleAnimationController = AnimationController(
-      // Longer than a plain spin so the riffle (split → interleave → settle)
-      // has room to read as a satisfying two-half shuffle. Drives
-      // _shuffleAnimation 0→1 — _shuffleCards logic/dispose are unchanged.
-      duration: const Duration(milliseconds: 1300),
+      // A cinematic "Celestial Ritual": three full riffle cycles (split →
+      // interleave → merge, ×3) then a bright flare + settle. ~2800ms gives the
+      // sequence room to read as the deck being charged, not a quick flick.
+      // Drives _shuffleAnimation 0→1 — _shuffleCards logic/dispose are unchanged.
+      duration: const Duration(milliseconds: 2800),
       vsync: this,
     );
 
@@ -927,37 +929,54 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     );
   }
 
+  // The three evocative lines the ritual fades through as the deck is charged.
+  static const List<String> _shuffleLines = [
+    'กำลังสับไพ่...',
+    'เชื่อมต่อกับพลังจักรวาล...',
+    'ไพ่กำลังเลือกคุณ...',
+  ];
+
   Widget _buildShufflingAnimation() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // A REAL riffle shuffle: a single stacked deck splits into a left +
-          // right half, the halves arc back and interleave/zip together, then
-          // the merged deck settles. Driven off _shuffleAnimation (0→1) so
-          // timing + dispose are untouched. Scoped AnimatedBuilder keeps it
-          // cheap (only this subtree rebuilds per frame).
+          // A cinematic Celestial Ritual: a single stacked deck splits into a
+          // left + right half and riffles back together THREE times — the glow
+          // breathing and brightening with each pass — then a bright flare as
+          // the deck squares up before settling. Driven off _shuffleAnimation
+          // (0→1) so timing + dispose are untouched. The scoped AnimatedBuilder
+          // keeps it cheap (only this subtree rebuilds per frame).
           SizedBox(
-            height: 110,
+            height: 170,
             child: AnimatedBuilder(
               animation: _shuffleAnimation,
               builder: (context, child) {
                 final v = _shuffleAnimation.value;
-                // Arm at the start of the riffle, fire a single tasteful
-                // tactile tick at the interleave peak.
-                if (v < 0.1) {
-                  _riffleHapticFired = false;
-                } else if (!_riffleHapticFired && v >= 0.55) {
-                  _riffleHapticFired = true;
+                // Light tactile ticks at each of the three interleave peaks,
+                // then a stronger one at the final flare. Re-armed at the start.
+                if (v < 0.04) {
+                  _riffleHapticStage = 0;
+                } else if (_riffleHapticStage < 1 && v >= 0.18) {
+                  _riffleHapticStage = 1;
                   HapticFeedback.lightImpact();
+                } else if (_riffleHapticStage < 2 && v >= 0.45) {
+                  _riffleHapticStage = 2;
+                  HapticFeedback.lightImpact();
+                } else if (_riffleHapticStage < 3 && v >= 0.72) {
+                  _riffleHapticStage = 3;
+                  HapticFeedback.lightImpact();
+                } else if (_riffleHapticStage < 4 && v >= 0.86) {
+                  _riffleHapticStage = 4;
+                  HapticFeedback.mediumImpact();
                 }
                 return Center(child: RiffleShuffle(progress: v));
               },
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Text(
-            'SHUFFLING',
+            'SHUFFLING THE DECK',
             style: GoogleFonts.fraunces(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -965,13 +984,38 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
               color: AppColors.primary.withValues(alpha: 0.75),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'กำลังสับไพ่...',
-            style: GoogleFonts.kanit(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.deepText,
+          const SizedBox(height: 6),
+          // The Thai line cross-fades through three evocative phrases in time
+          // with the riffle cycles (driven off the same animation value).
+          SizedBox(
+            height: 28,
+            child: AnimatedBuilder(
+              animation: _shuffleAnimation,
+              builder: (context, child) {
+                final v = _shuffleAnimation.value;
+                // Map progress → which line, with a soft fade across the seam.
+                final scaled = (v * _shuffleLines.length)
+                    .clamp(0.0, _shuffleLines.length - 0.001);
+                final idx = scaled.floor();
+                final frac = scaled - idx; // 0→1 within this line's window.
+                // Fade in at the start of the window, fade out near its end.
+                final fade = (frac < 0.18)
+                    ? frac / 0.18
+                    : (frac > 0.82 && idx < _shuffleLines.length - 1)
+                        ? (1 - frac) / 0.18
+                        : 1.0;
+                return Opacity(
+                  opacity: fade.clamp(0.0, 1.0),
+                  child: Text(
+                    _shuffleLines[idx],
+                    style: GoogleFonts.kanit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.deepText,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
