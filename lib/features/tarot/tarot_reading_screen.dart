@@ -1830,9 +1830,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             'THE CARDS SPEAK',
             style: GoogleFonts.fraunces(
               fontSize: 11,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               letterSpacing: 3,
-              color: AppColors.primary.withValues(alpha: 0.75),
+              // Loading area sits over a dark celestial glow — gold/white read.
+              color: AppColors.accent,
             ),
           ),
           const SizedBox(height: 4),
@@ -1841,7 +1842,13 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             style: GoogleFonts.kanit(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.deepText,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: AppColors.primary.withValues(alpha: 0.6),
+                  blurRadius: 12,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),
@@ -1849,7 +1856,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             'กำลังวิเคราะห์ความหมายและความสัมพันธ์ของไพ่',
             style: GoogleFonts.kanit(
               fontSize: 14,
-              color: AppColors.mutedText,
+              color: Colors.white.withValues(alpha: 0.85),
             ),
             textAlign: TextAlign.center,
           ),
