@@ -486,6 +486,17 @@ class LocalTarotData {
     ];
   }
 
+  /// Map a card's English name to its real asset filename in
+  /// assets/images/tarot/ — e.g. "The Fool" -> fool, "Ace of Cups" -> ace_of_cups,
+  /// "The Wheel of Fortune" -> wheel_of_fortune.
+  static String _imageFileFromName(String name) {
+    var s = name.toLowerCase().trim();
+    if (s.startsWith('the ')) {
+      s = s.substring(4);
+    }
+    return s.replaceAll(' ', '_');
+  }
+
   static TarotCard _card(
     int id, String name, String nameTh, String suit, int number,
     String keywords, String keywordsTh,
@@ -498,7 +509,7 @@ class LocalTarotData {
       nameTh: nameTh,
       suit: suit,
       number: number,
-      imagePath: 'assets/images/tarot/${suit}_${number.toString().padLeft(2, '0')}.webp',
+      imagePath: 'assets/images/tarot/${_imageFileFromName(name)}.webp',
       keywords: keywords,
       keywordsTh: keywordsTh,
       uprightMeaning: uprightMeaning,
