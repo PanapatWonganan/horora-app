@@ -981,7 +981,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 3,
-              color: AppColors.primary,
+              // The shuffle area sits over a dark celestial glow patch, so use
+              // a warm gold that reads against it (not the light-theme lavender).
+              color: AppColors.accent,
             ),
           ),
           const SizedBox(height: 6),
@@ -1011,7 +1013,14 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                     style: GoogleFonts.kanit(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.deepText,
+                      // Light text reads on the dark celestial shuffle glow.
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: AppColors.primary.withValues(alpha: 0.6),
+                          blurRadius: 12,
+                        ),
+                      ],
                     ),
                   ),
                 );
