@@ -296,6 +296,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     }
   }
 
+  // The lone "hero" case: a single-card spread gets a bigger, grander, more
+  // cinematic treatment than the multi-card spreads. Purely a visual branch —
+  // no draw/select/interpret/save logic depends on it.
+  bool get _isSingleHero => _spreadType == 'single' || _selectedCards.length == 1;
+
   int _getCardCountForSpreadType() {
     switch (_spreadType) {
       case 'single':
@@ -332,6 +337,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       if (index < _maxSpread) {
         // Clear the press-scale so the card releases into the flip.
         _isPressed[index] = false;
+        // For the lone hero card the flip is slower + weightier so the reveal
+        // lands like a grand moment; multi-card spreads keep the snappy default.
+        _flipControllers[index].duration = _isSingleHero
+            ? const Duration(milliseconds: 920)
+            : const Duration(milliseconds: 620);
         // Real 3D flip: drive the per-card flip controller back → front.
         _flipControllers[index].forward(from: 0).whenComplete(() {
           if (!mounted) return;
@@ -996,15 +1006,21 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('ไพ่ของคุณ', overline: 'YOUR CARDS'),
-        const SizedBox(height: 16),
+        SizedBox(height: _isSingleHero ? 40 : 16),
         Center(
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: List.generate(
-              _selectedCards.length,
-              (index) => _buildTarotCard(index),
+          child: Padding(
+            // Extra breathing room so the lone hero's spotlight + sparkle
+            // overflow (which draws beyond the card via Clip.none) has space
+            // and the card reads as a centred focal point.
+            padding: EdgeInsets.symmetric(vertical: _isSingleHero ? 32 : 0),
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              alignment: WrapAlignment.center,
+              children: List.generate(
+                _selectedCards.length,
+                (index) => _buildTarotCard(index),
+              ),
             ),
           ),
         ),
@@ -1069,6 +1085,13 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       if (shimmerCtrl != null) shimmerCtrl,
     ]);
 
+    // The lone hero card is rendered noticeably larger + centred so it becomes
+    // the focal point; multi-card spreads keep the compact 124x204 size.
+    final isHero = _isSingleHero;
+    final cardW = isHero ? 200.0 : 124.0;
+    final cardH = isHero ? 340.0 : 204.0;
+    final frameRadius = isHero ? 26.0 : 18.0;
+
     return AnimatedBuilder(
       animation: cardListenable,
       builder: (context, _) {
@@ -1084,16 +1107,30 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         final floatDy = isRevealed ? sin(t) * 3.0 : 0.0;
 
         // Idle invitation pulse on un-revealed backs (subtle breathing scale).
-        final idlePulse =
-            !isRevealed ? 1.0 + sin(t) * 0.012 : 1.0;
+        // The lone hero back breathes a touch more to draw the tap.
+        final idlePulse = !isRevealed
+            ? 1.0 + sin(t) * (isHero ? 0.022 : 0.012)
+            : 1.0;
 
         // Press-scale on tap-down, before the flip starts.
         final pressScale = (hasSlot && _isPressed[index]) ? 0.95 : 1.0;
 
-        // 3D FLIP progress 0→1 (back → front).
-        final flip = flipCtrl?.value ?? (isRevealed ? 1.0 : 0.0);
+        // 3D FLIP progress 0→1 (back → front). For the hero card we re-ease the
+        // raw controller value through a weightier curve so the turn feels
+        // grander (the controller duration is already longer in _revealCard).
+        final rawFlip = flipCtrl?.value ?? (isRevealed ? 1.0 : 0.0);
+        final flip = isHero
+            ? Curves.easeInOutCubic.transform(rawFlip.clamp(0.0, 1.0))
+            : rawFlip;
         final showFront = flip >= 0.5;
         final angle = flip * pi;
+
+        // BLOOM: as the hero front lands, the card grows ~5% then settles back —
+        // a subtle "arrival" pop. Peaks just past the halfway flip point.
+        final bloom = isHero && showFront
+            ? sin((flip - 0.5).clamp(0.0, 1.0) * pi) * 0.05
+            : 0.0;
+        final heroBloomScale = 1.0 + bloom;
 
         // Reveal glow pulse intensity (existing burst halo behavior).
         final p = isJustRevealed ? _revealBurstController.value : 0.0;
@@ -1105,7 +1142,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             ? Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()..rotateY(pi),
-                child: _buildCardFront(index),
+                child: _buildCardFront(index, isHero: isHero),
               )
             : _buildCardBack(index);
 
@@ -1118,7 +1155,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           child: Container(
             decoration: BoxDecoration(
               color: showFront ? Colors.white : AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(isHero ? 22 : 14),
             ),
             child: faceContent,
           ),
@@ -1127,7 +1164,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         return Transform.translate(
           offset: Offset(0, floatDy + dealDy),
           child: Transform.scale(
-            scale: dealScale * idlePulse * pressScale,
+            scale: dealScale * idlePulse * pressScale * heroBloomScale,
             child: Opacity(
               opacity: dealOpacity,
               child: GestureDetector(
@@ -1146,11 +1183,28 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,
                   children: [
+                    // SPOTLIGHT: a soft radial bloom behind the lone hero card
+                    // that swells as the flip reveals the face, drawing the eye.
+                    // Subtle/premium — only for the single-card case.
+                    if (isHero)
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: Center(
+                            child: CelestialGlow(
+                              size: cardW * (1.8 + flip * 0.9 + glow * 0.4),
+                              color: AppColors.accent,
+                              intensity: (0.10 + flip * 0.18 + glow * 0.22)
+                                  .clamp(0.0, 0.5),
+                            ),
+                          ),
+                        ),
+                      ),
                     // Gold celestial frame — catches light + intensifies on reveal.
+                    // The lone hero gets a stronger, wider gold glow + halo.
                     Container(
-                      width: 124,
-                      height: 204,
-                      padding: const EdgeInsets.all(4),
+                      width: cardW,
+                      height: cardH,
+                      padding: EdgeInsets.all(isHero ? 6 : 4),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
@@ -1165,19 +1219,29 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                             )!,
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(frameRadius),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.18),
-                            blurRadius: 14,
+                            color: AppColors.primary
+                                .withValues(alpha: isHero ? 0.26 : 0.18),
+                            blurRadius: isHero ? 22 : 14,
                             offset: const Offset(0, 6),
                           ),
+                          // Steady gold rim glow — stronger + wider for the hero
+                          // so the lone card always feels luminous.
+                          if (isHero)
+                            BoxShadow(
+                              color: AppColors.accent.withValues(
+                                  alpha: 0.22 + flip * 0.18),
+                              blurRadius: 30 + flip * 18,
+                              spreadRadius: 2 + flip * 4,
+                            ),
                           // Reveal glow halo (intensifies as the front lands).
                           BoxShadow(
-                            color:
-                                AppColors.accent.withValues(alpha: 0.55 * glow),
-                            blurRadius: 26 * glow,
-                            spreadRadius: 4 * glow,
+                            color: AppColors.accent
+                                .withValues(alpha: (isHero ? 0.7 : 0.55) * glow),
+                            blurRadius: (isHero ? 42 : 26) * glow,
+                            spreadRadius: (isHero ? 8 : 4) * glow,
                           ),
                         ],
                       ),
@@ -1191,10 +1255,28 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                         ),
                       ),
                     // Signature sparkle burst overlaid on the freshly revealed card.
+                    // For the lone hero we let the burst overflow well beyond the
+                    // card bounds for a bigger, more rewarding celestial flare.
                     if (isJustRevealed && p > 0 && p < 1)
-                      Positioned.fill(
-                        child: RevealBurst(progress: p),
-                      ),
+                      isHero
+                          ? Positioned.fill(
+                              child: IgnorePointer(
+                                child: Center(
+                                  child: OverflowBox(
+                                    maxWidth: cardW * 2.1,
+                                    maxHeight: cardH * 1.7,
+                                    child: SizedBox(
+                                      width: cardW * 2.1,
+                                      height: cardH * 1.7,
+                                      child: RevealBurst(progress: p),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Positioned.fill(
+                              child: RevealBurst(progress: p),
+                            ),
                   ],
                 ),
               ),
@@ -1207,12 +1289,12 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
   // The revealed card face (image + Thai label). Keeps the reversed-card
   // Transform.rotate(pi) so upside-down cards read correctly.
-  Widget _buildCardFront(int index) {
+  Widget _buildCardFront(int index, {bool isHero = false}) {
     final isReversed = _isCardReversed[index];
     return Transform.rotate(
       angle: isReversed ? pi : 0,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(isHero ? 18 : 14),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1222,10 +1304,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
-                  return const Center(
+                  return Center(
                     child: SvgIcon(
                       AppIcons.sparkle,
-                      size: 32,
+                      size: isHero ? 48 : 32,
                       color: AppColors.primary,
                     ),
                   );
@@ -1235,8 +1317,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             Container(
               width: double.infinity,
               color: AppColors.surfaceMuted,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+              padding: EdgeInsets.symmetric(
+                  vertical: isHero ? 12 : 8, horizontal: isHero ? 10 : 6),
               child: Column(
                 children: [
                   // English editorial overline (display font).
@@ -1246,18 +1328,18 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.fraunces(
-                      fontSize: 9,
+                      fontSize: isHero ? 12 : 9,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 1.4,
+                      letterSpacing: isHero ? 2.0 : 1.4,
                       color: AppColors.primary.withValues(alpha: 0.8),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: isHero ? 4 : 2),
                   Text(
                     _selectedCards[index].nameTh,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.kanit(
-                      fontSize: 14,
+                      fontSize: isHero ? 20 : 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.deepText,
                     ),
@@ -1266,7 +1348,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                     Text(
                       '(กลับหัว)',
                       style: GoogleFonts.kanit(
-                        fontSize: 12,
+                        fontSize: isHero ? 14 : 12,
                         color: AppColors.secondary,
                       ),
                     ),

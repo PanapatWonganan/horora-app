@@ -3,10 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/models/horoscope_model.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/loading_indicator.dart';
-import '../shared/widgets/gradient_background.dart';
 import '../report/report_dialog.dart';
 
 class HoroscopeDetailScreen extends StatefulWidget {
@@ -77,30 +77,19 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   Widget build(BuildContext context) {
     // แสดง Loading Indicator ระหว่างโหลดข้อมูล
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.lightBackground,
-        body: GradientBackground(
-          colors: [
-            AppColors.lightBackground,
-            AppColors.surfaceMuted,
-          ],
-          child: Center(
-            child: LoadingIndicator(),
-          ),
+      return const SacredScaffold(
+        body: Center(
+          child: LoadingIndicator(),
         ),
       );
     }
 
     // แสดงข้อความแจ้งเตือนเมื่อเกิดข้อผิดพลาด
     if (_errorMessage.isNotEmpty) {
-      return Scaffold(
-        backgroundColor: AppColors.lightBackground,
-        body: GradientBackground(
-          colors: const [
-            AppColors.lightBackground,
-            AppColors.surfaceMuted,
-          ],
-          child: Center(
+      return SacredScaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -112,20 +101,20 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
                 const SizedBox(height: 16),
                 Text(
                   _errorMessage,
-                  style: const TextStyle(
-                    color: AppColors.deepText,
+                  style: SacredText.kanit(
+                    color: AppColors.onBackdrop,
                     fontSize: 18,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                SizedBox(
+                  width: 160,
+                  child: SacredPrimaryButton(
+                    label: 'กลับ',
+                    filled: true,
+                    onTap: () => Navigator.pop(context),
                   ),
-                  child: const Text('กลับ'),
                 ),
               ],
             ),
@@ -135,37 +124,30 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     }
 
     // แสดงหน้าจอปกติเมื่อไม่มีข้อผิดพลาด
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      body: GradientBackground(
-        colors: const [
-          AppColors.lightBackground,
-          AppColors.surfaceMuted,
-        ],
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 24),
-                  _buildDateSection(),
-                  const SizedBox(height: 24),
-                  _buildContentSection(),
-                  const SizedBox(height: 32),
-                  _buildRatingsSection(),
-                  const SizedBox(height: 32),
-                  _buildLuckyItemsSection(),
-                  const SizedBox(height: 32),
-                  _buildAdviceSection(),
-                  const SizedBox(height: 32),
-                  _buildShareSection(),
-                  const SizedBox(height: 40),
-                ],
-              ),
+    return SacredScaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: 24),
+                _buildDateSection(),
+                const SizedBox(height: 24),
+                _buildContentSection(),
+                const SizedBox(height: 32),
+                _buildRatingsSection(),
+                const SizedBox(height: 32),
+                _buildLuckyItemsSection(),
+                const SizedBox(height: 32),
+                _buildAdviceSection(),
+                const SizedBox(height: 32),
+                _buildShareSection(),
+                const SizedBox(height: 40),
+              ],
             ),
           ),
         ),
@@ -178,26 +160,29 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.deepText),
+          icon: const SvgIcon(AppIcons.arrowBack,
+              size: 20, color: AppColors.onBackdrop),
           onPressed: () => Navigator.pop(context),
         ),
-        const Text(
+        Text(
           'ดวงประจำวัน',
-          style: TextStyle(
-            color: AppColors.deepText,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
         Row(
           children: [
             IconButton(
-              icon: const SvgIcon(AppIcons.flag, size: 20, color: AppColors.mutedText),
+              icon: const SvgIcon(AppIcons.flag,
+                  size: 20, color: AppColors.onBackdropMuted),
               onPressed: () => _reportContent(),
               tooltip: 'รายงานเนื้อหา',
             ),
             IconButton(
-              icon: const SvgIcon(AppIcons.share, size: 20, color: AppColors.primary),
+              icon: const SvgIcon(AppIcons.share,
+                  size: 20, color: AppColors.candleGold),
               onPressed: _shareHoroscope,
             ),
           ],
@@ -217,13 +202,17 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
+                color: AppColors.candleGold.withValues(alpha: 0.14),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.candleGold.withValues(alpha: 0.4),
+                  width: 1.2,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
+                    color: AppColors.templeIndigo.withValues(alpha: 0.3),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -236,33 +225,38 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
         const SizedBox(height: 16),
         Text(
           widget.zodiacSignThai,
-          style: const TextStyle(
-            color: AppColors.deepText,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 24,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           widget.zodiacSignEn,
-          style: const TextStyle(
-            color: AppColors.mutedText,
-            fontSize: 16,
-            fontStyle: FontStyle.italic,
+          style: SacredText.display(
+            color: AppColors.onBackdropMuted,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 1.5,
           ),
         ),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.secondary.withValues(alpha: 0.25),
+            color: AppColors.onBackdrop.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppColors.candleGold.withValues(alpha: 0.35),
+              width: 1,
+            ),
           ),
           child: Text(
             DateFormat('EEEE d MMMM yyyy', 'th_TH').format(widget.horoscope.date),
-            style: const TextStyle(
-              color: AppColors.deepText,
-              fontSize: 16,
+            style: SacredText.kanit(
+              color: AppColors.onBackdrop,
+              fontSize: 15,
             ),
           ),
         ),
@@ -278,35 +272,21 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _buildContentSection() {
-    return Container(
+    return SacredCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.divider,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      radius: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'คำทำนาย',
-                style: TextStyle(
+                style: SacredText.kanit(
                   color: AppColors.deepText,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               Switch(
@@ -316,9 +296,9 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
                     _showEnglishContent = value;
                   });
                 },
-                activeColor: AppColors.tertiary,
-                activeTrackColor: AppColors.tertiary.withValues(alpha: 0.5),
-                inactiveThumbColor: AppColors.lightSurface,
+                activeColor: AppColors.deepGoldBrown,
+                activeTrackColor: AppColors.candleGold.withValues(alpha: 0.5),
+                inactiveThumbColor: AppColors.ivorySilk,
                 inactiveTrackColor: AppColors.disabled,
               ),
             ],
@@ -326,7 +306,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           const SizedBox(height: 8),
           Text(
             _showEnglishContent ? widget.horoscope.content : widget.horoscope.contentTh,
-            style: const TextStyle(
+            style: SacredText.kanit(
               color: AppColors.deepText,
               fontSize: 16,
               height: 1.6,
@@ -336,7 +316,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           const SizedBox(height: 8),
           Text(
             _showEnglishContent ? 'Switch to Thai' : 'Switch to English',
-            style: const TextStyle(
+            style: SacredText.kanit(
               color: AppColors.mutedText,
               fontSize: 12,
             ),
@@ -350,14 +330,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'คะแนนดวงชะตา',
-          style: TextStyle(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        const SacredSectionTitle('คะแนนดวงชะตา'),
         const SizedBox(height: 16),
         _buildRatingBar('ความรัก', widget.horoscope.loveRating, 
           'ดวงความรักของคุณวันนี้อยู่ในเกณฑ์${_getRatingDescription(widget.horoscope.loveRating)}'),
@@ -372,19 +345,9 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _buildRatingBar(String label, int rating, String description) {
-    return Container(
+    return SacredCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      radius: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -393,10 +356,10 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: SacredText.kanit(
                   color: AppColors.deepText,
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               Row(
@@ -407,7 +370,9 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
                     child: SvgIcon(
                       index < rating ? AppIcons.starFilled : AppIcons.starOutline,
                       size: 18,
-                      color: AppColors.accent,
+                      color: index < rating
+                          ? AppColors.candleGold
+                          : AppColors.warmCardBorder,
                     ),
                   ),
                 ),
@@ -417,7 +382,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           const SizedBox(height: 8),
           Text(
             description,
-            style: const TextStyle(
+            style: SacredText.kanit(
               color: AppColors.mutedText,
               fontSize: 14,
             ),
@@ -431,14 +396,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'สิ่งนำโชค',
-          style: TextStyle(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        const SacredSectionTitle('สิ่งนำโชค', overline: 'LUCKY'),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -464,41 +422,27 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _buildLuckyItemSvg(String label, String value, String svgPath) {
-    return Container(
+    return SacredCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.lightSurface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      radius: 20,
       child: Column(
         children: [
-          SvgIcon(
-            svgPath,
-            size: 32,
-            color: AppColors.primary,
-          ),
-          const SizedBox(height: 8),
+          SacredIconCoin(svgPath, size: 28),
+          const SizedBox(height: 10),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.deepText,
+            style: SacredText.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
-              color: AppColors.secondary,
+            style: SacredText.kanit(
+              color: AppColors.deepGoldBrown,
               fontSize: 18,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -507,33 +451,26 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _buildAdviceSection() {
-    return Container(
+    return SacredCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.tertiary.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.tertiary.withValues(alpha: 0.4),
-          width: 1,
-        ),
-      ),
+      radius: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.lightbulb,
-                color: AppColors.accent,
-                size: 24,
+                color: AppColors.deepGoldBrown,
+                size: 22,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
                 'คำแนะนำประจำวัน',
-                style: TextStyle(
+                style: SacredText.kanit(
                   color: AppColors.deepText,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -541,8 +478,8 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           const SizedBox(height: 12),
           Text(
             _getDailyAdvice(),
-            style: const TextStyle(
-              color: AppColors.deepText,
+            style: SacredText.kanit(
+              color: AppColors.mutedText,
               fontSize: 15,
               height: 1.5,
             ),
@@ -553,20 +490,11 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
   }
 
   Widget _buildShareSection() {
-    return Center(
-      child: ElevatedButton.icon(
-        onPressed: _shareHoroscope,
-        icon: const SvgIcon(AppIcons.share, size: 18, color: Colors.white),
-        label: const Text('แชร์ดวงของคุณ'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.tertiary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-        ),
-      ),
+    return SacredPrimaryButton(
+      label: 'แชร์ดวงของคุณ',
+      filled: true,
+      trailingSvg: AppIcons.share,
+      onTap: _shareHoroscope,
     );
   }
 

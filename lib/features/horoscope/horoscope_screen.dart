@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
+import '../../core/theme/celestial_effects.dart';
 import '../../core/utils/zodiac_utils.dart';
 import '../../core/api/api_client.dart';
 import '../../config/constants.dart';
@@ -10,6 +13,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import '../chat/repositories/chat_repository.dart';
 import 'widgets/horoscope_category_card.dart';
+
+/// Calm temple-toned colors for the four horoscope life areas. No neon.
+const Color _kLoveColor = AppColors.templeVermilion;
+const Color _kCareerColor = AppColors.deepGoldBrown;
+const Color _kHealthColor = AppColors.bodhiGreen;
+const Color _kFinanceColor = AppColors.mutedGold;
 
 class HoroscopeScreen extends StatefulWidget {
   const HoroscopeScreen({Key? key}) : super(key: key);
@@ -34,11 +43,24 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
   Map<String, dynamic> _monthlyHoroscope = {};
   Map<String, dynamic> _yearlyHoroscope = {};
 
+  // Bumped each time the user lands on a new tab so the tab body's
+  // StaggeredReveal widgets rebuild fresh and re-cascade in (a soft reveal on
+  // tab switch instead of a hard swap). Visual only — no data is reloaded.
+  int _revealEpoch = 0;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_handleTabChange);
     _init();
+  }
+
+  // Re-trigger the entrance cascade once the swipe/tap settles on a new tab.
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) return;
+    if (!mounted) return;
+    setState(() => _revealEpoch++);
   }
 
   Future<void> _init() async {
@@ -297,20 +319,27 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SacredScaffold(
+      bottomNavigationBar: const AppBottomNavigation(currentIndex: 1),
       body: SafeArea(
+        bottom: false,
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+                ),
+              )
             : Column(
                 children: [
-                  _buildHeader(),
-                  _buildTabBar(),
+                  StaggeredReveal(index: 0, child: _buildHeader()),
+                  StaggeredReveal(index: 1, child: _buildTabBar()),
                   Expanded(
                     child: TabBarView(
                       controller: _tabController,
@@ -325,60 +354,72 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 ],
               ),
       ),
-      bottomNavigationBar: const AppBottomNavigation(currentIndex: 0),
     );
   }
 
   Widget _buildHeader() {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      title: Row(
-        children: [
-          if (_isLoading)
-            const SizedBox(
+    return SacredHeader(
+      showBack: false,
+      overline: 'HOROSCOPE',
+      title: 'ดวงชะตา',
+      trailing: _isLoading
+          ? const SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
               ),
             )
-          else
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                ZodiacUtils.getZodiacIcon(_zodiacSignEn),
-                color: AppColors.primary,
-                size: 20,
-              ),
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.candleGold.withValues(alpha: 0.4),
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(
+                    ZodiacUtils.getZodiacIcon(_zodiacSignEn),
+                    color: AppColors.candleGold,
+                    size: 19,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Text(
+                  _zodiacSign,
+                  style: SacredText.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          const SizedBox(width: 12),
-          Text(
-            _zodiacSign,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildTabBar() {
     return TabBar(
       controller: _tabController,
-      indicatorColor: AppColors.primary,
+      indicatorColor: AppColors.candleGold,
       indicatorSize: TabBarIndicatorSize.label,
-      labelColor: AppColors.primary,
-      unselectedLabelColor: Colors.grey,
+      labelColor: AppColors.onBackdrop,
+      unselectedLabelColor: AppColors.onBackdropMuted,
+      labelStyle: GoogleFonts.kanit(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelStyle: GoogleFonts.kanit(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
       tabs: const [
         Tab(text: 'รายวัน'),
         Tab(text: 'รายสัปดาห์'),
@@ -392,20 +433,21 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     if (_isHoroscopeLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
       );
     }
 
     return SingleChildScrollView(
+      key: ValueKey('daily_$_revealEpoch'),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          _buildHoroscopeCategories(),
+          StaggeredReveal(index: 2, child: _buildHoroscopeCategories()),
           const SizedBox(height: 32),
-          _buildLuckyElements(),
+          StaggeredReveal(index: 3, child: _buildLuckyElements()),
           const SizedBox(height: 32),
         ],
       ),
@@ -416,126 +458,142 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     if (_isHoroscopeLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
       );
     }
 
     final weeklyData = _weeklyHoroscope;
     if (weeklyData.isEmpty) {
-      return const Center(
-        child: Text(
-          'ดวงชะตารายสัปดาห์จะมาเร็วๆ นี้',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      );
+      return _buildEmptyState('ดวงชะตารายสัปดาห์จะมาเร็วๆ นี้');
     }
 
     return SingleChildScrollView(
+      key: ValueKey('weekly_$_revealEpoch'),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          const Text(
-            'ดวงชะตาประจำสัปดาห์',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          const StaggeredReveal(
+            index: 2,
+            child: SacredSectionTitle(
+              'แนวทางประจำสัปดาห์',
+              overline: 'THIS WEEK',
             ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'ความรัก',
-                  icon: Icons.favorite,
-                  color: Colors.pink,
-                  description: weeklyData['love']['description'],
-                  rating: weeklyData['love']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to love horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การงาน',
-                  icon: Icons.work,
-                  color: Colors.amber,
-                  description: weeklyData['career']['description'],
-                  rating: weeklyData['career']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to career horoscope details
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'สุขภาพ',
-                  icon: Icons.favorite_border,
-                  color: Colors.green,
-                  description: weeklyData['health']['description'],
-                  rating: weeklyData['health']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to health horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การเงิน',
-                  icon: Icons.attach_money,
-                  color: Colors.blue,
-                  description: weeklyData['finance']['description'],
-                  rating: weeklyData['finance']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to finance horoscope details
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          StaggeredReveal(
+            index: 3,
+            child: Row(
               children: [
-                const Text(
-                  'ข้อมูลเพิ่มเติม',
-                  style: TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'ความรัก',
+                    icon: Icons.favorite,
+                    color: _kLoveColor,
+                    description: weeklyData['love']['description'],
+                    rating: weeklyData['love']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to love horoscope details
+                    },
                   ),
                 ),
-                const SizedBox(height: 16),
-                _buildInfoItem('เลขนำโชค', weeklyData['lucky_numbers']),
-                const Divider(height: 24, color: Colors.white10),
-                _buildInfoItem('วันนำโชค', weeklyData['lucky_day']),
-                const Divider(height: 24, color: Colors.white10),
-                _buildInfoItem('สีนำโชค', weeklyData['lucky_color']),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การงาน',
+                    icon: Icons.work,
+                    color: _kCareerColor,
+                    description: weeklyData['career']['description'],
+                    rating: weeklyData['career']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to career horoscope details
+                    },
+                  ),
+                ),
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          StaggeredReveal(
+            index: 4,
+            child: Row(
+              children: [
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'สุขภาพ',
+                    icon: Icons.favorite_border,
+                    color: _kHealthColor,
+                    description: weeklyData['health']['description'],
+                    rating: weeklyData['health']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to health horoscope details
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การเงิน',
+                    icon: Icons.attach_money,
+                    color: _kFinanceColor,
+                    description: weeklyData['finance']['description'],
+                    rating: weeklyData['finance']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to finance horoscope details
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          StaggeredReveal(
+            index: 5,
+            child: SacredCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ข้อมูลเพิ่มเติม',
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildInfoItem('เลขนำโชค', weeklyData['lucky_numbers']),
+                  const SizedBox(height: 16),
+                  const SacredGoldDivider(),
+                  const SizedBox(height: 16),
+                  _buildInfoItem('วันนำโชค', weeklyData['lucky_day']),
+                  const SizedBox(height: 16),
+                  const SacredGoldDivider(),
+                  const SizedBox(height: 16),
+                  _buildInfoItem('สีนำโชค', weeklyData['lucky_color']),
+                ],
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
+            fontSize: 16,
+          ),
+        ),
       ),
     );
   }
@@ -544,127 +602,117 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     if (_isHoroscopeLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
       );
     }
 
     final monthlyData = _monthlyHoroscope;
     if (monthlyData.isEmpty) {
-      return const Center(
-        child: Text(
-          'ดวงชะตารายเดือนจะมาเร็วๆ นี้',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      );
+      return _buildEmptyState('ดวงชะตารายเดือนจะมาเร็วๆ นี้');
     }
 
     return SingleChildScrollView(
+      key: ValueKey('monthly_$_revealEpoch'),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(16),
+          StaggeredReveal(
+            index: 2,
+            child: SacredCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SacredSectionTitle(
+                    'ภาพรวมประจำเดือน',
+                    overline: 'THIS MONTH',
+                    onCard: true,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    monthlyData['overview'],
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          const SizedBox(height: 24),
+          const StaggeredReveal(
+            index: 3,
+            child: SacredSectionTitle('ด้านต่างๆ ของชีวิต'),
+          ),
+          const SizedBox(height: 16),
+          StaggeredReveal(
+            index: 4,
+            child: Row(
               children: [
-                const Text(
-                  'ภาพรวมประจำเดือน',
-                  style: TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'ความรัก',
+                    icon: Icons.favorite,
+                    color: _kLoveColor,
+                    description: monthlyData['love']['description'],
+                    rating: monthlyData['love']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to love horoscope details
+                    },
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  monthlyData['overview'],
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.8),
-                    fontSize: 15,
-                    height: 1.5,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การงาน',
+                    icon: Icons.work,
+                    color: _kCareerColor,
+                    description: monthlyData['career']['description'],
+                    rating: monthlyData['career']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to career horoscope details
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'ด้านต่างๆ ของชีวิต',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          const SizedBox(height: 16),
+          StaggeredReveal(
+            index: 5,
+            child: Row(
+              children: [
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'สุขภาพ',
+                    icon: Icons.favorite_border,
+                    color: _kHealthColor,
+                    description: monthlyData['health']['description'],
+                    rating: monthlyData['health']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to health horoscope details
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การเงิน',
+                    icon: Icons.attach_money,
+                    color: _kFinanceColor,
+                    description: monthlyData['finance']['description'],
+                    rating: monthlyData['finance']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to finance horoscope details
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'ความรัก',
-                  icon: Icons.favorite,
-                  color: Colors.pink,
-                  description: monthlyData['love']['description'],
-                  rating: monthlyData['love']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to love horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การงาน',
-                  icon: Icons.work,
-                  color: Colors.amber,
-                  description: monthlyData['career']['description'],
-                  rating: monthlyData['career']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to career horoscope details
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'สุขภาพ',
-                  icon: Icons.favorite_border,
-                  color: Colors.green,
-                  description: monthlyData['health']['description'],
-                  rating: monthlyData['health']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to health horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การเงิน',
-                  icon: Icons.attach_money,
-                  color: Colors.blue,
-                  description: monthlyData['finance']['description'],
-                  rating: monthlyData['finance']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to finance horoscope details
-                  },
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -675,145 +723,135 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     if (_isHoroscopeLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
         ),
       );
     }
 
     final yearlyData = _yearlyHoroscope;
     if (yearlyData.isEmpty) {
-      return const Center(
-        child: Text(
-          'ดวงชะตารายปีจะมาเร็วๆ นี้',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      );
+      return _buildEmptyState('ดวงชะตารายปีจะมาเร็วๆ นี้');
     }
 
     return SingleChildScrollView(
+      key: ValueKey('yearly_$_revealEpoch'),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(16),
+          StaggeredReveal(
+            index: 2,
+            child: SacredCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SacredSectionTitle(
+                    'ภาพรวมประจำปี',
+                    overline: 'THIS YEAR',
+                    onCard: true,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    yearlyData['overview'],
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'คำแนะนำ',
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    yearlyData['advice'],
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          const SizedBox(height: 24),
+          const StaggeredReveal(
+            index: 3,
+            child: SacredSectionTitle('ด้านต่างๆ ของชีวิต'),
+          ),
+          const SizedBox(height: 16),
+          StaggeredReveal(
+            index: 4,
+            child: Row(
               children: [
-                const Text(
-                  'ภาพรวมประจำปี',
-                  style: TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'ความรัก',
+                    icon: Icons.favorite,
+                    color: _kLoveColor,
+                    description: yearlyData['love']['description'],
+                    rating: yearlyData['love']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to love horoscope details
+                    },
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  yearlyData['overview'],
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.8),
-                    fontSize: 15,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'คำแนะนำ',
-                  style: TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  yearlyData['advice'],
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.8),
-                    fontSize: 15,
-                    height: 1.5,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การงาน',
+                    icon: Icons.work,
+                    color: _kCareerColor,
+                    description: yearlyData['career']['description'],
+                    rating: yearlyData['career']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to career horoscope details
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'ด้านต่างๆ ของชีวิต',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          const SizedBox(height: 16),
+          StaggeredReveal(
+            index: 5,
+            child: Row(
+              children: [
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'สุขภาพ',
+                    icon: Icons.favorite_border,
+                    color: _kHealthColor,
+                    description: yearlyData['health']['description'],
+                    rating: yearlyData['health']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to health horoscope details
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: HoroscopeCategoryCard(
+                    title: 'การเงิน',
+                    icon: Icons.attach_money,
+                    color: _kFinanceColor,
+                    description: yearlyData['finance']['description'],
+                    rating: yearlyData['finance']['rating'],
+                    onTap: () {
+                      // TODO: Navigate to finance horoscope details
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'ความรัก',
-                  icon: Icons.favorite,
-                  color: Colors.pink,
-                  description: yearlyData['love']['description'],
-                  rating: yearlyData['love']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to love horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การงาน',
-                  icon: Icons.work,
-                  color: Colors.amber,
-                  description: yearlyData['career']['description'],
-                  rating: yearlyData['career']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to career horoscope details
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'สุขภาพ',
-                  icon: Icons.favorite_border,
-                  color: Colors.green,
-                  description: yearlyData['health']['description'],
-                  rating: yearlyData['health']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to health horoscope details
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: HoroscopeCategoryCard(
-                  title: 'การเงิน',
-                  icon: Icons.attach_money,
-                  color: Colors.blue,
-                  description: yearlyData['finance']['description'],
-                  rating: yearlyData['finance']['rating'],
-                  onTap: () {
-                    // TODO: Navigate to finance horoscope details
-                  },
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -827,12 +865,12 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
+            color: AppColors.candleGold.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             _getLuckyIcon(title),
-            color: AppColors.primary,
+            color: AppColors.deepGoldBrown,
             size: 18,
           ),
         ),
@@ -843,18 +881,18 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 15,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -870,13 +908,9 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ดวงชะตาวันนี้',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          const SacredSectionTitle(
+            'พลังงานวันนี้',
+            overline: 'TODAY',
           ),
           const SizedBox(height: 16),
           Row(
@@ -885,7 +919,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 child: HoroscopeCategoryCard(
                   title: 'ความรัก',
                   icon: Icons.favorite,
-                  color: Colors.pink,
+                  color: _kLoveColor,
                   description:
                       'วันนี้คุณจะได้พบกับความรักที่สดใสและมีความสุขกับคนรอบข้าง',
                   rating: 4,
@@ -899,7 +933,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 child: HoroscopeCategoryCard(
                   title: 'การงาน',
                   icon: Icons.work,
-                  color: Colors.amber,
+                  color: _kCareerColor,
                   description: 'งานของคุณจะราบรื่น มีโอกาสได้รับคำชมจากผู้ใหญ่',
                   rating: 3,
                   onTap: () {
@@ -916,7 +950,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 child: HoroscopeCategoryCard(
                   title: 'สุขภาพ',
                   icon: Icons.favorite_border,
-                  color: Colors.green,
+                  color: _kHealthColor,
                   description:
                       'สุขภาพของคุณแข็งแรงดี ควรออกกำลังกายเพื่อเสริมพลัง',
                   rating: 5,
@@ -930,7 +964,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                 child: HoroscopeCategoryCard(
                   title: 'การเงิน',
                   icon: Icons.attach_money,
-                  color: Colors.blue,
+                  color: _kFinanceColor,
                   description:
                       'การเงินของคุณมีแนวโน้มที่ดี มีโอกาสได้รับโชคลาภ',
                   rating: 4,
@@ -949,37 +983,29 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'ดวงชะตาวันนี้',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        const SacredSectionTitle(
+          'แนวทางวันนี้',
+          overline: 'TODAY',
         ),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.darkSurface,
-            borderRadius: BorderRadius.circular(16),
-          ),
+        SacredCard(
+          highlight: true,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'คำทำนายประจำวันที่ ${_dailyHoroscope!.date.day}/${_dailyHoroscope!.date.month}/${_dailyHoroscope!.date.year}',
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 _dailyHoroscope!.contentTh,
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.8),
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -994,7 +1020,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               child: HoroscopeCategoryCard(
                 title: 'ความรัก',
                 icon: Icons.favorite,
-                color: Colors.pink,
+                color: _kLoveColor,
                 description:
                     'ความรักของคุณอยู่ในช่วงที่ดี สัมพันธภาพกับคนรอบข้างเป็นไปอย่างราบรื่น',
                 rating: _dailyHoroscope!.loveRating,
@@ -1008,7 +1034,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               child: HoroscopeCategoryCard(
                 title: 'การงาน',
                 icon: Icons.work,
-                color: Colors.amber,
+                color: _kCareerColor,
                 description:
                     'งานของคุณมีความคืบหน้า ได้รับการยอมรับจากเพื่อนร่วมงาน',
                 rating: _dailyHoroscope!.careerRating,
@@ -1026,7 +1052,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               child: HoroscopeCategoryCard(
                 title: 'สุขภาพ',
                 icon: Icons.favorite_border,
-                color: Colors.green,
+                color: _kHealthColor,
                 description:
                     'สุขภาพของคุณอยู่ในเกณฑ์ดี ควรหาเวลาพักผ่อนให้เพียงพอ',
                 rating: _dailyHoroscope!.healthRating,
@@ -1040,7 +1066,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
               child: HoroscopeCategoryCard(
                 title: 'การเงิน',
                 icon: Icons.attach_money,
-                color: Colors.blue,
+                color: _kFinanceColor,
                 description: 'การเงินมีเสถียรภาพ อาจมีรายได้พิเศษเข้ามา',
                 rating: 4,
                 onTap: () {
@@ -1060,29 +1086,20 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          const SacredSectionTitle(
             'สิ่งนำโชค',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            overline: 'LUCKY',
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.darkSurface,
-              borderRadius: BorderRadius.circular(16),
-            ),
+          SacredCard(
             child: Column(
               children: [
                 _buildLuckyItem('เลขนำโชค', '3, 8, 13, 17, 21'),
-                const Divider(height: 24, color: Colors.white10),
+                _luckyDivider(),
                 _buildLuckyItem('สีนำโชค', 'แดง, ม่วง, น้ำเงินเข้ม'),
-                const Divider(height: 24, color: Colors.white10),
+                _luckyDivider(),
                 _buildLuckyItem('วันนำโชค', 'วันอังคาร, วันอาทิตย์'),
-                const Divider(height: 24, color: Colors.white10),
+                _luckyDivider(),
                 _buildLuckyItem('อัญมณีนำโชค', 'โกเมน, ทับทิม, โอปอล'),
               ],
             ),
@@ -1095,34 +1112,32 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        const SacredSectionTitle(
           'สิ่งนำโชค',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          overline: 'LUCKY',
         ),
         const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.darkSurface,
-            borderRadius: BorderRadius.circular(16),
-          ),
+        SacredCard(
           child: Column(
             children: [
               _buildLuckyItem('เลขนำโชค', _dailyHoroscope!.luckyNumber),
-              const Divider(height: 24, color: Colors.white10),
+              _luckyDivider(),
               _buildLuckyItem('สีนำโชค', _dailyHoroscope!.luckyColor),
-              const Divider(height: 24, color: Colors.white10),
+              _luckyDivider(),
               _buildLuckyItem('วันนำโชค', 'วันอังคาร, วันอาทิตย์'),
-              const Divider(height: 24, color: Colors.white10),
+              _luckyDivider(),
               _buildLuckyItem('อัญมณีนำโชค', 'โกเมน, ทับทิม, โอปอล'),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _luckyDivider() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: SacredGoldDivider(),
     );
   }
 
@@ -1133,12 +1148,12 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
+            color: AppColors.candleGold.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(
             _getLuckyIcon(title),
-            color: AppColors.primary,
+            color: AppColors.deepGoldBrown,
             size: 20,
           ),
         ),
@@ -1149,18 +1164,18 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
