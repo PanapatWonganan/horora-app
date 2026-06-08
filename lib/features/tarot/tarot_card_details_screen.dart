@@ -145,12 +145,12 @@ ${_reading!.interpretation}
         title: Text(
           'รายละเอียดการอ่านไพ่',
           style: GoogleFonts.kanit(
-            color: AppColors.deepText,
+            color: AppColors.onBackdrop,
             fontWeight: FontWeight.w700,
           ),
         ),
         backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.deepText,
+        foregroundColor: AppColors.onBackdrop,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         actions: [
@@ -209,7 +209,7 @@ ${_reading!.interpretation}
                         const SizedBox(height: 16),
                         Text(
                           _errorMessage!,
-                          style: GoogleFonts.kanit(color: AppColors.deepText),
+                          style: GoogleFonts.kanit(color: AppColors.onBackdrop),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
@@ -234,7 +234,7 @@ ${_reading!.interpretation}
                     ? Center(
                         child: Text(
                           'ไม่พบข้อมูลการอ่านไพ่',
-                          style: GoogleFonts.kanit(color: AppColors.deepText),
+                          style: GoogleFonts.kanit(color: AppColors.onBackdrop),
                         ),
                       )
                     : _buildReadingDetails(),

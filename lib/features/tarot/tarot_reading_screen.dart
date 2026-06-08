@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,6 +61,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   int? _lastRevealedIndex;
   // Ambient, looping float for the selected cards + interpretation shimmer.
   late AnimationController _ambientController;
+
+  // Max card count across all spreads (celtic = 10). We pre-allocate one flip
+  // controller and one deal-in controller per possible slot so they can be
+  // disposed deterministically.
+  static const int _maxSpread = 10;
+  // Per-card 3D Y-axis flip (0 = back facing viewer, 1 = front facing viewer).
+  late List<AnimationController> _flipControllers;
+  // Per-card deal-in (0 = in deck/off-screen, 1 = settled in layout).
+  late List<AnimationController> _dealControllers;
+  // Per-card one-shot diagonal shimmer sweep fired as the flip lands.
+  late List<AnimationController> _shimmerControllers;
+  // Per-card transient press-scale on tap-down (before the flip starts).
+  final List<bool> _isPressed = List<bool>.filled(_maxSpread, false);
 
   @override
   void initState() {
@@ -141,6 +155,33 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       duration: const Duration(seconds: 4),
       vsync: this,
     )..repeat();
+
+    // Per-card 3D flip controllers (back → front, one tasteful turn).
+    _flipControllers = List.generate(
+      _maxSpread,
+      (_) => AnimationController(
+        duration: const Duration(milliseconds: 620),
+        vsync: this,
+      ),
+    );
+
+    // Per-card deal-in controllers (cards fly in + fan out when selected).
+    _dealControllers = List.generate(
+      _maxSpread,
+      (_) => AnimationController(
+        duration: const Duration(milliseconds: 360),
+        vsync: this,
+      ),
+    );
+
+    // Per-card one-shot shimmer sweep across the face once the flip lands.
+    _shimmerControllers = List.generate(
+      _maxSpread,
+      (_) => AnimationController(
+        duration: const Duration(milliseconds: 900),
+        vsync: this,
+      ),
+    );
   }
 
   Future<void> _loadCards() async {
@@ -200,6 +241,14 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       _lastRevealedIndex = null;
     });
 
+    // Reset per-card visual state so the next deal/flip starts clean.
+    for (var i = 0; i < _maxSpread; i++) {
+      _flipControllers[i].value = 0;
+      _dealControllers[i].value = 0;
+      _shimmerControllers[i].value = 0;
+      _isPressed[i] = false;
+    }
+
     _shuffleAnimationController.forward().then((_) {
       _shuffleAnimationController.reset();
       setState(() {
@@ -232,6 +281,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       _isSelectingCards = false;
       _hasSelectedCards = true;
     });
+
+    // DEAL-IN: each chosen card flies in + fans out with a staggered delay,
+    // settling into its layout slot. Animation only — no logic depends on this.
+    for (var i = 0; i < cardCount && i < _maxSpread; i++) {
+      _flipControllers[i].value = 0;
+      _shimmerControllers[i].value = 0;
+      _isPressed[i] = false;
+      _dealControllers[i].value = 0;
+      Future.delayed(Duration(milliseconds: 80 * i), () {
+        if (!mounted) return;
+        _dealControllers[i].forward();
+      });
+    }
   }
 
   int _getCardCountForSpreadType() {
@@ -264,6 +326,20 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
     // Signature: fire the one-shot glow/sparkle burst on a fresh reveal.
     if (!alreadyRevealed) {
+      // HAPTIC: one tasteful tap the moment the card starts flipping.
+      HapticFeedback.mediumImpact();
+
+      if (index < _maxSpread) {
+        // Clear the press-scale so the card releases into the flip.
+        _isPressed[index] = false;
+        // Real 3D flip: drive the per-card flip controller back → front.
+        _flipControllers[index].forward(from: 0).whenComplete(() {
+          if (!mounted) return;
+          // GLOW/SHIMMER: sweep a diagonal light band as the front lands.
+          _shimmerControllers[index].forward(from: 0);
+        });
+      }
+
       _revealBurstController.forward(from: 0);
     }
 
@@ -444,6 +520,15 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     _loadingAnimationController.dispose();
     _revealBurstController.dispose();
     _ambientController.dispose();
+    for (final c in _flipControllers) {
+      c.dispose();
+    }
+    for (final c in _dealControllers) {
+      c.dispose();
+    }
+    for (final c in _shimmerControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -967,253 +1052,392 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
   Widget _buildTarotCard(int index) {
     final isRevealed = _isCardRevealed[index];
-    final isReversed = _isCardReversed[index];
     final isJustRevealed = _lastRevealedIndex == index;
+    final hasSlot = index < _maxSpread;
 
-    // Gentle continuous float; each card offset by index so they bob out of sync.
+    // Animations that drive this card. We Listenable.merge the per-card
+    // controllers so only THIS card rebuilds per frame (scoped, 60fps-safe).
+    final dealCtrl = hasSlot ? _dealControllers[index] : null;
+    final flipCtrl = hasSlot ? _flipControllers[index] : null;
+    final shimmerCtrl = hasSlot ? _shimmerControllers[index] : null;
+
+    final cardListenable = Listenable.merge([
+      _ambientController,
+      _revealBurstController,
+      if (dealCtrl != null) dealCtrl,
+      if (flipCtrl != null) flipCtrl,
+      if (shimmerCtrl != null) shimmerCtrl,
+    ]);
+
     return AnimatedBuilder(
-      animation: _ambientController,
-      builder: (context, child) {
+      animation: cardListenable,
+      builder: (context, _) {
+        // DEAL-IN: slide up + scale in from the deck as the card settles.
+        final deal = dealCtrl?.value ?? 1.0;
+        final dealEased = Curves.easeOutBack.transform(deal.clamp(0.0, 1.0));
+        final dealOpacity = Curves.easeOut.transform(deal.clamp(0.0, 1.0));
+        final dealDy = (1 - dealEased) * -60.0; // fly down from above the row.
+        final dealScale = 0.7 + dealEased * 0.3;
+
+        // Gentle continuous float once revealed (offset per index so out of sync).
         final t = _ambientController.value * 2 * pi + index * 1.1;
-        final dy = isRevealed ? sin(t) * 3.0 : 0.0;
-        return Transform.translate(offset: Offset(0, dy), child: child);
-      },
-      child: GestureDetector(
-        onTap: () => _revealCard(index),
-        // Reveal glow pulse: a soft halo blooms behind a freshly revealed card.
-        child: AnimatedBuilder(
-          animation: _revealBurstController,
-          builder: (context, child) {
-            final p = isJustRevealed ? _revealBurstController.value : 0.0;
-            final glow = (sin(p * pi)).clamp(0.0, 1.0);
-            return Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                  width: 124,
-                  height: 204,
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    // Soft gold celestial frame — catches light on reveal.
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.accent.withValues(
-                            alpha: (0.9 + glow * 0.1).clamp(0.0, 1.0)),
-                        Color.lerp(
-                          AppColors.accent.withValues(alpha: 0.45),
-                          Colors.white,
-                          glow * 0.6,
-                        )!,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.18),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                      // Reveal glow halo.
-                      BoxShadow(
-                        color: AppColors.accent.withValues(alpha: 0.55 * glow),
-                        blurRadius: 26 * glow,
-                        spreadRadius: 4 * glow,
-                      ),
-                    ],
-                  ),
-                  child: child,
-                ),
-                // Signature sparkle burst overlaid on the freshly revealed card.
-                if (isJustRevealed && p > 0 && p < 1)
-                  Positioned.fill(
-                    child: RevealBurst(progress: p),
-                  ),
-              ],
-            );
-          },
+        final floatDy = isRevealed ? sin(t) * 3.0 : 0.0;
+
+        // Idle invitation pulse on un-revealed backs (subtle breathing scale).
+        final idlePulse =
+            !isRevealed ? 1.0 + sin(t) * 0.012 : 1.0;
+
+        // Press-scale on tap-down, before the flip starts.
+        final pressScale = (hasSlot && _isPressed[index]) ? 0.95 : 1.0;
+
+        // 3D FLIP progress 0→1 (back → front).
+        final flip = flipCtrl?.value ?? (isRevealed ? 1.0 : 0.0);
+        final showFront = flip >= 0.5;
+        final angle = flip * pi;
+
+        // Reveal glow pulse intensity (existing burst halo behavior).
+        final p = isJustRevealed ? _revealBurstController.value : 0.0;
+        final glow = (sin(p * pi)).clamp(0.0, 1.0);
+
+        // The face/back content, counter-rotated when showing the front so it
+        // isn't mirrored by the Y flip past the halfway point.
+        Widget faceContent = showFront
+            ? Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()..rotateY(pi),
+                child: _buildCardFront(index),
+              )
+            : _buildCardBack(index);
+
+        // The 3D-rotated card body with perspective.
+        Widget rotated = Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001) // perspective
+            ..rotateY(angle),
           child: Container(
             decoration: BoxDecoration(
-              color: isRevealed ? Colors.white : AppColors.surfaceMuted,
+              color: showFront ? Colors.white : AppColors.surfaceMuted,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: isRevealed
-                ? Transform.rotate(
-                    angle: isReversed ? pi : 0,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Image.asset(
-                              _selectedCards[index].imagePath,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
-                                return const Center(
-                                  child: SvgIcon(
-                                    AppIcons.sparkle,
-                                    size: 32,
-                                    color: AppColors.primary,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            color: AppColors.surfaceMuted,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 6),
-                            child: Column(
-                              children: [
-                                // English editorial overline (display font).
-                                Text(
-                                  _cardOverline(_selectedCards[index]),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.fraunces(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1.4,
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.8),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _selectedCards[index].nameTh,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.kanit(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.deepText,
-                                  ),
-                                ),
-                                if (isReversed)
-                                  Text(
-                                    '(กลับหัว)',
-                                    style: GoogleFonts.kanit(
-                                      fontSize: 12,
-                                      color: AppColors.secondary,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : Center(
-                    child: Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        // Deeper, more mystical card back gradient.
+            child: faceContent,
+          ),
+        );
+
+        return Transform.translate(
+          offset: Offset(0, floatDy + dealDy),
+          child: Transform.scale(
+            scale: dealScale * idlePulse * pressScale,
+            child: Opacity(
+              opacity: dealOpacity,
+              child: GestureDetector(
+                onTapDown: (_) {
+                  if (!hasSlot || isRevealed) return;
+                  setState(() => _isPressed[index] = true);
+                },
+                onTapCancel: () {
+                  if (!hasSlot) return;
+                  if (_isPressed[index]) {
+                    setState(() => _isPressed[index] = false);
+                  }
+                },
+                onTap: () => _revealCard(index),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    // Gold celestial frame — catches light + intensifies on reveal.
+                    Container(
+                      width: 124,
+                      height: 204,
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            Color(0xFF6C5BD0), // deep lavender
-                            Color(0xFF8B6FE0),
-                            Color(0xFFB8A6F0),
+                            AppColors.accent.withValues(
+                                alpha: (0.9 + glow * 0.1).clamp(0.0, 1.0)),
+                            Color.lerp(
+                              AppColors.accent.withValues(alpha: 0.45),
+                              Colors.white,
+                              glow * 0.6,
+                            )!,
                           ],
                         ),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Faint inner top sheen for depth.
-                          Positioned.fill(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.white.withValues(alpha: 0.22),
-                                    Colors.white.withValues(alpha: 0.0),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.18),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
                           ),
-                          // Scattered star/sparkle accents on the back.
-                          Positioned(
-                            top: 14,
-                            left: 14,
-                            child: SvgIcon(
-                              AppIcons.star,
-                              size: 12,
-                              color: Colors.white.withValues(alpha: 0.85),
-                            ),
-                          ),
-                          Positioned(
-                            top: 30,
-                            right: 18,
-                            child: SvgIcon(
-                              AppIcons.star,
-                              size: 8,
-                              color: Colors.white.withValues(alpha: 0.55),
-                            ),
-                          ),
-                          const Positioned(
-                            bottom: 16,
-                            right: 16,
-                            child: SvgIcon(
-                              AppIcons.sparkle,
-                              size: 14,
-                              color: AppColors.accent,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 26,
-                            left: 20,
-                            child: SvgIcon(
-                              AppIcons.sparkle,
-                              size: 9,
-                              color: Colors.white.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.32),
-                                  Colors.white.withValues(alpha: 0.1),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: AppColors.accent.withValues(alpha: 0.85),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: const Center(
-                              child: SvgIcon(
-                                AppIcons.sparkle,
-                                size: 28,
-                                color: Colors.white,
-                              ),
-                            ),
+                          // Reveal glow halo (intensifies as the front lands).
+                          BoxShadow(
+                            color:
+                                AppColors.accent.withValues(alpha: 0.55 * glow),
+                            blurRadius: 26 * glow,
+                            spreadRadius: 4 * glow,
                           ),
                         ],
                       ),
+                      child: rotated,
+                    ),
+                    // Diagonal SHIMMER sweep across the face as the flip lands.
+                    if (hasSlot && showFront && shimmerCtrl != null)
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: _buildCardShimmer(shimmerCtrl.value),
+                        ),
+                      ),
+                    // Signature sparkle burst overlaid on the freshly revealed card.
+                    if (isJustRevealed && p > 0 && p < 1)
+                      Positioned.fill(
+                        child: RevealBurst(progress: p),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // The revealed card face (image + Thai label). Keeps the reversed-card
+  // Transform.rotate(pi) so upside-down cards read correctly.
+  Widget _buildCardFront(int index) {
+    final isReversed = _isCardReversed[index];
+    return Transform.rotate(
+      angle: isReversed ? pi : 0,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Image.asset(
+                _selectedCards[index].imagePath,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // แสดงไอคอนเมื่อไม่สามารถโหลดรูปภาพได้
+                  return const Center(
+                    child: SvgIcon(
+                      AppIcons.sparkle,
+                      size: 32,
+                      color: AppColors.primary,
+                    ),
+                  );
+                },
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              color: AppColors.surfaceMuted,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+              child: Column(
+                children: [
+                  // English editorial overline (display font).
+                  Text(
+                    _cardOverline(_selectedCards[index]),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.fraunces(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.4,
+                      color: AppColors.primary.withValues(alpha: 0.8),
                     ),
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _selectedCards[index].nameTh,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.kanit(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.deepText,
+                    ),
+                  ),
+                  if (isReversed)
+                    Text(
+                      '(กลับหัว)',
+                      style: GoogleFonts.kanit(
+                        fontSize: 12,
+                        color: AppColors.secondary,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // The un-revealed card back (mystical lavender + star/sparkle accents),
+  // with a subtle travelling sheen inviting a tap.
+  Widget _buildCardBack(int index) {
+    // Slow ambient shimmer band travelling across the back to feel interactive.
+    final shimmerT = (_ambientController.value + index * 0.13) % 1.0;
+    return Center(
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(14)),
+          // Deeper, more mystical card back gradient.
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF6C5BD0), // deep lavender
+              Color(0xFF8B6FE0),
+              Color(0xFFB8A6F0),
+            ],
           ),
         ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Faint inner top sheen for depth.
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white.withValues(alpha: 0.22),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Idle travelling shimmer band (invites a tap).
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: ShaderMask(
+                    blendMode: BlendMode.srcATop,
+                    shaderCallback: (rect) {
+                      final dx = (shimmerT * 2 - 0.5) * rect.width;
+                      return LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.0),
+                          Colors.white.withValues(alpha: 0.14),
+                          Colors.white.withValues(alpha: 0.0),
+                        ],
+                        stops: const [0.35, 0.5, 0.65],
+                      ).createShader(
+                        Rect.fromLTWH(dx, 0, rect.width, rect.height),
+                      );
+                    },
+                    child: const SizedBox.expand(),
+                  ),
+                ),
+              ),
+              // Scattered star/sparkle accents on the back.
+              Positioned(
+                top: 14,
+                left: 14,
+                child: SvgIcon(
+                  AppIcons.star,
+                  size: 12,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+              Positioned(
+                top: 30,
+                right: 18,
+                child: SvgIcon(
+                  AppIcons.star,
+                  size: 8,
+                  color: Colors.white.withValues(alpha: 0.55),
+                ),
+              ),
+              const Positioned(
+                bottom: 16,
+                right: 16,
+                child: SvgIcon(
+                  AppIcons.sparkle,
+                  size: 14,
+                  color: AppColors.accent,
+                ),
+              ),
+              Positioned(
+                bottom: 26,
+                left: 20,
+                child: SvgIcon(
+                  AppIcons.sparkle,
+                  size: 9,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.32),
+                      Colors.white.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.85),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Center(
+                  child: SvgIcon(
+                    AppIcons.sparkle,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // One-shot diagonal light band sweeping across the card face on flip-land.
+  Widget _buildCardShimmer(double progress) {
+    if (progress <= 0 || progress >= 1) return const SizedBox.shrink();
+    final fade = sin(progress * pi); // bloom then fade.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: ShaderMask(
+        blendMode: BlendMode.srcATop,
+        shaderCallback: (rect) {
+          final dx = (progress * 2 - 0.5) * rect.width;
+          return LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: 0.0),
+              Colors.white.withValues(alpha: 0.45 * fade),
+              Colors.white.withValues(alpha: 0.0),
+            ],
+            stops: const [0.35, 0.5, 0.65],
+          ).createShader(
+            Rect.fromLTWH(dx, 0, rect.width, rect.height),
+          );
+        },
+        child: const SizedBox.expand(),
       ),
     );
   }

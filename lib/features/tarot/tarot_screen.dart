@@ -91,7 +91,7 @@ class _TarotScreenState extends State<TarotScreen> {
             Text(
               'THE ORACLE · ทาโรต์',
               style: GoogleFonts.fraunces(
-                color: AppColors.primary.withValues(alpha: 0.8),
+                color: AppColors.onBackdropMuted,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 3,
@@ -103,7 +103,7 @@ class _TarotScreenState extends State<TarotScreen> {
                 Text(
                   'ไพ่ทาโรต์',
                   style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
+                    color: AppColors.onBackdrop,
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
                     height: 1.1,
@@ -121,7 +121,7 @@ class _TarotScreenState extends State<TarotScreen> {
             Text(
               'ค้นพบความลึกลับของชีวิต',
               style: GoogleFonts.kanit(
-                color: AppColors.mutedText,
+                color: AppColors.onBackdropMuted,
                 fontSize: 15,
               ),
             ),
@@ -185,7 +185,7 @@ class _TarotScreenState extends State<TarotScreen> {
               Text(
                 overline,
                 style: GoogleFonts.fraunces(
-                  color: AppColors.primary.withValues(alpha: 0.75),
+                  color: AppColors.onBackdropMuted,
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2.5,
@@ -194,7 +194,7 @@ class _TarotScreenState extends State<TarotScreen> {
             Text(
               title,
               style: GoogleFonts.kanit(
-                color: AppColors.deepText,
+                color: AppColors.onBackdrop,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
@@ -373,78 +373,104 @@ class _TarotScreenState extends State<TarotScreen> {
         const SizedBox(height: 16),
         // TODO: Implement saved readings list when data is available
         Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppColors.lightSurface,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.18),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.18),
+              width: 1,
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.surfaceMuted,
-                  ),
-                  child: Center(
-                    child: SvgIcon(
-                      AppIcons.bookmarkOutline,
-                      size: 36,
-                      color: AppColors.primary.withValues(alpha: 0.7),
-                    ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceMuted,
+                ),
+                child: Center(
+                  child: SvgIcon(
+                    AppIcons.bookmarkOutline,
+                    size: 36,
+                    color: AppColors.primary.withValues(alpha: 0.7),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'ยังไม่มีการอ่านไพ่ที่บันทึกไว้',
-                  style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'ยังไม่มีการอ่านไพ่ที่บันทึกไว้',
+                style: GoogleFonts.kanit(
+                  color: AppColors.deepText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'เมื่อคุณบันทึกการอ่านไพ่ คุณจะสามารถกลับมาดูได้ที่นี่',
-                  style: GoogleFonts.kanit(
-                    color: AppColors.mutedText,
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                  textAlign: TextAlign.center,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'เมื่อคุณบันทึกการอ่านไพ่ คุณจะสามารถกลับมาดูได้ที่นี่',
+                style: GoogleFonts.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 14,
+                  height: 1.4,
                 ),
-                const SizedBox(height: 18),
-                OutlinedGradientButton(
-                  text: 'เริ่มการอ่านไพ่ใหม่',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.tarotReading);
                   },
-                  gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient,
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.nightPlum,
+                    foregroundColor: AppColors.onBackdrop,
+                    shadowColor: AppColors.primary.withValues(alpha: 0.18),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: AppColors.candleGold.withValues(alpha: 0.42),
+                        width: 1,
+                      ),
+                    ),
                   ),
-                  icon: const SvgIcon(
-                    AppIcons.divination,
-                    size: 20,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SvgIcon(
+                        AppIcons.divination,
+                        size: 20,
+                        color: AppColors.candleGold,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'เริ่มการอ่านไพ่ใหม่',
+                        style: GoogleFonts.kanit(
+                          color: AppColors.onBackdrop,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       ],
     );
   }
