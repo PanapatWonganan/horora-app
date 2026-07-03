@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
@@ -156,7 +157,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               height: 80,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
+                  colors: MeritColors.accentGradient,
                 ),
                 shape: BoxShape.circle,
               ),
@@ -176,7 +177,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             Text(
               'เลขที่คำสั่งบุญ: ${_createdOrder?.orderNumber}',
               style: GoogleFonts.kanit(
-                color: AppColors.primary,
+                color: MeritColors.accentDark,
                 fontSize: 14,
               ),
             ),
@@ -251,28 +252,12 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: MeritColors.accent,
-                  foregroundColor: AppColors.deepText,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'กลับหน้าหลัก',
-                  style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+            SacredPrimaryButton(
+              label: 'กลับหน้าหลัก',
+              onTap: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              filled: true,
             ),
           ],
         ),
@@ -670,36 +655,12 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
   Widget _buildSubmitButton() {
     final canSubmit = _slipImage != null && _orderCreated && !_isUploading;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canSubmit ? _uploadSlip : null,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: canSubmit ? MeritColors.accent : AppColors.disabled,
-          foregroundColor: AppColors.deepText,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isUploading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: AppColors.deepText,
-                  strokeWidth: 2,
-                ),
-              )
-            : Text(
-                'ส่งหลักฐานการโอน',
-                style: GoogleFonts.kanit(
-                  color: AppColors.deepText,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-      ),
+    return SacredPrimaryButton(
+      label: 'ส่งหลักฐานการโอน',
+      onTap: _uploadSlip,
+      enabled: canSubmit,
+      filled: true,
+      isLoading: _isUploading,
     );
   }
 }

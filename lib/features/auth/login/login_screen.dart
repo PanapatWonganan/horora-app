@@ -5,7 +5,6 @@ import '../../../core/theme/theme.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/app_icons.dart';
-import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -181,15 +180,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          GradientButton(
-            text: 'เข้าสู่ระบบ',
-            onPressed: _login,
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            width: double.infinity,
+          SacredPrimaryButton(
+            label: 'เข้าสู่ระบบ',
+            onTap: _login,
+            filled: true,
             isLoading: _isLoading,
           ),
         ],

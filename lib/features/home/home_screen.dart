@@ -1049,8 +1049,8 @@ class _HomeScreenState extends State<HomeScreen>
               child: _buildSmallFeatureCard(
                 title: 'ไพ่ทาโรต์',
                 svgIconPath: AppIcons.sparkleFilled,
-                // Tarot — rose → lavender.
-                tileGradient: const [Color(0xFFE79BB8), Color(0xFFB8A6F0)],
+                // Tarot — same code as Dashboard's tarotMajor (muted gilt).
+                tileGradient: const [AppColors.tarotMajor, AppColors.deepGoldBrown],
                 onTap: () => Navigator.pushNamed(context, AppRoutes.tarot),
               ),
             ),
@@ -1059,8 +1059,8 @@ class _HomeScreenState extends State<HomeScreen>
               child: _buildSmallFeatureCard(
                 title: 'พ่อหมอโหรา',
                 svgIconPath: AppIcons.chatFilled,
-                // Chat — sky blue → lavender.
-                tileGradient: const [Color(0xFF9CC9F0), Color(0xFFB8A6F0)],
+                // Chat — same code as Dashboard's chatBubble (soft plum).
+                tileGradient: const [AppColors.chatBubble, AppColors.nightPlum],
                 onTap: () =>
                     Navigator.pushReplacementNamed(context, AppRoutes.chat),
               ),
@@ -1070,8 +1070,8 @@ class _HomeScreenState extends State<HomeScreen>
               child: _buildSmallFeatureCard(
                 title: 'โหราศาสตร์',
                 svgIconPath: AppIcons.starFilled,
-                // Horoscope — gold → peach.
-                tileGradient: const [Color(0xFFF6CE7A), Color(0xFFFFB0A0)],
+                // Horoscope — same code as Dashboard's zodiacFire (ember vermilion).
+                tileGradient: const [AppColors.zodiacFire, AppColors.deepGoldBrown],
                 onTap: () => Navigator.pushNamed(context, AppRoutes.horoscope),
               ),
             ),
@@ -1082,9 +1082,11 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  /// Premium feature tile: a clean white glyph on a soft per-feature pastel
+  /// Premium feature tile: a clean white glyph on a per-feature temple-toned
   /// gradient chip (with a matching colored shadow) above a deep-ink label.
-  /// [tileGradient] is the 2-stop pastel ramp for this feature's icon chip.
+  /// [tileGradient] is the 2-stop ramp for this feature's icon chip — the same
+  /// feature color Dashboard uses (tarotMajor / chatBubble / zodiacFire), so
+  /// Home and Dashboard code the same features identically.
   Widget _buildSmallFeatureCard({
     required String title,
     required String svgIconPath,

@@ -94,16 +94,13 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 24),
-                              ElevatedButton(
-                                onPressed: _loadReadings,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.deepGoldBrown,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
+                              SizedBox(
+                                width: 160,
+                                child: SacredPrimaryButton(
+                                  label: 'ลองใหม่',
+                                  onTap: _loadReadings,
+                                  filled: true,
                                 ),
-                                child: const Text('ลองใหม่'),
                               ),
                             ],
                           ),
@@ -147,19 +144,15 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              AppRouter.navigateTo(context, AppRoutes.tarotReading);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.deepGoldBrown,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          SizedBox(
+            width: 200,
+            child: SacredPrimaryButton(
+              label: 'เริ่มอ่านไพ่',
+              onTap: () {
+                AppRouter.navigateTo(context, AppRoutes.tarotReading);
+              },
+              filled: true,
             ),
-            child: const Text('เริ่มอ่านไพ่'),
           ),
         ],
       ),

@@ -478,21 +478,29 @@ class SacredPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final String? trailingSvg;
+  final String? leadingSvg;
   final bool filled;
   final bool enabled;
+
+  /// When true, shows a small spinner in place of the label/icons and
+  /// disables the tap — mirrors the loading state the old GradientButton /
+  /// raw ElevatedButtons offered.
+  final bool isLoading;
 
   const SacredPrimaryButton({
     super.key,
     required this.label,
     required this.onTap,
     this.trailingSvg,
+    this.leadingSvg,
     this.filled = false,
     this.enabled = true,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final on = enabled && onTap != null;
+    final on = enabled && onTap != null && !isLoading;
     final labelColor = filled ? Colors.white : AppColors.deepGoldBrown;
 
     final inner = Container(
@@ -524,27 +532,42 @@ class SacredPrimaryButton extends StatelessWidget {
               ]
             : null,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: SacredText.kanit(
-              color: labelColor,
-              fontSize: 15.5,
-              fontWeight: FontWeight.w600,
+      child: isLoading
+          ? Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: labelColor,
+                  strokeWidth: 2.2,
+                ),
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (leadingSvg != null) ...[
+                  SvgIcon(leadingSvg!, size: 18, color: labelColor),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  label,
+                  style: SacredText.kanit(
+                    color: labelColor,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (trailingSvg != null) ...[
+                  const SizedBox(width: 8),
+                  SvgIcon(trailingSvg!, size: 18, color: labelColor),
+                ],
+              ],
             ),
-          ),
-          if (trailingSvg != null) ...[
-            const SizedBox(width: 8),
-            SvgIcon(trailingSvg!, size: 18, color: labelColor),
-          ],
-        ],
-      ),
     );
 
     return Opacity(
-      opacity: on ? 1 : 0.5,
+      opacity: on || isLoading ? 1 : 0.5,
       child: SacredPressable(
         onTap: on ? onTap! : () {},
         borderRadius: BorderRadius.circular(16),

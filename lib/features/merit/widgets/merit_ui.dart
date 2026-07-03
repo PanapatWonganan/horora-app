@@ -392,13 +392,13 @@ class MeritTransparencyBlock extends StatelessWidget {
       label: 'ค่าดำเนินการทีมงาน',
       detail: 'ค่าเดินทาง จัดเตรียม และถ่ายภาพ/วิดีโอหลักฐาน',
       fraction: 0.15,
-      color: Color(0xFFCDB7FF),
+      color: Color(0xFFBFA06B), // warm bronze — distinct from the gilt segment
     ),
     MeritFeeLine(
       label: 'ค่าธรรมเนียมระบบ',
       detail: 'ค่าธรรมเนียมการชำระเงินและดูแลแพลตฟอร์ม',
       fraction: 0.05,
-      color: Color(0xFFBEE8FF),
+      color: Color(0xFF8C86A8), // muted indigo — temple-toned, not neon
     ),
   ];
 

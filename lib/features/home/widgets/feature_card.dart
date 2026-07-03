@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/theme/app_colors.dart';
 
 class FeatureCard extends StatelessWidget {
   final String title;
@@ -25,7 +28,7 @@ class FeatureCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF8B6FE0).withValues(alpha: 0.18),
+              color: AppColors.primary.withValues(alpha: 0.18),
               blurRadius: 18,
               spreadRadius: 0,
               offset: const Offset(0, 8),
@@ -70,7 +73,7 @@ class FeatureCard extends StatelessWidget {
                     ),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: GoogleFonts.kanit(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

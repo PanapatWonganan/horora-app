@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
+import '../../../core/utils/app_icons.dart';
 import '../models/affiliate_models.dart';
 import '../services/affiliate_service.dart';
 
@@ -231,19 +232,11 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                       const SizedBox(height: 24),
 
                       // Share buttons
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton.icon(
-                          onPressed: _shareLink,
-                          icon: const Icon(Icons.share),
-                          label: const Text('แชร์ให้เพื่อน', style: TextStyle(fontSize: 16)),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.deepGoldBrown,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
+                      SacredPrimaryButton(
+                        label: 'แชร์ให้เพื่อน',
+                        onTap: _shareLink,
+                        trailingSvg: AppIcons.share,
+                        filled: true,
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
@@ -252,7 +245,8 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         child: OutlinedButton.icon(
                           onPressed: _copyLink,
                           icon: const Icon(Icons.link),
-                          label: const Text('คัดลอกลิงก์', style: TextStyle(fontSize: 16)),
+                          label: Text('คัดลอกลิงก์',
+                              style: SacredText.kanit(fontSize: 16, fontWeight: FontWeight.w500)),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.onBackdrop,
                             side: BorderSide(

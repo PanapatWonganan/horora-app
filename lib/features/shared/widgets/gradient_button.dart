@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/theme.dart';
 
@@ -69,10 +70,10 @@ class GradientButton extends StatelessWidget {
                   ],
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: GoogleFonts.kanit(
                       color: Colors.white,
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -155,10 +156,10 @@ class OutlinedGradientButton extends StatelessWidget {
                         ),
                         child: Text(
                           text,
-                          style: const TextStyle(
+                          style: GoogleFonts.kanit(
                             color: Colors.white,
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),

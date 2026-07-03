@@ -5,6 +5,7 @@ import '../../core/routes/app_routes.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/utils/app_icons.dart';
+import '../shared/widgets/gradient_button.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -213,33 +214,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 16),
-      child: ElevatedButton(
+      child: OutlinedGradientButton(
+        text: 'ออกจากระบบ',
         onPressed: _logout,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.error,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.logout,
-              size: 20,
-              color: Colors.white,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'ออกจากระบบ',
-              style: SacredText.kanit(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.error.withValues(alpha: 0.85),
+            AppColors.error,
           ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        icon: const SvgIcon(
+          AppIcons.logout,
+          size: 20,
+          color: AppColors.error,
         ),
       ),
     );

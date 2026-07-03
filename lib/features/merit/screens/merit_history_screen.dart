@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
@@ -124,7 +125,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
   Widget _buildOrderList() {
     return RefreshIndicator(
       onRefresh: _loadOrders,
-      color: AppColors.primary,
+      color: MeritColors.accent,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: _orders.length,
@@ -149,7 +150,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.06),
+              color: MeritColors.accent.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 6),
             ),
@@ -411,26 +412,10 @@ class _OrderDetailSheet extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: MeritColors.accent,
-                foregroundColor: AppColors.deepText,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'ปิด',
-                style: GoogleFonts.kanit(
-                  color: AppColors.deepText,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+          SacredPrimaryButton(
+            label: 'ปิด',
+            onTap: () => Navigator.pop(context),
+            filled: true,
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],

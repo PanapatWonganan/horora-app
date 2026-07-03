@@ -1016,19 +1016,19 @@ class _ProofSample {
       temple: 'วัดเล่งเน่ยยี่',
       date: '3 มิ.ย. 2569',
       caption: 'ถวายของไหว้ครบชุด พร้อมวิดีโอยืนยัน 🎥',
-      gradient: [Color(0xFFCDB7FF), Color(0xFFBEE8FF)],
+      gradient: [Color(0xFFBFA06B), Color(0xFF8C86A8)], // bronze → plum-grey
     ),
     _ProofSample(
       temple: 'พระพิฆเนศ ห้วยขวาง',
       date: '1 มิ.ย. 2569',
       caption: 'จุดธูปบูชาเสร็จสิ้น ขอให้สมหวังนะคะ ✨',
-      gradient: [Color(0xFFFFD7C2), Color(0xFFF2C879)],
+      gradient: [Color(0xFFFFD7C2), Color(0xFFF2C879)], // peach-sand → gilt
     ),
     _ProofSample(
       temple: 'ท้าวเวสสุวรรณ สำเพ็ง',
       date: '29 พ.ค. 2569',
       caption: 'ปิดทอง ถวายพวงมาลัยเรียบร้อย 🌺',
-      gradient: [Color(0xFFC8F2DC), Color(0xFFBEE8FF)],
+      gradient: [Color(0xFF8FA98F), Color(0xFF8C86A8)], // bodhi-green → plum-grey
     ),
   ];
 }

@@ -6,9 +6,9 @@ import 'package:lottie/lottie.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/celestial_effects.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/theme/theme.dart';
 import '../../core/utils/app_icons.dart';
-import '../shared/widgets/gradient_button.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -312,20 +312,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           StaggeredReveal(
             index: 3,
             child: _PressableScale(
-              child: GradientButton(
-                text: 'เริ่มทำบุญออนไลน์',
-                onPressed: () {
+              child: SacredPrimaryButton(
+                label: 'เริ่มทำบุญออนไลน์',
+                onTap: () {
                   AppRouter.navigateToReplacement(
                       context, AppRoutes.onboarding);
                 },
-                icon: const SvgIcon(AppIcons.sparkle,
-                    size: 20, color: Colors.white),
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                width: double.infinity,
+                leadingSvg: AppIcons.sparkle,
+                filled: true,
               ),
             ),
           ),

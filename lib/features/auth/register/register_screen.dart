@@ -9,7 +9,6 @@ import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/utils/app_icons.dart';
 import '../../onboarding/models/onboarding_models.dart';
-import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -453,15 +452,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ],
           const SizedBox(height: 24),
-          GradientButton(
-            text: 'สมัครสมาชิก',
-            onPressed: _register,
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            width: double.infinity,
+          SacredPrimaryButton(
+            label: 'สมัครสมาชิก',
+            onTap: _register,
+            filled: true,
             isLoading: _isLoading,
           ),
         ],

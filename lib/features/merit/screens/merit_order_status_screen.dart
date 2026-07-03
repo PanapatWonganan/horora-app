@@ -107,13 +107,15 @@ class MeritOrderStatusScreen extends StatelessWidget {
     // UI-only placeholder proofs for completed orders without real URLs yet.
     // TODO(backend): once the proof endpoint returns media, these placeholders
     // are bypassed by the `urls.isNotEmpty` branch above.
+    // Muted temple-tone placeholders (gilt, bronze, plum-grey, bodhi-green) —
+    // no candy pastels, so unloaded proofs still read as calm/premium.
     const gradients = [
-      [Color(0xFFF2C879), Color(0xFFFFB0A0)],
-      [Color(0xFFCDB7FF), Color(0xFFBEE8FF)],
-      [Color(0xFFFFD7C2), Color(0xFFF2C879)],
-      [Color(0xFFC8F2DC), Color(0xFFBEE8FF)],
-      [Color(0xFFFFB0A0), Color(0xFFCDB7FF)],
-      [Color(0xFFBEE8FF), Color(0xFFC8F2DC)],
+      [Color(0xFFF2C879), Color(0xFFFFB0A0)], // gilt → warm salmon
+      [Color(0xFFBFA06B), Color(0xFF8C86A8)], // bronze → plum-grey
+      [Color(0xFFFFD7C2), Color(0xFFF2C879)], // peach-sand → gilt
+      [Color(0xFF8FA98F), Color(0xFF8C86A8)], // bodhi-green tint → plum-grey
+      [Color(0xFFFFB0A0), Color(0xFFBFA06B)], // warm salmon → bronze
+      [Color(0xFF8C86A8), Color(0xFF8FA98F)], // plum-grey → bodhi-green tint
     ];
     final temple = order.location?.nameTh ?? 'สถานที่ปลายทาง';
     return List.generate(

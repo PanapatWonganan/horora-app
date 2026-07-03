@@ -4,7 +4,6 @@ import '../../../core/api/api_client.dart';
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/sacred_ui.dart';
-import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -115,15 +114,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                GradientButton(
-                  text: 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
-                  onPressed: _resetPassword,
-                  gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient,
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  width: double.infinity,
+                SacredPrimaryButton(
+                  label: 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
+                  onTap: _resetPassword,
+                  filled: true,
                   isLoading: _isLoading,
                 ),
               ],
@@ -177,17 +171,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 28),
-              GradientButton(
-                text: 'กลับไปหน้าเข้าสู่ระบบ',
-                onPressed: () {
+              SacredPrimaryButton(
+                label: 'กลับไปหน้าเข้าสู่ระบบ',
+                onTap: () {
                   AppRouter.navigateToReplacement(context, AppRoutes.login);
                 },
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                width: double.infinity,
+                filled: true,
               ),
             ],
           ),

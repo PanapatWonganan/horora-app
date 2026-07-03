@@ -122,16 +122,13 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadDashboard,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.deepGoldBrown,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          SizedBox(
+            width: 160,
+            child: SacredPrimaryButton(
+              label: 'ลองใหม่',
+              onTap: _loadDashboard,
+              filled: true,
             ),
-            child: const Text('ลองใหม่'),
           ),
         ],
       ),

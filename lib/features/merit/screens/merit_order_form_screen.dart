@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
@@ -503,31 +504,12 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
   }
 
   Widget _buildProceedButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _proceedToPayment,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: MeritColors.accent,
-          foregroundColor: AppColors.deepText,
-          elevation: 2,
-          shadowColor: MeritColors.accent.withValues(alpha: 0.4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Text(
-          _selectedPackage != null
-              ? 'ร่วมบุญ ${_selectedPackage!.priceFormatted}'
-              : 'เลือกชุดร่วมบุญก่อน',
-          style: GoogleFonts.kanit(
-            color: AppColors.deepText,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+    return SacredPrimaryButton(
+      label: _selectedPackage != null
+          ? 'ร่วมบุญ ${_selectedPackage!.priceFormatted}'
+          : 'เลือกชุดร่วมบุญก่อน',
+      onTap: _proceedToPayment,
+      filled: true,
     );
   }
 }

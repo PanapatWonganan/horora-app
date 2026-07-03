@@ -224,23 +224,11 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
               ],
 
               const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.deepGoldBrown,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20, height: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : const Text('สมัครเป็นตัวแทน', style: TextStyle(fontSize: 16)),
-                ),
+              SacredPrimaryButton(
+                label: 'สมัครเป็นตัวแทน',
+                onTap: _register,
+                filled: true,
+                isLoading: _isLoading,
               ),
               const SizedBox(height: 32),
                     ],
