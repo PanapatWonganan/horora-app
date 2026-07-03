@@ -72,8 +72,15 @@ class SacredOverline extends StatelessWidget {
   final String text;
   final Color? color;
   final double fontSize;
+  final double letterSpacing;
 
-  const SacredOverline(this.text, {super.key, this.color, this.fontSize = 11.5});
+  const SacredOverline(
+    this.text, {
+    super.key,
+    this.color,
+    this.fontSize = 11.5,
+    this.letterSpacing = 2.6,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +90,7 @@ class SacredOverline extends StatelessWidget {
         fontSize: fontSize,
         color: color ?? AppColors.onBackdropMuted,
         fontWeight: FontWeight.w600,
-        letterSpacing: 2.6,
+        letterSpacing: letterSpacing,
       ),
     );
   }
@@ -488,6 +495,22 @@ class SacredPrimaryButton extends StatelessWidget {
   /// raw ElevatedButtons offered.
   final bool isLoading;
 
+  /// Optional overrides so callers with a slightly different brand accent
+  /// (e.g. merit's silk-gold gradient) can reuse this button's structure
+  /// exactly rather than forking it. All default to the standard Sacred
+  /// look when omitted, so existing call sites are unaffected.
+  final Gradient? gradient;
+  final Color? fillColor;
+  final Color? labelColorOverride;
+  final Color? borderColor;
+  final double? borderWidth;
+  final double? radius;
+  final EdgeInsetsGeometry? contentPadding;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final double iconSize;
+  final List<BoxShadow>? boxShadowOverride;
+
   const SacredPrimaryButton({
     super.key,
     required this.label,
@@ -497,41 +520,60 @@ class SacredPrimaryButton extends StatelessWidget {
     this.filled = false,
     this.enabled = true,
     this.isLoading = false,
+    this.gradient,
+    this.fillColor,
+    this.labelColorOverride,
+    this.borderColor,
+    this.borderWidth,
+    this.radius,
+    this.contentPadding,
+    this.fontSize,
+    this.fontWeight,
+    this.iconSize = 18,
+    this.boxShadowOverride,
   });
 
   @override
   Widget build(BuildContext context) {
     final on = enabled && onTap != null && !isLoading;
-    final labelColor = filled ? Colors.white : AppColors.deepGoldBrown;
+    final labelColor = labelColorOverride ??
+        (filled ? Colors.white : AppColors.deepGoldBrown);
+    final effectiveRadius = radius ?? AppRadius.md;
 
     final inner = Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 15),
+      padding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15),
       decoration: BoxDecoration(
         gradient: filled
-            ? const LinearGradient(
-                colors: [AppColors.candleGold, AppColors.deepGoldBrown],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
+            ? (gradient ??
+                const LinearGradient(
+                  colors: [AppColors.candleGold, AppColors.deepGoldBrown],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ))
             : null,
-        color: filled ? null : AppColors.candleGold.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: filled
+        color: filled
             ? null
+            : (fillColor ?? AppColors.candleGold.withValues(alpha: 0.10)),
+        borderRadius: BorderRadius.circular(effectiveRadius),
+        border: filled
+            ? (borderColor != null
+                ? Border.all(color: borderColor!, width: borderWidth ?? 1.2)
+                : null)
             : Border.all(
-                color: AppColors.candleGold.withValues(alpha: 0.7),
-                width: 1.2,
+                color: borderColor ?? AppColors.candleGold.withValues(alpha: 0.7),
+                width: borderWidth ?? 1.2,
               ),
-        boxShadow: filled
-            ? [
-                BoxShadow(
-                  color: AppColors.deepGoldBrown.withValues(alpha: 0.35),
-                  blurRadius: 16,
-                  offset: const Offset(0, 7),
-                ),
-              ]
-            : null,
+        boxShadow: boxShadowOverride ??
+            (filled
+                ? [
+                    BoxShadow(
+                      color: AppColors.deepGoldBrown.withValues(alpha: 0.35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 7),
+                    ),
+                  ]
+                : null),
       ),
       child: isLoading
           ? Center(
@@ -548,20 +590,23 @@ class SacredPrimaryButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (leadingSvg != null) ...[
-                  SvgIcon(leadingSvg!, size: 18, color: labelColor),
+                  SvgIcon(leadingSvg!, size: iconSize, color: labelColor),
                   const SizedBox(width: 8),
                 ],
-                Text(
-                  label,
-                  style: SacredText.kanit(
-                    color: labelColor,
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
+                    style: SacredText.kanit(
+                      color: labelColor,
+                      fontSize: fontSize ?? 15.5,
+                      fontWeight: fontWeight ?? FontWeight.w600,
+                    ),
                   ),
                 ),
                 if (trailingSvg != null) ...[
                   const SizedBox(width: 8),
-                  SvgIcon(trailingSvg!, size: 18, color: labelColor),
+                  SvgIcon(trailingSvg!, size: iconSize, color: labelColor),
                 ],
               ],
             ),
@@ -571,7 +616,7 @@ class SacredPrimaryButton extends StatelessWidget {
       opacity: on || isLoading ? 1 : 0.5,
       child: SacredPressable(
         onTap: on ? onTap! : () {},
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(effectiveRadius),
         child: inner,
       ),
     );

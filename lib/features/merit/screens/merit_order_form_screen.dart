@@ -179,7 +179,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const MeritOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted),
+                const SacredOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted, fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 2),
                 Text(
                   'กรอกข้อมูลร่วมบุญ',

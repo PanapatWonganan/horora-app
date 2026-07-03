@@ -77,7 +77,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const MeritOverline('Merit · บุญของฉัน', color: AppColors.onBackdropMuted),
+                const SacredOverline('Merit · บุญของฉัน', color: AppColors.onBackdropMuted, fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 2),
                 Text(
                   'บุญของฉัน',

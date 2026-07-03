@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../widgets/merit_ui.dart';
@@ -182,7 +183,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const MeritOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted),
+                const SacredOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted, fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 2),
                 Text(
                   'รายละเอียดคำสั่งบุญ',

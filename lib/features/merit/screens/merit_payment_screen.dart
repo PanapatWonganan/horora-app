@@ -324,7 +324,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const MeritOverline('Merit · ร่วมบุญอย่างสบายใจ', color: AppColors.onBackdropMuted),
+                const SacredOverline('Merit · ร่วมบุญอย่างสบายใจ', color: AppColors.onBackdropMuted, fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 2),
                 Text(
                   'ชำระเงิน',

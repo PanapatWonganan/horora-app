@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/celestial_effects.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────
@@ -157,34 +158,13 @@ class _SilkWeavePainter extends CustomPainter {
 }
 
 // ── Typography helpers ──────────────────────────────────────────────────────
-
-/// Small uppercase serif overline above Thai section titles.
-///
-/// These overlines almost always sit DIRECTLY on the dark celestial backdrop,
-/// so they default to a light muted-lilac tone ([AppColors.onBackdropMuted]).
-/// Pass [onCard] when the overline lives inside an ivory/cream card, which
-/// switches it back to the warm deep-gold-brown ink. An explicit [color] always
-/// wins over both.
-class MeritOverline extends StatelessWidget {
-  final String text;
-  final Color? color;
-  final bool onCard;
-
-  const MeritOverline(this.text, {super.key, this.color, this.onCard = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: GoogleFonts.fraunces(
-        fontSize: 12,
-        color: color ?? (onCard ? MeritColors.accentDark : AppColors.onBackdropMuted),
-        fontWeight: FontWeight.w600,
-        letterSpacing: 2.8,
-      ),
-    );
-  }
-}
+//
+// The plain overline (small uppercase serif above a Thai title) is not
+// forked here anymore — use `SacredOverline` from sacred_ui.dart directly.
+// Merit's overlines sit on the dark celestial backdrop at fontSize 12 (vs
+// SacredOverline's default 11.5), so pass `fontSize: 12` explicitly to keep
+// pixel parity, e.g. `SacredOverline('...', color: AppColors.onBackdropMuted,
+// fontSize: 12)`.
 
 /// Section title with optional serif overline + leading icon.
 ///
@@ -218,7 +198,12 @@ class MeritSectionTitle extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (overline != null) ...[
-          MeritOverline(overline!, onCard: onCard),
+          SacredOverline(
+            overline!,
+            color: onCard ? MeritColors.accentDark : AppColors.onBackdropMuted,
+            fontSize: 12,
+            letterSpacing: 2.8,
+          ),
           const SizedBox(height: 6),
         ],
         Row(
@@ -1183,7 +1168,7 @@ class MeritAnumothanaCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const MeritOverline('Certificate of Merit', color: Color(0xFF5A4326)),
+                const SacredOverline('Certificate of Merit', color: Color(0xFF5A4326), fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 6),
                 Text(
                   'ใบอนุโมทนาบุญ',
@@ -1339,40 +1324,28 @@ class MeritAnumothanaCard extends StatelessWidget {
         child: _DashedLine(color: MeritColors.accent.withValues(alpha: 0.3)),
       );
 
+  // Both certificate CTAs are built on SacredPrimaryButton — the geometry
+  // (radius 14, vertical padding 13, fontSize 14/w700) and colors differ
+  // slightly from Sacred's own defaults (radius 16, padding 15, fontSize
+  // 15.5/w600), so every value is pinned via override to keep the
+  // certificate's look pixel-identical to the pre-migration version.
   Widget _primaryButton({
     required String icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return MeritPressScale(
-      borderRadius: BorderRadius.circular(14),
+    return SacredPrimaryButton(
+      label: label,
+      leadingSvg: icon,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 13),
-        decoration: BoxDecoration(
-          gradient: MeritUI.accentGradient,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: MeritUI.goldGlow(blur: 12, y: 6, alpha: 0.4),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgIcon(icon, size: 16, color: Colors.white),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.kanit(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      filled: true,
+      gradient: MeritUI.accentGradient,
+      radius: 14,
+      contentPadding: const EdgeInsets.symmetric(vertical: 13),
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+      iconSize: 16,
+      boxShadowOverride: MeritUI.goldGlow(blur: 12, y: 6, alpha: 0.4),
     );
   }
 
@@ -1381,35 +1354,20 @@ class MeritAnumothanaCard extends StatelessWidget {
     required String label,
     required VoidCallback onTap,
   }) {
-    return MeritPressScale(
-      borderRadius: BorderRadius.circular(14),
+    return SacredPrimaryButton(
+      label: label,
+      leadingSvg: icon,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 13),
-        decoration: BoxDecoration(
-          color: MeritColors.cardBackground,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: MeritColors.accent.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgIcon(icon, size: 16, color: MeritColors.accentDark),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.kanit(
-                  color: MeritColors.accentDark,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      filled: false,
+      fillColor: MeritColors.cardBackground,
+      labelColorOverride: MeritColors.accentDark,
+      borderColor: MeritColors.accent.withValues(alpha: 0.5),
+      borderWidth: 1,
+      radius: 14,
+      contentPadding: const EdgeInsets.symmetric(vertical: 13),
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+      iconSize: 16,
     );
   }
 }
@@ -1522,37 +1480,26 @@ class MeritStickyCTA extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 16),
+          // Built on SacredPrimaryButton with the sticky-CTA's own geometry
+          // pinned via override (radius 18, padding 16, fontSize 17/w700,
+          // white hairline border, wider gold glow) to stay pixel-identical
+          // to the pre-migration bespoke button.
           Expanded(
-            child: MeritPressScale(
-              borderRadius: BorderRadius.circular(18),
-              onTap: enabled ? onTap : null,
-              child: Opacity(
-                opacity: enabled ? 1 : 0.5,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    gradient: MeritUI.accentGradient,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-                    boxShadow: MeritUI.goldGlow(blur: 16, y: 8, alpha: 0.45),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgIcon(ctaIcon, size: 19, color: Colors.white),
-                      const SizedBox(width: 9),
-                      Text(
-                        ctaLabel,
-                        style: GoogleFonts.kanit(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            child: SacredPrimaryButton(
+              label: ctaLabel,
+              leadingSvg: ctaIcon,
+              onTap: onTap,
+              enabled: enabled,
+              filled: true,
+              gradient: MeritUI.accentGradient,
+              radius: 18,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              iconSize: 19,
+              borderColor: Colors.white.withValues(alpha: 0.5),
+              borderWidth: 1,
+              boxShadowOverride: MeritUI.goldGlow(blur: 16, y: 8, alpha: 0.45),
             ),
           ),
         ],
