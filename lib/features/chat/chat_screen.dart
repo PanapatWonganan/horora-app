@@ -25,6 +25,15 @@ class _ChatScreenState extends State<ChatScreen> {
   late ChatViewModel _viewModel;
   final ScrollController _scrollController = ScrollController();
 
+  // Message ids that have already played (or been instantly rendered without)
+  // their typewriter reveal. Lives on the View's State — NOT on
+  // ChatMessageItem — so rebuilding/scrolling the list never re-triggers the
+  // animation for a message once it has been seen. Populated eagerly for
+  // every message that exists the moment a session is (re)loaded, so history
+  // never animates; only a message that arrives *after* that point is new.
+  final Set<String> _seenMessageIds = {};
+  String? _lastSessionId;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +41,25 @@ class _ChatScreenState extends State<ChatScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeChat();
     });
+  }
+
+  /// Returns true only the first time this is asked about a given message id
+  /// while that message belongs to the current session's already-known set.
+  /// Called from the builder, so it must be idempotent per id (checking
+  /// membership, not mutating on every call for the same id).
+  bool _isNewlyArrived(String sessionId, String messageId) {
+    if (_lastSessionId != sessionId) {
+      // Session changed (new topic / loaded a different history) — every
+      // message currently in it is "history" as far as animation goes.
+      _lastSessionId = sessionId;
+      _seenMessageIds
+        ..clear()
+        ..addAll(_viewModel.messages.map((m) => m.id));
+      return false;
+    }
+    if (_seenMessageIds.contains(messageId)) return false;
+    _seenMessageIds.add(messageId);
+    return true;
   }
 
   Future<void> _initializeChat() async {
@@ -84,6 +112,17 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // Lighter-weight autoscroll used on every typewriter reveal tick (can fire
+  // dozens of times/sec) — an immediate jump instead of re-triggering a new
+  // 300ms animateTo on top of an already-running one.
+  void _jumpToBottom() {
+    if (!_scrollController.hasClients) return;
+    final max = _scrollController.position.maxScrollExtent;
+    if (_scrollController.offset < max) {
+      _scrollController.jumpTo(max);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -98,8 +137,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 builder: (context, viewModel, _) {
                   return SacredHeader(
                     overline: 'DUANGJAI ORACLE',
-                    title: viewModel.currentSession?.topic ??
-                        'สนทนากับนักพยากรณ์',
+                    title:
+                        viewModel.currentSession?.topic ?? 'สนทนากับนักพยากรณ์',
                     onBack: () {
                       Navigator.pushReplacementNamed(context, AppRoutes.home);
                     },
@@ -167,12 +206,19 @@ class _ChatScreenState extends State<ChatScreen> {
                       }
 
                       final message = viewModel.messages[index];
+                      final sessionId = viewModel.currentSession?.id ?? '';
+                      final animate = !message.isUser &&
+                          !message.isSystemMessage &&
+                          _isNewlyArrived(sessionId, message.id);
                       return ChatMessageItem(
+                        key: ValueKey(message.id),
                         message: message.content,
                         isUser: message.isUser,
                         isTyping: false,
                         isSystemMessage: message.isSystemMessage,
                         messageId: message.id,
+                        animateReveal: animate,
+                        onRevealTick: _jumpToBottom,
                       );
                     },
                   );
@@ -233,7 +279,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushReplacementNamed(context, AppRoutes.historyChat);
+                  Navigator.pushReplacementNamed(
+                      context, AppRoutes.historyChat);
                 },
               ),
               ListTile(
@@ -300,8 +347,7 @@ class _ChatScreenState extends State<ChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                    '1. เลือกหัวข้อที่ต้องการสนทนา เช่น ความรัก การงาน สุขภาพ',
+                Text('1. เลือกหัวข้อที่ต้องการสนทนา เช่น ความรัก การงาน สุขภาพ',
                     style: bodyStyle),
                 const SizedBox(height: 8),
                 Text('2. พิมพ์คำถามที่ต้องการถาม', style: bodyStyle),
@@ -397,7 +443,8 @@ class _ChatScreenState extends State<ChatScreen> {
             onPressed: () {
               Navigator.pop(context);
               // รายงานข้อความล่าสุดของ AI
-              final aiMessages = _viewModel.messages.where((m) => !m.isUser).toList();
+              final aiMessages =
+                  _viewModel.messages.where((m) => !m.isUser).toList();
               if (aiMessages.isNotEmpty) {
                 final lastAiMessage = aiMessages.last;
                 showReportDialog(
@@ -405,9 +452,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   contentId: 'chat_${lastAiMessage.id}',
                   contentType: 'chat_message',
                   contentSnapshot: lastAiMessage.content.substring(
-                    0, 
-                    lastAiMessage.content.length > 200 ? 200 : lastAiMessage.content.length
-                  ),
+                      0,
+                      lastAiMessage.content.length > 200
+                          ? 200
+                          : lastAiMessage.content.length),
                 );
               }
             },

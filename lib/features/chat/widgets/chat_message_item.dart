@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/simple_markdown.dart';
+import '../../../core/widgets/typewriter_rich_text.dart';
 import '../../report/report_dialog.dart';
 
 class ChatMessageItem extends StatelessWidget {
@@ -12,6 +13,13 @@ class ChatMessageItem extends StatelessWidget {
   final bool isTyping;
   final bool isSystemMessage;
   final String? messageId;
+  // Whether the AI reply text should play the typewriter reveal. The caller
+  // (ChatScreen) decides this once per message id — history renders with
+  // this false so it never re-animates on rebuild/scroll.
+  final bool animateReveal;
+  // Fired on every revealed-character tick while animating, so the caller
+  // can keep the growing bubble scrolled into view.
+  final VoidCallback? onRevealTick;
 
   const ChatMessageItem({
     Key? key,
@@ -20,6 +28,8 @@ class ChatMessageItem extends StatelessWidget {
     required this.isTyping,
     this.isSystemMessage = false,
     this.messageId,
+    this.animateReveal = false,
+    this.onRevealTick,
   }) : super(key: key);
 
   @override
@@ -28,9 +38,8 @@ class ChatMessageItem extends StatelessWidget {
     if (isSystemMessage) {
       return _buildSystemMessage(context);
     }
-    
-    final bubbleTextColor =
-        isUser ? AppColors.onBackdrop : AppColors.deepText;
+
+    final bubbleTextColor = isUser ? AppColors.onBackdrop : AppColors.deepText;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -117,8 +126,15 @@ class ChatMessageItem extends StatelessWidget {
                             height: 1.45,
                           ),
                         )
-                      : Text.rich(
-                          SimpleMarkdown.parse(
+                      : TypewriterRichText(
+                          // Keyed by message id so a message that already
+                          // finished revealing keeps its own State (and thus
+                          // its "done" flag) across ChatScreen rebuilds, and
+                          // a genuinely different message never inherits a
+                          // finished/partial reveal state from another key.
+                          key: ValueKey(
+                              'typewriter_${messageId ?? message.hashCode}'),
+                          span: SimpleMarkdown.parse(
                             message,
                             base: GoogleFonts.kanit(
                               color: bubbleTextColor,
@@ -126,6 +142,8 @@ class ChatMessageItem extends StatelessWidget {
                               height: 1.45,
                             ),
                           ),
+                          animate: animateReveal,
+                          onTick: onRevealTick,
                         ),
             ],
           ),
@@ -133,18 +151,28 @@ class ChatMessageItem extends StatelessWidget {
       ),
     );
   }
-  
+
   // Widget สำหรับแสดงข้อความระบบ
   Widget _buildSystemMessage(BuildContext context) {
     // ตรวจสอบว่าข้อความเกี่ยวกับราศีหรือไม่
     final bool isZodiacMessage = message.contains('ราศี');
-    
+
     // หาว่าเป็นราศีอะไร
     String? zodiacSign;
     if (isZodiacMessage) {
       for (final sign in [
-        'เมษ', 'พฤษภ', 'เมถุน', 'กรกฎ', 'สิงห์', 'กันย์',
-        'ตุลย์', 'พิจิก', 'ธนู', 'มังกร', 'กุมภ์', 'มีน'
+        'เมษ',
+        'พฤษภ',
+        'เมถุน',
+        'กรกฎ',
+        'สิงห์',
+        'กันย์',
+        'ตุลย์',
+        'พิจิก',
+        'ธนู',
+        'มังกร',
+        'กุมภ์',
+        'มีน'
       ]) {
         if (message.contains('ราศี$sign')) {
           zodiacSign = sign;
@@ -152,14 +180,14 @@ class ChatMessageItem extends StatelessWidget {
         }
       }
     }
-    
+
     // หาไอคอนที่เหมาะสมกับราศี
     IconData zodiacIcon = Icons.auto_awesome;
-    
+
     // หาธาตุของราศี
     String? element;
     Color elementColor = AppColors.primary;
-    
+
     if (zodiacSign != null) {
       // กำหนดธาตุตามราศี — temple-toned element colors
       if (['เมษ', 'สิงห์', 'ธนู'].contains(zodiacSign)) {
@@ -180,7 +208,7 @@ class ChatMessageItem extends StatelessWidget {
         zodiacIcon = Icons.water_drop;
       }
     }
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -236,7 +264,8 @@ class ChatMessageItem extends StatelessWidget {
               if (element != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: elementColor.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(12),
@@ -276,7 +305,8 @@ class ChatMessageItem extends StatelessWidget {
       context,
       contentId: messageId ?? 'chat_${DateTime.now().millisecondsSinceEpoch}',
       contentType: 'chat_message',
-      contentSnapshot: message.length > 200 ? message.substring(0, 200) : message,
+      contentSnapshot:
+          message.length > 200 ? message.substring(0, 200) : message,
     );
   }
 }

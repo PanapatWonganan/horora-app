@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/models/tarot_card_model.dart';
 import '../../core/utils/simple_markdown.dart';
+import '../../core/widgets/typewriter_rich_text.dart';
 import '../../core/repositories/tarot_repository.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/laravel_auth_service.dart';
@@ -51,6 +52,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   bool _isShuffling = false;
   bool _isSelectingCards = false;
   bool _hasSelectedCards = false;
+
+  // Bumped each time a fresh interpretation arrives from the backend. Used to
+  // key the TypewriterRichText so a NEW reading always gets its own State
+  // (and thus animates), while rebuilds of the SAME reading (setState calls
+  // from card float/shimmer tickers etc.) reuse the same key and never
+  // restart the reveal. Also gates the panel shimmer so it only sweeps once
+  // the text has fully revealed instead of racing it.
+  int _interpretationRevealId = 0;
+  bool _interpretationRevealDone = false;
+  // Lets the whole ivory panel (not just the text glyphs) act as a
+  // tap-to-skip target for the typewriter reveal.
+  final TypewriterController _interpretationRevealController =
+      TypewriterController();
 
   late AnimationController _shuffleAnimationController;
   late Animation<double> _shuffleAnimation;
@@ -276,6 +290,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       _isCardRevealed = [];
       _isCardReversed = [];
       _interpretation = null;
+      _interpretationRevealDone = false;
       _lastRevealedIndex = null;
     });
 
@@ -470,6 +485,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       setState(() {
         _interpretation = content;
         _isLoading = false;
+        _interpretationRevealId++;
+        _interpretationRevealDone = false;
       });
 
       // บันทึก action สำเร็จ และเช็คว่าควรขอ rating หรือไม่
@@ -1543,126 +1560,152 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           index: 0,
           duration: const Duration(milliseconds: 700),
           offsetY: 20,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  // Warm ivory→rice-paper card (Sacred palette) over the
-                  // celestial backdrop, replacing the cold translucent-white
-                  // glass so the reading matches Horoscope/Chat.
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.ivorySilk, AppColors.ricePaper],
-                  ),
-                  borderRadius: BorderRadius.circular(22),
-                  // Warm gold hairline border.
-                  border: Border.all(
-                    color: AppColors.warmCardBorder.withValues(alpha: 0.8),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.templeIndigo.withValues(alpha: 0.16),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
+          child: GestureDetector(
+            // Tap anywhere on the panel to complete the reveal instantly,
+            // not just directly on the glyphs.
+            behavior: HitTestBehavior.translucent,
+            onTap: () => _interpretationRevealController.skip(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    // Warm ivory→rice-paper card (Sacred palette) over the
+                    // celestial backdrop, replacing the cold translucent-white
+                    // glass so the reading matches Horoscope/Chat.
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.ivorySilk, AppColors.ricePaper],
                     ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const SvgIcon(
-                              AppIcons.sparkle,
-                              size: 18,
-                              color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(22),
+                    // Warm gold hairline border.
+                    border: Border.all(
+                      color: AppColors.warmCardBorder.withValues(alpha: 0.8),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.templeIndigo.withValues(alpha: 0.16),
+                        blurRadius: 24,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const SvgIcon(
+                                AppIcons.sparkle,
+                                size: 18,
+                                color: AppColors.accent,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'ดวงใจของไพ่บอกว่า',
+                                style: GoogleFonts.kanit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'THE CARDS SPEAK',
+                            style: GoogleFonts.fraunces(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 2.5,
+                              color: AppColors.mutedText.withValues(alpha: 0.8),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'ดวงใจของไพ่บอกว่า',
-                              style: GoogleFonts.kanit(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary,
+                          ),
+                          if (_userThaiZodiac != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                'สำหรับผู้ที่เกิด$_userThaiZodiac',
+                                style: GoogleFonts.kanit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.deepText,
+                                ),
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'THE CARDS SPEAK',
-                          style: GoogleFonts.fraunces(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2.5,
-                            color: AppColors.mutedText.withValues(alpha: 0.8),
-                          ),
-                        ),
-                        if (_userThaiZodiac != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Text(
-                              'สำหรับผู้ที่เกิด$_userThaiZodiac',
-                              style: GoogleFonts.kanit(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
+                          const SizedBox(height: 12),
+                          // Keyed by _interpretationRevealId: a NEW reading
+                          // (id bumped in _interpretCards) always gets a fresh
+                          // State and animates; rebuilds of the SAME reading
+                          // (e.g. from the ambient card float ticker calling
+                          // setState) reuse this State and never restart the
+                          // reveal. Tap anywhere on the panel to skip via the
+                          // GestureDetector below.
+                          TypewriterRichText(
+                            key: ValueKey(
+                                'tarot_reveal_$_interpretationRevealId'),
+                            span: SimpleMarkdown.parse(
+                              _interpretation ?? '',
+                              base: GoogleFonts.kanit(
+                                fontSize: 16,
                                 color: AppColors.deepText,
+                                height: 1.7,
                               ),
                             ),
+                            controller: _interpretationRevealController,
+                            onDone: () {
+                              if (!mounted) return;
+                              setState(() => _interpretationRevealDone = true);
+                            },
                           ),
-                        const SizedBox(height: 12),
-                        Text.rich(
-                          SimpleMarkdown.parse(
-                            _interpretation ?? '',
-                            base: GoogleFonts.kanit(
-                              fontSize: 16,
-                              color: AppColors.deepText,
-                              height: 1.7,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // One-time diagonal shimmer sweep across the panel.
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0, end: 1),
-                          duration: const Duration(milliseconds: 1400),
-                          curve: Curves.easeInOut,
-                          builder: (context, t, _) {
-                            return ShaderMask(
-                              blendMode: BlendMode.srcATop,
-                              shaderCallback: (rect) {
-                                final dx = (t * 2 - 0.5) * rect.width;
-                                return LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Colors.white.withValues(alpha: 0.0),
-                                    Colors.white
-                                        .withValues(alpha: 0.35 * (1 - t)),
-                                    Colors.white.withValues(alpha: 0.0),
-                                  ],
-                                  stops: const [0.35, 0.5, 0.65],
-                                ).createShader(
-                                  Rect.fromLTWH(dx, 0, rect.width, rect.height),
+                        ],
+                      ),
+                      // One-time diagonal shimmer sweep across the panel — held
+                      // back until the typewriter reveal finishes so it doesn't
+                      // sweep across text that's still growing underneath it
+                      // (the shimmer is a nice-to-have flourish; the reveal is
+                      // the primary moment, so it goes first).
+                      if (_interpretationRevealDone)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: TweenAnimationBuilder<double>(
+                              tween: Tween(begin: 0, end: 1),
+                              duration: const Duration(milliseconds: 1400),
+                              curve: Curves.easeInOut,
+                              builder: (context, t, _) {
+                                return ShaderMask(
+                                  blendMode: BlendMode.srcATop,
+                                  shaderCallback: (rect) {
+                                    final dx = (t * 2 - 0.5) * rect.width;
+                                    return LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.0),
+                                        Colors.white
+                                            .withValues(alpha: 0.35 * (1 - t)),
+                                        Colors.white.withValues(alpha: 0.0),
+                                      ],
+                                      stops: const [0.35, 0.5, 0.65],
+                                    ).createShader(
+                                      Rect.fromLTWH(
+                                          dx, 0, rect.width, rect.height),
+                                    );
+                                  },
+                                  child: const SizedBox.expand(),
                                 );
                               },
-                              child: const SizedBox.expand(),
-                            );
-                          },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
