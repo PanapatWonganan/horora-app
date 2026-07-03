@@ -293,12 +293,7 @@ class _HomeScreenState extends State<HomeScreen>
             const SizedBox(width: 8),
             Text(
               title,
-              style: GoogleFonts.kanit(
-                color: AppColors.onBackdrop,
-                fontSize: 21,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-              ),
+              style: context.sacredText.sectionTitle(),
             ),
           ],
         ),
@@ -336,13 +331,7 @@ class _HomeScreenState extends State<HomeScreen>
                       _userName.isEmpty
                           ? 'สวัสดีค่ะ'
                           : 'สวัสดีค่ะ คุณ$_userName',
-                      style: GoogleFonts.kanit(
-                        color: AppColors.onBackdrop,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                        height: 1.05,
-                        letterSpacing: -0.6,
-                      ),
+                      style: context.sacredText.pageTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -749,13 +738,7 @@ class _HomeScreenState extends State<HomeScreen>
                 // Daily guidance — the belief/intent of today, framed gently.
                 Text(
                   'แนวทางวันนี้',
-                  style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    height: 1.15,
-                    letterSpacing: -0.3,
-                  ),
+                  style: context.sacredText.heroTitle,
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -933,11 +916,7 @@ class _HomeScreenState extends State<HomeScreen>
                 const SizedBox(width: 6),
                 Text(
                   label,
-                  style: GoogleFonts.kanit(
-                    color: AppColors.onBackdropMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: context.sacredText.chipLabel(),
                 ),
               ],
             ),

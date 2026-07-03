@@ -2,4 +2,5 @@
 // Export all theme files here for easy imports
 
 export 'app_colors.dart';
-export 'app_theme.dart'; 
+export 'app_theme.dart';
+export 'sacred_typography.dart'; 

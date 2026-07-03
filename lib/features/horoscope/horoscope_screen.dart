@@ -570,9 +570,8 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: SacredText.kanit(
+          style: context.sacredText.body.copyWith(
             color: AppColors.onBackdropMuted,
-            fontSize: 16,
           ),
         ),
       ),
@@ -854,9 +853,8 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             children: [
               Text(
                 title,
-                style: SacredText.kanit(
+                style: context.sacredText.bodyMedium.copyWith(
                   color: AppColors.mutedText,
-                  fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
@@ -1137,19 +1135,14 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
             children: [
               Text(
                 title,
-                style: SacredText.kanit(
+                style: context.sacredText.bodyMedium.copyWith(
                   color: AppColors.mutedText,
-                  fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: SacredText.kanit(
-                  color: AppColors.deepText,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: context.sacredText.cardHeading,
               ),
             ],
           ),
