@@ -504,33 +504,27 @@ class _SacredHeaderAction extends StatelessWidget {
       button: true,
       label: semanticLabel,
       child: SizedBox(
-        // Visual chip stays 40x40 (matches SacredHeader's back chip);
-        // OverflowBox grows only the tappable region to the 44px minimum,
-        // so the header Row's layout is unaffected.
-        width: 40,
-        height: 40,
-        child: OverflowBox(
-          minWidth: 44,
-          minHeight: 44,
-          maxWidth: 44,
-          maxHeight: 44,
-          child: GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: Center(
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.onBackdrop.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(13),
-                  border: Border.all(
-                    color: AppColors.onBackdrop.withValues(alpha: 0.12),
-                    width: 1,
-                  ),
+        // Host is a real 44x44 (matches SacredHeader's back chip, which has
+        // the same padding room to absorb it without the header growing
+        // visibly). The 40x40 visual chip is centered inside.
+        width: 44,
+        height: 44,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Center(
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(13),
+                border: Border.all(
+                  color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                  width: 1,
                 ),
-                child: Icon(icon, size: 20, color: AppColors.onBackdrop),
               ),
+              child: Icon(icon, size: 20, color: AppColors.onBackdrop),
             ),
           ),
         ),

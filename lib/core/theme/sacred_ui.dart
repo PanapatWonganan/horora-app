@@ -347,43 +347,36 @@ class _BackChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Layout footprint stays exactly 40x40 (unchanged rhythm / sibling
-    // spacing in SacredHeader's Row); the tappable region is expanded to the
-    // 44x44 accessibility minimum via OverflowBox, which lets the
-    // GestureDetector claim a larger hit area without the parent Row
-    // reserving any extra space for it.
+    // Host is a real 44x44 (the accessibility minimum) — SacredHeader's
+    // padding (12/8 vertical) has room to absorb the extra 4px without the
+    // header visibly growing. The 40x40 visual chip is centered inside so
+    // its look is unchanged; only the tappable area got bigger.
     return Semantics(
       button: true,
       label: 'ย้อนกลับ',
       child: SizedBox(
-        width: 40,
-        height: 40,
-        child: OverflowBox(
-          minWidth: 44,
-          minHeight: 44,
-          maxWidth: 44,
-          maxHeight: 44,
-          child: GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
+        width: 44,
+        height: 44,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Center(
             child: Container(
+              width: 40,
+              height: 40,
               alignment: Alignment.center,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.onBackdrop.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(13),
-                  border: Border.all(
-                    color: AppColors.onBackdrop.withValues(alpha: 0.12),
-                    width: 1,
-                  ),
+              decoration: BoxDecoration(
+                color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(13),
+                border: Border.all(
+                  color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                  width: 1,
                 ),
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 17,
-                  color: AppColors.onBackdrop,
-                ),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 17,
+                color: AppColors.onBackdrop,
               ),
             ),
           ),

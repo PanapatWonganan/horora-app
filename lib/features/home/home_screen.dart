@@ -654,34 +654,24 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
           ),
-          // Quiet dismiss — user is never trapped by the offer. Layout
-          // footprint stays the icon's own 18px + 4px leading gap so the
-          // card's Row/Expanded sizing is untouched; OverflowBox grows only
-          // the tappable region to the 44px minimum, overlapping into the
-          // card's own padding instead of widening the card.
+          // Quiet dismiss — user is never trapped by the offer. Host is a
+          // real 44x44 (the card has plenty of width/height to absorb it —
+          // this Row item just nudges the Expanded content a few px
+          // narrower); the 18px icon is centered inside.
           Semantics(
             button: true,
             label: 'ปิดข้อเสนอนี้',
             child: SizedBox(
-              width: 22,
-              height: 18,
-              child: OverflowBox(
-                minWidth: 44,
-                minHeight: 44,
-                maxWidth: 44,
-                maxHeight: 44,
-                child: GestureDetector(
-                  onTap: () => setState(() => _showGentleOffer = false),
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 4),
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: 18,
-                        color: AppColors.mutedText.withValues(alpha: 0.6),
-                      ),
-                    ),
+              width: 44,
+              height: 44,
+              child: GestureDetector(
+                onTap: () => setState(() => _showGentleOffer = false),
+                behavior: HitTestBehavior.opaque,
+                child: Center(
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: AppColors.mutedText.withValues(alpha: 0.6),
                   ),
                 ),
               ),

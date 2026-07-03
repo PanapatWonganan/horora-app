@@ -105,30 +105,26 @@ class ChatMessageItem extends StatelessWidget {
                         button: true,
                         label: 'รายงานข้อความนี้',
                         child: SizedBox(
-                          // Layout footprint stays exactly the icon's 16x16
-                          // so the header row's height / spaceBetween
-                          // layout is untouched; OverflowBox expands only
-                          // the *tappable* region to the 44px minimum, with
-                          // the extra hit area overlapping into the
-                          // bubble's own padding rather than pushing
-                          // anything below it downward.
-                          width: 16,
-                          height: 16,
-                          child: OverflowBox(
-                            minWidth: 44,
-                            minHeight: 44,
-                            maxWidth: 44,
-                            maxHeight: 44,
-                            child: GestureDetector(
-                              onTap: () => _showReportDialog(context),
-                              behavior: HitTestBehavior.opaque,
-                              child: Center(
-                                child: Icon(
-                                  Icons.flag_outlined,
-                                  size: 16,
-                                  color:
-                                      AppColors.mutedText.withValues(alpha: 0.7),
-                                ),
+                          // Can't reach the 44px minimum here: this sits
+                          // inline in the header Row next to the 24px avatar
+                          // + name label, so a full 44px host would roughly
+                          // double the row's height. 36px is the largest
+                          // footprint the row absorbs without visibly
+                          // growing/jumping; the 16px icon is centered
+                          // inside it. Short of ideal, but real (no
+                          // OverflowBox hit-test trick — that pattern does
+                          // not expand the tappable area at all).
+                          width: 36,
+                          height: 36,
+                          child: GestureDetector(
+                            onTap: () => _showReportDialog(context),
+                            behavior: HitTestBehavior.opaque,
+                            child: Center(
+                              child: Icon(
+                                Icons.flag_outlined,
+                                size: 16,
+                                color:
+                                    AppColors.mutedText.withValues(alpha: 0.7),
                               ),
                             ),
                           ),

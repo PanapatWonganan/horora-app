@@ -237,39 +237,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             button: true,
             label: 'ตั้งค่า',
             child: SizedBox(
-              // Visual chip stays 42x42; OverflowBox grows only the
-              // tappable region to the 44px minimum, so the header Row's
-              // spaceBetween layout is unaffected.
-              width: 42,
-              height: 42,
-              child: OverflowBox(
-                minWidth: 44,
-                minHeight: 44,
-                maxWidth: 44,
-                maxHeight: 44,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.settings);
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.onBackdrop.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: AppColors.onBackdrop.withValues(alpha: 0.12),
-                          width: 1,
-                        ),
+              // Host is a real 44x44 (the header's top padding gives room
+              // to absorb the extra 2px over the 42x42 visual chip, which
+              // is centered inside).
+              width: 44,
+              height: 44,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.settings);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Center(
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(13),
+                      border: Border.all(
+                        color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                        width: 1,
                       ),
-                      child: const Center(
-                        child: SvgIcon(
-                          AppIcons.settings,
-                          size: 22,
-                          color: AppColors.onBackdrop,
-                        ),
+                    ),
+                    child: const Center(
+                      child: SvgIcon(
+                        AppIcons.settings,
+                        size: 22,
+                        color: AppColors.onBackdrop,
                       ),
                     ),
                   ),
