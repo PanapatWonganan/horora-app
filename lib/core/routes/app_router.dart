@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'app_routes.dart';
 import '../../features/welcome/welcome_screen.dart';
 import '../../features/onboarding/screens/onboarding_router.dart';
-import '../../features/onboarding/screens/variant_a/onboarding_quiz_screen.dart';
 import '../../features/auth/login/login_screen.dart';
 import '../../features/auth/register/register_screen.dart';
 import '../../features/auth/forgot_password/forgot_password_screen.dart';
@@ -50,9 +49,6 @@ class AppRouter {
       case AppRoutes.onboarding:
         // ใช้ OnboardingRouter สำหรับ A/B Testing
         return MaterialPageRoute(builder: (_) => const OnboardingRouter());
-      case AppRoutes.onboardingQuiz:
-        // Full Quiz Flow (6 หน้า)
-        return MaterialPageRoute(builder: (_) => const OnboardingQuizScreen());
       case AppRoutes.authWrapper:
         return MaterialPageRoute(builder: (_) => const AuthWrapper());
 

@@ -3,7 +3,6 @@ class AppRoutes {
   static const String splash = '/';
   static const String welcome = '/welcome';
   static const String onboarding = '/onboarding';
-  static const String onboardingQuiz = '/onboarding/quiz'; // Full Quiz Flow
   static const String authWrapper = '/auth-wrapper';
 
   // Authentication
