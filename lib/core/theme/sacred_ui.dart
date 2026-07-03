@@ -165,7 +165,8 @@ class SacredBackground extends StatelessWidget {
   /// When false, omit the decorative star specks (e.g. dense form screens).
   final bool showSpecks;
 
-  const SacredBackground({super.key, required this.child, this.showSpecks = true});
+  const SacredBackground(
+      {super.key, required this.child, this.showSpecks = true});
 
   @override
   Widget build(BuildContext context) {
@@ -478,6 +479,47 @@ class SacredGoldDivider extends StatelessWidget {
   }
 }
 
+/// Escape hatch for callers that need [SacredPrimaryButton] to render with a
+/// slightly different brand accent (e.g. merit's silk-gold gradient) while
+/// reusing the button's structure exactly rather than forking it.
+///
+/// This exists for pixel-parity migrations only — when an old bespoke button
+/// is being ported onto `SacredPrimaryButton` and every visual value must be
+/// pinned to match the pre-migration look byte-for-byte. It is NOT for
+/// casual per-screen tweaks; new call sites should use the plain
+/// [SacredPrimaryButton] defaults.
+///
+/// All fields are nullable and fall back to the button's own defaults when
+/// left unset, so passing a partially-filled style is safe.
+@immutable
+class SacredButtonStyle {
+  final Gradient? gradient;
+  final Color? fillColor;
+  final Color? labelColorOverride;
+  final Color? borderColor;
+  final double? borderWidth;
+  final double? radius;
+  final EdgeInsetsGeometry? contentPadding;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final double? iconSize;
+  final List<BoxShadow>? boxShadowOverride;
+
+  const SacredButtonStyle({
+    this.gradient,
+    this.fillColor,
+    this.labelColorOverride,
+    this.borderColor,
+    this.borderWidth,
+    this.radius,
+    this.contentPadding,
+    this.fontSize,
+    this.fontWeight,
+    this.iconSize,
+    this.boxShadowOverride,
+  });
+}
+
 /// The primary action button: a quiet candle-gold outlined CTA (gold edge + a
 /// faint gold wash + ink-gold label). Reserved for the key action on a card —
 /// calm, premium, never a loud fill. Set [filled] = true for the single most
@@ -495,21 +537,12 @@ class SacredPrimaryButton extends StatelessWidget {
   /// raw ElevatedButtons offered.
   final bool isLoading;
 
-  /// Optional overrides so callers with a slightly different brand accent
-  /// (e.g. merit's silk-gold gradient) can reuse this button's structure
-  /// exactly rather than forking it. All default to the standard Sacred
-  /// look when omitted, so existing call sites are unaffected.
-  final Gradient? gradient;
-  final Color? fillColor;
-  final Color? labelColorOverride;
-  final Color? borderColor;
-  final double? borderWidth;
-  final double? radius;
-  final EdgeInsetsGeometry? contentPadding;
-  final double? fontSize;
-  final FontWeight? fontWeight;
-  final double iconSize;
-  final List<BoxShadow>? boxShadowOverride;
+  /// Optional style override so callers with a slightly different brand
+  /// accent (e.g. merit's silk-gold gradient) can reuse this button's
+  /// structure exactly rather than forking it. Defaults to the standard
+  /// Sacred look when omitted, so existing call sites are unaffected. See
+  /// [SacredButtonStyle] for when this should (and shouldn't) be used.
+  final SacredButtonStyle? styleOverride;
 
   const SacredPrimaryButton({
     super.key,
@@ -520,32 +553,24 @@ class SacredPrimaryButton extends StatelessWidget {
     this.filled = false,
     this.enabled = true,
     this.isLoading = false,
-    this.gradient,
-    this.fillColor,
-    this.labelColorOverride,
-    this.borderColor,
-    this.borderWidth,
-    this.radius,
-    this.contentPadding,
-    this.fontSize,
-    this.fontWeight,
-    this.iconSize = 18,
-    this.boxShadowOverride,
+    this.styleOverride,
   });
 
   @override
   Widget build(BuildContext context) {
     final on = enabled && onTap != null && !isLoading;
-    final labelColor = labelColorOverride ??
+    final labelColor = styleOverride?.labelColorOverride ??
         (filled ? Colors.white : AppColors.deepGoldBrown);
-    final effectiveRadius = radius ?? AppRadius.md;
+    final effectiveRadius = styleOverride?.radius ?? AppRadius.md;
+    final iconSize = styleOverride?.iconSize ?? 18;
 
     final inner = Container(
       width: double.infinity,
-      padding: contentPadding ?? const EdgeInsets.symmetric(vertical: 15),
+      padding: styleOverride?.contentPadding ??
+          const EdgeInsets.symmetric(vertical: 15),
       decoration: BoxDecoration(
         gradient: filled
-            ? (gradient ??
+            ? (styleOverride?.gradient ??
                 const LinearGradient(
                   colors: [AppColors.candleGold, AppColors.deepGoldBrown],
                   begin: Alignment.topLeft,
@@ -554,17 +579,21 @@ class SacredPrimaryButton extends StatelessWidget {
             : null,
         color: filled
             ? null
-            : (fillColor ?? AppColors.candleGold.withValues(alpha: 0.10)),
+            : (styleOverride?.fillColor ??
+                AppColors.candleGold.withValues(alpha: 0.10)),
         borderRadius: BorderRadius.circular(effectiveRadius),
         border: filled
-            ? (borderColor != null
-                ? Border.all(color: borderColor!, width: borderWidth ?? 1.2)
+            ? (styleOverride?.borderColor != null
+                ? Border.all(
+                    color: styleOverride!.borderColor!,
+                    width: styleOverride?.borderWidth ?? 1.2)
                 : null)
             : Border.all(
-                color: borderColor ?? AppColors.candleGold.withValues(alpha: 0.7),
-                width: borderWidth ?? 1.2,
+                color: styleOverride?.borderColor ??
+                    AppColors.candleGold.withValues(alpha: 0.7),
+                width: styleOverride?.borderWidth ?? 1.2,
               ),
-        boxShadow: boxShadowOverride ??
+        boxShadow: styleOverride?.boxShadowOverride ??
             (filled
                 ? [
                     BoxShadow(
@@ -599,8 +628,8 @@ class SacredPrimaryButton extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: SacredText.kanit(
                       color: labelColor,
-                      fontSize: fontSize ?? 15.5,
-                      fontWeight: fontWeight ?? FontWeight.w600,
+                      fontSize: styleOverride?.fontSize ?? 15.5,
+                      fontWeight: styleOverride?.fontWeight ?? FontWeight.w600,
                     ),
                   ),
                 ),
@@ -796,7 +825,8 @@ class SacredLoader extends StatelessWidget {
   });
 
   /// Convenience constructor for the full-screen center loading state.
-  const SacredLoader.large({super.key, this.label, this.color = AppColors.candleGold})
+  const SacredLoader.large(
+      {super.key, this.label, this.color = AppColors.candleGold})
       : size = sizeLarge;
 
   @override

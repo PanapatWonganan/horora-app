@@ -54,7 +54,9 @@ class MeritUI {
       ];
 
   /// Warm gold glow used under hero / CTA surfaces.
-  static List<BoxShadow> goldGlow({double blur = 22, double y = 12, double alpha = 0.38}) => [
+  static List<BoxShadow> goldGlow(
+          {double blur = 22, double y = 12, double alpha = 0.38}) =>
+      [
         BoxShadow(
           color: MeritColors.accent.withValues(alpha: alpha),
           blurRadius: blur,
@@ -103,7 +105,8 @@ class SilkCandleBackdrop extends StatelessWidget {
             const Positioned(
               top: -130,
               right: -90,
-              child: CelestialGlow(size: 340, color: MeritColors.accent, intensity: 0.40),
+              child: CelestialGlow(
+                  size: 340, color: MeritColors.accent, intensity: 0.40),
             ),
           Positioned(
             top: 200,
@@ -117,10 +120,12 @@ class SilkCandleBackdrop extends StatelessWidget {
           const Positioned(
             bottom: -70,
             right: -70,
-            child: CelestialGlow(size: 300, color: AppColors.primary, intensity: 0.16),
+            child: CelestialGlow(
+                size: 300, color: AppColors.primary, intensity: 0.16),
           ),
           // Woven-silk diagonal sheen.
-          const Positioned.fill(child: IgnorePointer(child: _SilkWeaveOverlay())),
+          const Positioned.fill(
+              child: IgnorePointer(child: _SilkWeaveOverlay())),
           const Positioned.fill(child: GrainOverlay()),
           child,
         ],
@@ -149,7 +154,8 @@ class _SilkWeavePainter extends CustomPainter {
     const gap = 26.0;
     // Diagonal sheen lines (top-left → bottom-right).
     for (double x = -size.height; x < size.width; x += gap) {
-      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), paint);
+      canvas.drawLine(
+          Offset(x, 0), Offset(x + size.height, size.height), paint);
     }
   }
 
@@ -193,7 +199,8 @@ class MeritSectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = onCard ? AppColors.deepText : AppColors.onBackdrop;
-    final defaultIconColor = onCard ? MeritColors.accentDark : MeritColors.accent;
+    final defaultIconColor =
+        onCard ? MeritColors.accentDark : MeritColors.accent;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -286,7 +293,8 @@ class MeritTrustChip extends StatelessWidget {
   final String text;
   final String icon;
 
-  const MeritTrustChip({super.key, required this.text, this.icon = AppIcons.checkCircle});
+  const MeritTrustChip(
+      {super.key, required this.text, this.icon = AppIcons.checkCircle});
 
   @override
   Widget build(BuildContext context) {
@@ -323,9 +331,11 @@ class MeritTrustStrip extends StatelessWidget {
   const MeritTrustStrip({super.key, this.chips = _defaults});
 
   static const List<MeritTrustChip> _defaults = [
-    MeritTrustChip(text: 'ส่งภาพ/วิดีโอหลักฐานทุกคำสั่งบุญ', icon: AppIcons.camera),
+    MeritTrustChip(
+        text: 'ส่งภาพ/วิดีโอหลักฐานทุกคำสั่งบุญ', icon: AppIcons.camera),
     MeritTrustChip(text: 'ระบุวัด/มูลนิธิปลายทางชัดเจน', icon: AppIcons.temple),
-    MeritTrustChip(text: 'ใบอนุโมทนาพร้อมเลขอ้างอิง', icon: AppIcons.checkCircle),
+    MeritTrustChip(
+        text: 'ใบอนุโมทนาพร้อมเลขอ้างอิง', icon: AppIcons.checkCircle),
   ];
 
   @override
@@ -403,7 +413,8 @@ class MeritTransparencyBlock extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SvgIcon(AppIcons.info, size: 18, color: MeritColors.accentDark),
+              const SvgIcon(AppIcons.info,
+                  size: 18, color: MeritColors.accentDark),
               const SizedBox(width: 8),
               Text(
                 'บุญของคุณไปถึงไหน',
@@ -444,7 +455,8 @@ class MeritTransparencyBlock extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SvgIcon(AppIcons.heart, size: 15, color: MeritColors.accentDark),
+                const SvgIcon(AppIcons.heart,
+                    size: 15, color: MeritColors.accentDark),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -472,7 +484,8 @@ class MeritTransparencyBlock extends StatelessWidget {
           margin: const EdgeInsets.only(top: 3),
           width: 12,
           height: 12,
-          decoration: BoxDecoration(color: l.color, borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(
+              color: l.color, borderRadius: BorderRadius.circular(4)),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -546,7 +559,8 @@ class MeritWishInput extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SvgIcon(AppIcons.pray, size: 16, color: MeritColors.accentDark),
+              const SvgIcon(AppIcons.pray,
+                  size: 16, color: MeritColors.accentDark),
               const SizedBox(width: 8),
               Text(
                 label,
@@ -575,11 +589,13 @@ class MeritWishInput extends StatelessWidget {
             controller: controller,
             maxLines: 3,
             maxLength: maxLength,
-            style: GoogleFonts.kanit(color: AppColors.deepText, fontSize: 14, height: 1.5),
+            style: GoogleFonts.kanit(
+                color: AppColors.deepText, fontSize: 14, height: 1.5),
             decoration: InputDecoration(
               counterText: '',
               hintText: hint,
-              hintStyle: GoogleFonts.kanit(color: MeritColors.textHint, fontSize: 13.5, height: 1.5),
+              hintStyle: GoogleFonts.kanit(
+                  color: MeritColors.textHint, fontSize: 13.5, height: 1.5),
               filled: true,
               fillColor: AppColors.surfaceMuted,
               border: OutlineInputBorder(
@@ -588,7 +604,8 @@ class MeritWishInput extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: MeritColors.accent.withValues(alpha: 0.6)),
+                borderSide: BorderSide(
+                    color: MeritColors.accent.withValues(alpha: 0.6)),
               ),
               contentPadding: const EdgeInsets.all(14),
             ),
@@ -675,7 +692,8 @@ class _StepRow extends StatefulWidget {
   State<_StepRow> createState() => _StepRowState();
 }
 
-class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin {
+class _StepRowState extends State<_StepRow>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _pulse;
 
   @override
@@ -707,8 +725,9 @@ class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin 
   @override
   Widget build(BuildContext context) {
     final reached = widget.done || widget.active;
-    final connectorColor =
-        widget.done ? MeritColors.accent.withValues(alpha: 0.55) : AppColors.divider;
+    final connectorColor = widget.done
+        ? MeritColors.accent.withValues(alpha: 0.55)
+        : AppColors.divider;
 
     return IntrinsicHeight(
       child: Row(
@@ -743,7 +762,8 @@ class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin 
                       boxShadow: widget.active
                           ? [
                               BoxShadow(
-                                color: MeritColors.accent.withValues(alpha: glow),
+                                color:
+                                    MeritColors.accent.withValues(alpha: glow),
                                 blurRadius: 14,
                                 spreadRadius: 1,
                               ),
@@ -785,15 +805,16 @@ class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin 
                                 ? AppColors.deepText
                                 : AppColors.mutedText,
                             fontSize: 15.5,
-                            fontWeight:
-                                widget.active ? FontWeight.w700 : FontWeight.w600,
+                            fontWeight: widget.active
+                                ? FontWeight.w700
+                                : FontWeight.w600,
                           ),
                         ),
                       ),
                       if (widget.active)
                         Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 9, vertical: 3),
                           decoration: BoxDecoration(
                             color: MeritColors.accent.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
@@ -822,7 +843,8 @@ class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin 
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const SvgIcon(AppIcons.clock, size: 12, color: AppColors.mutedText),
+                        const SvgIcon(AppIcons.clock,
+                            size: 12, color: AppColors.mutedText),
                         const SizedBox(width: 5),
                         Text(
                           widget.step.timestamp!,
@@ -937,9 +959,11 @@ class _ProofThumb extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.35),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.8)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.8)),
                 ),
-                child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+                child: const Icon(Icons.play_arrow_rounded,
+                    color: Colors.white, size: 22),
               ),
             ),
           // Silk hairline frame.
@@ -970,7 +994,8 @@ class _ProofThumb extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.5),
             shape: BoxShape.circle,
           ),
-          child: const SvgIcon(AppIcons.temple, size: 22, color: AppColors.deepText),
+          child: const SvgIcon(AppIcons.temple,
+              size: 22, color: AppColors.deepText),
         ),
       ),
     );
@@ -1053,7 +1078,8 @@ class _ProofViewerState extends State<_ProofViewer> {
             right: 12,
             child: IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+              icon: const Icon(Icons.close_rounded,
+                  color: Colors.white, size: 28),
             ),
           ),
           // Caption + counter.
@@ -1131,7 +1157,8 @@ class MeritAnumothanaCard extends StatelessWidget {
           colors: [Color(0xFFFFFDF8), Color(0xFFFFF6E9)],
         ),
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: MeritColors.accent.withValues(alpha: 0.55), width: 1.4),
+        border: Border.all(
+            color: MeritColors.accent.withValues(alpha: 0.55), width: 1.4),
         boxShadow: MeritUI.goldGlow(alpha: 0.22, blur: 26, y: 14),
       ),
       child: Column(
@@ -1164,11 +1191,13 @@ class MeritAnumothanaCard extends StatelessWidget {
                     ],
                   ),
                   child: const Center(
-                    child: SvgIcon(AppIcons.pray, size: 32, color: AppColors.deepText),
+                    child: SvgIcon(AppIcons.pray,
+                        size: 32, color: AppColors.deepText),
                   ),
                 ),
                 const SizedBox(height: 12),
-                const SacredOverline('Certificate of Merit', color: Color(0xFF5A4326), fontSize: 12, letterSpacing: 2.8),
+                const SacredOverline('Certificate of Merit',
+                    color: Color(0xFF5A4326), fontSize: 12, letterSpacing: 2.8),
                 const SizedBox(height: 6),
                 Text(
                   'ใบอนุโมทนาบุญ',
@@ -1339,13 +1368,15 @@ class MeritAnumothanaCard extends StatelessWidget {
       leadingSvg: icon,
       onTap: onTap,
       filled: true,
-      gradient: MeritUI.accentGradient,
-      radius: 14,
-      contentPadding: const EdgeInsets.symmetric(vertical: 13),
-      fontSize: 14,
-      fontWeight: FontWeight.w700,
-      iconSize: 16,
-      boxShadowOverride: MeritUI.goldGlow(blur: 12, y: 6, alpha: 0.4),
+      styleOverride: SacredButtonStyle(
+        gradient: MeritUI.accentGradient,
+        radius: 14,
+        contentPadding: const EdgeInsets.symmetric(vertical: 13),
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        iconSize: 16,
+        boxShadowOverride: MeritUI.goldGlow(blur: 12, y: 6, alpha: 0.4),
+      ),
     );
   }
 
@@ -1359,15 +1390,17 @@ class MeritAnumothanaCard extends StatelessWidget {
       leadingSvg: icon,
       onTap: onTap,
       filled: false,
-      fillColor: MeritColors.cardBackground,
-      labelColorOverride: MeritColors.accentDark,
-      borderColor: MeritColors.accent.withValues(alpha: 0.5),
-      borderWidth: 1,
-      radius: 14,
-      contentPadding: const EdgeInsets.symmetric(vertical: 13),
-      fontSize: 14,
-      fontWeight: FontWeight.w700,
-      iconSize: 16,
+      styleOverride: SacredButtonStyle(
+        fillColor: MeritColors.cardBackground,
+        labelColorOverride: MeritColors.accentDark,
+        borderColor: MeritColors.accent.withValues(alpha: 0.5),
+        borderWidth: 1,
+        radius: 14,
+        contentPadding: const EdgeInsets.symmetric(vertical: 13),
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        iconSize: 16,
+      ),
     );
   }
 }
@@ -1401,7 +1434,8 @@ class _DashedLinePainter extends CustomPainter {
     const gap = 4.0;
     double x = 0;
     while (x < size.width) {
-      canvas.drawLine(Offset(x, 0), Offset(math.min(x + dash, size.width), 0), paint);
+      canvas.drawLine(
+          Offset(x, 0), Offset(math.min(x + dash, size.width), 0), paint);
       x += dash + gap;
     }
   }
@@ -1491,15 +1525,18 @@ class MeritStickyCTA extends StatelessWidget {
               onTap: onTap,
               enabled: enabled,
               filled: true,
-              gradient: MeritUI.accentGradient,
-              radius: 18,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              iconSize: 19,
-              borderColor: Colors.white.withValues(alpha: 0.5),
-              borderWidth: 1,
-              boxShadowOverride: MeritUI.goldGlow(blur: 16, y: 8, alpha: 0.45),
+              styleOverride: SacredButtonStyle(
+                gradient: MeritUI.accentGradient,
+                radius: 18,
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                iconSize: 19,
+                borderColor: Colors.white.withValues(alpha: 0.5),
+                borderWidth: 1,
+                boxShadowOverride:
+                    MeritUI.goldGlow(blur: 16, y: 8, alpha: 0.45),
+              ),
             ),
           ),
         ],
@@ -1548,9 +1585,11 @@ class MeritDestinationBanner extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.7)),
                 ),
-                child: const SvgIcon(AppIcons.temple, size: 28, color: AppColors.deepText),
+                child: const SvgIcon(AppIcons.temple,
+                    size: 28, color: AppColors.deepText),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1570,7 +1609,8 @@ class MeritDestinationBanner extends StatelessWidget {
                         if (verified) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.75),
                               borderRadius: BorderRadius.circular(8),
@@ -1619,7 +1659,8 @@ class MeritDestinationBanner extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const SvgIcon(AppIcons.sparkle, size: 16, color: AppColors.deepText),
+                const SvgIcon(AppIcons.sparkle,
+                    size: 16, color: AppColors.deepText),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -1639,7 +1680,8 @@ class MeritDestinationBanner extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                SvgIcon(AppIcons.clock, size: 14,
+                SvgIcon(AppIcons.clock,
+                    size: 14,
                     color: AppColors.deepText.withValues(alpha: 0.75)),
                 const SizedBox(width: 6),
                 Text(
