@@ -281,8 +281,11 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
   }
 
   Widget _buildCardsList(List<TarotCardPosition> cards) {
+    // Rail grows with the user's font scale so Thai card names don't clip
+    // (identical to the old fixed 120 at scale 1.0).
+    final textScale = MediaQuery.textScalerOf(context).scale(1.0);
     return SizedBox(
-      height: 120.0,
+      height: 120.0 * textScale,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
@@ -296,7 +299,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
   Widget _buildTarotCard(TarotCardPosition cardPosition) {
     return Container(
       width: 80.0,
-      height: 120.0,
+      height: 120.0 * MediaQuery.textScalerOf(context).scale(1.0),
       margin: const EdgeInsets.only(right: 12.0),
       decoration: BoxDecoration(
         color: AppColors.ricePaper,

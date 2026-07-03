@@ -131,4 +131,21 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # Fonts are loaded at runtime via google_fonts (Kanit/Fraunces). To bundle for offline, add real .ttf files + a fonts: block.
+  # Bundled fonts (OFL, from github.com/google/fonts) so Thai text renders
+  # correctly offline/first-launch. google_fonts runtime fetching is disabled
+  # in main.dart — these bundles are authoritative.
+  fonts:
+    - family: Kanit
+      fonts:
+        - asset: assets/fonts/Kanit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Kanit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Kanit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Kanit-Bold.ttf
+          weight: 700
+    - family: Fraunces
+      fonts:
+        # Variable font — covers all weights via the wght axis.
+        - asset: assets/fonts/Fraunces-Variable.ttf

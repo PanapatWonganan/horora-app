@@ -266,7 +266,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Container(
-        height: 250,
+        // minHeight (not a fixed height) so large font scales can't clip.
+        constraints: const BoxConstraints(minHeight: 250),
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.lightSurface,
@@ -288,7 +289,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     final horoscope = _horoscope;
     if (horoscope == null) {
       return Container(
-        height: 250,
+        // minHeight (not a fixed height) so large font scales can't clip.
+        constraints: const BoxConstraints(minHeight: 250),
         width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.lightSurface,

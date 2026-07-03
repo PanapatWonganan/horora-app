@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app.dart';
 import 'core/repositories/horoscope_repository.dart';
 import 'core/api/api_client.dart';
@@ -11,6 +12,10 @@ import 'config/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Kanit + Fraunces ship as bundled assets (see pubspec fonts:) — never
+  // fetch them at runtime, so Thai text is correct on first launch offline.
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   // Load environment variables (optional - for OpenAI key etc.)
   try {

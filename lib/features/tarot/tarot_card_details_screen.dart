@@ -411,7 +411,9 @@ ${_reading!.interpretation}
         const SacredSectionTitle('ไพ่ที่ได้', overline: 'THE CARDS'),
         const SizedBox(height: 16),
         SizedBox(
-          height: 220,
+          // Card art stays 168px; only the label area under it grows with the
+          // font scale, so scale just that portion (220 = 168 art + 52 labels).
+          height: 168 + 52 * MediaQuery.textScalerOf(context).scale(1.0),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _reading!.cards.length,

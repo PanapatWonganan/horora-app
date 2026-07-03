@@ -937,7 +937,9 @@ class _HomeScreenState extends State<HomeScreen>
         _sectionTitle('ร่วมบุญประจำสัปดาห์', overline: 'Weekly Merit'),
         const SizedBox(height: 14),
         SizedBox(
-          height: 100,
+          // Grows with font scale so two-line temple names don't clip
+          // (identical to the old fixed 100 at scale 1.0).
+          height: 100 * MediaQuery.textScalerOf(context).scale(1.0),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),

@@ -54,6 +54,20 @@ class _AstrologyAppState extends State<AstrologyApp> {
           Locale('en', 'US'),
         ],
         locale: const Locale('th', 'TH'),
+        // Respect the system font-size setting but keep the layout survivable:
+        // scale follows the user up to 1.3x (and never below 0.85x). Fixed-
+        // height spots were audited at 1.3x; beyond that Thai text clips.
+        builder: (context, child) {
+          final media = MediaQuery.of(context);
+          final clamped = media.textScaler.clamp(
+            minScaleFactor: 0.85,
+            maxScaleFactor: 1.3,
+          );
+          return MediaQuery(
+            data: media.copyWith(textScaler: clamped),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         initialRoute: AppRoutes.authWrapper,
         onGenerateRoute: AppRouter.generateRoute,
         onGenerateInitialRoutes: (initialRouteName) {
