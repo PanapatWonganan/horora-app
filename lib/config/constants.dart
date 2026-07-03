@@ -6,7 +6,8 @@ class ApiConstants {
   // Development: 'http://10.0.2.2:8000/api' (Android Emulator)
   // Development: 'http://127.0.0.1:8000/api' (iOS Simulator)
   // Production:  'https://horora-admin-production.up.railway.app/api'
-  static const String baseUrl = 'https://horora-admin-production.up.railway.app/api';
+  static const String baseUrl =
+      'https://horora-admin-production.up.railway.app/api';
 
   // Auth endpoints
   static const String authEndpoint = '$baseUrl/auth';
@@ -24,10 +25,11 @@ class ApiConstants {
 
   // AI proxied through the backend (OpenAI key stays server-side, never in client).
   // Paths are relative to baseUrl, used via ApiClient.
-  static const String horoscopeGuestPath = '/horoscope/guest';   // public (guest)
-  static const String horoscopeDailyPath = '/horoscope/daily';   // auth
-  static const String chatSessionsPath = '/chat/sessions';       // auth
-  static const String tarotReadingsPath = '/tarot/readings';     // auth
+  static const String horoscopeGuestPath = '/horoscope/guest'; // public (guest)
+  static const String horoscopeDailyPath = '/horoscope/daily'; // auth
+  static const String chatSessionsPath = '/chat/sessions'; // auth
+  static const String tarotReadingsPath = '/tarot/readings'; // auth
+  static const String tarotGuestPath = '/tarot/guest'; // public (guest)
 }
 
 // ค่าคงที่สำหรับการจัดเก็บข้อมูลในเครื่อง
@@ -153,18 +155,20 @@ class TarotConstants {
     'Three-Card',
     'Celtic Cross',
   ];
-  
+
   static const Map<String, String> spreadDescriptions = {
-    'Single Card': 'การอ่านไพ่แบบใบเดียว เหมาะสำหรับคำถามง่ายๆ หรือการขอคำแนะนำรายวัน',
+    'Single Card':
+        'การอ่านไพ่แบบใบเดียว เหมาะสำหรับคำถามง่ายๆ หรือการขอคำแนะนำรายวัน',
     'Three-Card': 'การอ่านไพ่แบบสามใบ แสดงถึงอดีต ปัจจุบัน และอนาคต',
-    'Celtic Cross': 'การอ่านไพ่แบบเซลติกครอส เป็นการอ่านไพ่แบบละเอียดที่ใช้ไพ่ 10 ใบ',
+    'Celtic Cross':
+        'การอ่านไพ่แบบเซลติกครอส เป็นการอ่านไพ่แบบละเอียดที่ใช้ไพ่ 10 ใบ',
   };
 }
 
 // ค่าคงที่สำหรับโหมดสมาธิ
 class FocusConstants {
   static const List<int> focusDurations = [5, 10, 15, 20, 30, 45, 60];
-  
+
   static const List<Map<String, dynamic>> focusThemes = [
     {
       'name': 'จักรวาล',
@@ -191,4 +195,4 @@ class FocusConstants {
       'sound': 'assets/audio/sun.mp3',
     },
   ];
-} 
+}

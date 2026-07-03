@@ -20,18 +20,18 @@ class AppIcons {
   static const String pisces = '$_basePath/pisces.svg';
 
   // Thai Zodiac Animals (12 นักษัตร)
-  static const String rat = '$_basePath/rat.svg';         // ชวด
-  static const String ox = '$_basePath/ox.svg';           // ฉลู
-  static const String tiger = '$_basePath/tiger.svg';     // ขาล
-  static const String rabbit = '$_basePath/rabbit.svg';   // เถาะ
-  static const String dragon = '$_basePath/dragon.svg';   // มะโรง
-  static const String snake = '$_basePath/snake.svg';     // มะเส็ง
-  static const String horse = '$_basePath/horse.svg';     // มะเมีย
-  static const String goat = '$_basePath/goat.svg';       // มะแม
-  static const String monkey = '$_basePath/monkey.svg';   // วอก
+  static const String rat = '$_basePath/rat.svg'; // ชวด
+  static const String ox = '$_basePath/ox.svg'; // ฉลู
+  static const String tiger = '$_basePath/tiger.svg'; // ขาล
+  static const String rabbit = '$_basePath/rabbit.svg'; // เถาะ
+  static const String dragon = '$_basePath/dragon.svg'; // มะโรง
+  static const String snake = '$_basePath/snake.svg'; // มะเส็ง
+  static const String horse = '$_basePath/horse.svg'; // มะเมีย
+  static const String goat = '$_basePath/goat.svg'; // มะแม
+  static const String monkey = '$_basePath/monkey.svg'; // วอก
   static const String rooster = '$_basePath/rooster.svg'; // ระกา
-  static const String dog = '$_basePath/dog.svg';         // จอ
-  static const String pig = '$_basePath/pig.svg';         // กุน
+  static const String dog = '$_basePath/dog.svg'; // จอ
+  static const String pig = '$_basePath/pig.svg'; // กุน
 
   // Elements (ธาตุ)
   static const String fire = '$_basePath/fire.svg';
@@ -48,6 +48,9 @@ class AppIcons {
   static const String personFilled = '$_basePath/person_filled.svg';
   static const String sparkle = '$_basePath/sparkle.svg';
   static const String sparkleFilled = '$_basePath/sparkle_filled.svg';
+  static const String horoscopeWheel = '$_basePath/horoscope_wheel.svg';
+  static const String horoscopeWheelFilled =
+      '$_basePath/horoscope_wheel_filled.svg';
 
   // Feature Icons
   static const String love = '$_basePath/love.svg';
@@ -190,9 +193,8 @@ class SvgIcon extends StatelessWidget {
       height: h,
       fit: fit,
       alignment: alignment,
-      colorFilter: color != null
-          ? ColorFilter.mode(color!, BlendMode.srcIn)
-          : null,
+      colorFilter:
+          color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
     );
   }
 }

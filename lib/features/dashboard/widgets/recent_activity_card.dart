@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_colors.dart';
 
 class RecentActivityCard extends StatelessWidget {
   final String title;
@@ -18,12 +20,26 @@ class RecentActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.ivorySilk, AppColors.ricePaper],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.templeIndigo.withValues(alpha: 0.12),
+            blurRadius: 16.0,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      color: Colors.black38,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
@@ -33,7 +49,7 @@ class RecentActivityCard extends StatelessWidget {
               width: 40.0,
               height: 40.0,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.2),
+                color: color.withValues(alpha: 0.16),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -50,17 +66,17 @@ class RecentActivityCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: GoogleFonts.kanit(
+                      color: AppColors.deepText,
                       fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4.0),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.7),
+                    style: GoogleFonts.kanit(
+                      color: AppColors.mutedText,
                       fontSize: 12.0,
                     ),
                   ),
@@ -70,8 +86,8 @@ class RecentActivityCard extends StatelessWidget {
             // Time
             Text(
               time,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.5),
+              style: GoogleFonts.kanit(
+                color: AppColors.softInk.withValues(alpha: 0.75),
                 fontSize: 12.0,
               ),
             ),

@@ -24,13 +24,13 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.lightBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.lightBackground,
-        foregroundColor: AppColors.darkText,
+        foregroundColor: AppColors.onBackdrop,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.kanit(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.darkText,
+          color: AppColors.onBackdrop,
         ),
       ),
       textTheme: _getTextTheme(isDark: false),
@@ -148,9 +148,9 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
       tabBarTheme: TabBarTheme(
-        labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.darkText.withValues(alpha: 0.5),
-        indicatorColor: AppColors.primary,
+        labelColor: AppColors.onBackdrop,
+        unselectedLabelColor: AppColors.onBackdropMuted,
+        indicatorColor: AppColors.candleGold,
         labelStyle: GoogleFonts.kanit(
           fontSize: 14,
           fontWeight: FontWeight.w600,

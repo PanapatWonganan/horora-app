@@ -163,41 +163,46 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       children: [
         // Small uppercase letter-spaced overline.
         Text(
-          'YOUR COSMIC COMPANION',
+          'ทำบุญออนไลน์ · บุญถึงมือจริง',
           style: GoogleFonts.kanit(
-            color: AppColors.mutedText,
+            color: AppColors.onBackdropMuted.withValues(alpha: 0.88),
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 4.5,
           ),
         ),
         const SizedBox(height: 14),
-        // Big, gradient-masked display title.
+        // Big display title. Keep it bright on the plum backdrop; the previous
+        // dark mystical gradient looked elegant in code but was nearly
+        // invisible on-device.
         ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
-            colors: AppColors.mysticalGradient,
+            colors: [
+              AppColors.onBackdrop,
+              AppColors.candleGold,
+              AppColors.onBackdrop,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ).createShader(bounds),
           child: Text(
-            'Astrology',
-            style: GoogleFonts.fraunces(
+            'ฝากมูออนไลน์',
+            style: GoogleFonts.kanit(
               color: Colors.white,
-              fontSize: 56,
-              height: 1.0,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.0,
-              fontStyle: FontStyle.italic,
+              fontSize: 52,
+              height: 1.05,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
             ),
           ),
         ),
         const SizedBox(height: 12),
         // Calm muted Thai subtitle.
         Text(
-          'ค้นพบดวงชะตาของคุณ',
+          'ทำบุญกับวัดและมูลนิธิจริง สบายใจทุกครั้ง',
           style: GoogleFonts.kanit(
-            color: AppColors.mutedText,
-            fontSize: 17,
+            color: AppColors.onBackdropMuted.withValues(alpha: 0.92),
+            fontSize: 16,
             fontWeight: FontWeight.w400,
             letterSpacing: 0.5,
           ),
@@ -291,13 +296,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           StaggeredReveal(
             index: 2,
             child: Text(
-              'ค้นหาความลับของดวงดาว ดูดวง และอ่านไพ่ทาโรต์',
+              'ร่วมบุญกับวัดและมูลนิธิที่คัดสรรแล้ว '
+              'พร้อมรูปถ่ายและใบอนุโมทนาส่งถึงคุณทุกครั้ง\n'
+              'มีดวงประจำวันและไพ่ทาโรต์ให้เสริมกำลังใจ',
               textAlign: TextAlign.center,
               style: GoogleFonts.kanit(
-                color: AppColors.deepText.withValues(alpha: 0.82),
-                fontSize: 16,
+                color: AppColors.onBackdropMuted.withValues(alpha: 0.95),
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
-                height: 1.55,
+                height: 1.6,
               ),
             ),
           ),
@@ -306,7 +313,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             index: 3,
             child: _PressableScale(
               child: GradientButton(
-                text: 'เริ่มต้นการเดินทาง',
+                text: 'เริ่มทำบุญออนไลน์',
                 onPressed: () {
                   AppRouter.navigateToReplacement(
                       context, AppRoutes.onboarding);
@@ -331,7 +338,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Text(
                   'มีบัญชีอยู่แล้ว? ',
                   style: GoogleFonts.kanit(
-                    color: AppColors.mutedText,
+                    color: AppColors.onBackdropMuted.withValues(alpha: 0.88),
                     fontSize: 14,
                   ),
                 ),
@@ -344,7 +351,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     child: Text(
                       'เข้าสู่ระบบ',
                       style: GoogleFonts.kanit(
-                        color: AppColors.primary,
+                        color: AppColors.candleGold,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),

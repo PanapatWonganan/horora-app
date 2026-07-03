@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/api/api_client.dart';
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../widgets/auth_text_field.dart';
 
@@ -62,40 +63,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: AppColors.lightText,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: _emailSent ? _buildSuccessContent() : _buildResetForm(),
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            SacredHeader(
+              title: 'ลืมรหัสผ่าน',
+              overline: 'Reset password',
+              onBack: () => Navigator.pop(context),
             ),
-          ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+                  child:
+                      _emailSent ? _buildSuccessContent() : _buildResetForm(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -105,44 +91,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
         _buildHeader(),
-        const SizedBox(height: 40),
-        Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              AuthTextField(
-                controller: _emailController,
-                hintText: 'อีเมล',
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'กรุณากรอกอีเมล';
-                  }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                    return 'กรุณากรอกอีเมลให้ถูกต้อง';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 32),
-              GradientButton(
-                text: 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
-                onPressed: _resetPassword,
-                gradient: const LinearGradient(
-                  colors: AppColors.primaryGradient,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
+        const SizedBox(height: 24),
+        SacredCard(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                AuthTextField(
+                  controller: _emailController,
+                  hintText: 'อีเมล',
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกอีเมล';
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'กรุณากรอกอีเมลให้ถูกต้อง';
+                    }
+                    return null;
+                  },
                 ),
-                width: double.infinity,
-                isLoading: _isLoading,
-              ),
-            ],
+                const SizedBox(height: 24),
+                GradientButton(
+                  text: 'ส่งลิงก์รีเซ็ตรหัสผ่าน',
+                  onPressed: _resetPassword,
+                  gradient: const LinearGradient(
+                    colors: AppColors.primaryGradient,
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  width: double.infinity,
+                  isLoading: _isLoading,
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 28),
         _buildLoginLink(),
       ],
     );
@@ -152,60 +140,67 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(height: 40),
-        const Icon(
-          Icons.check_circle_outline,
-          size: 100,
-          color: AppColors.success,
-        ),
-        const SizedBox(height: 32),
-        const Text(
-          'ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'เราได้ส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปยังอีเมล ${_emailController.text} แล้ว กรุณาตรวจสอบอีเมลของคุณและทำตามคำแนะนำเพื่อรีเซ็ตรหัสผ่าน',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
-            height: 1.5,
-          ),
-        ),
-        const SizedBox(height: 40),
-        GradientButton(
-          text: 'กลับไปหน้าเข้าสู่ระบบ',
-          onPressed: () {
-            AppRouter.navigateToReplacement(context, AppRoutes.login);
-          },
-          gradient: const LinearGradient(
-            colors: AppColors.primaryGradient,
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          width: double.infinity,
-        ),
         const SizedBox(height: 24),
-        TextButton(
-          onPressed: () {
+        SacredCard(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle_outline,
+                  size: 64,
+                  color: AppColors.success,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว',
+                textAlign: TextAlign.center,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'เราได้ส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปยังอีเมล ${_emailController.text} แล้ว กรุณาตรวจสอบอีเมลของคุณและทำตามคำแนะนำเพื่อรีเซ็ตรหัสผ่าน',
+                textAlign: TextAlign.center,
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              GradientButton(
+                text: 'กลับไปหน้าเข้าสู่ระบบ',
+                onPressed: () {
+                  AppRouter.navigateToReplacement(context, AppRoutes.login);
+                },
+                gradient: const LinearGradient(
+                  colors: AppColors.primaryGradient,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                width: double.infinity,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        SacredTextAction(
+          label: 'ลองใช้อีเมลอื่น',
+          onTap: () {
             setState(() {
               _emailSent = false;
               _emailController.clear();
             });
           },
-          child: const Text(
-            'ลองใช้อีเมลอื่น',
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
         ),
       ],
     );
@@ -215,20 +210,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'ลืมรหัสผ่าน?',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'กรุณากรอกอีเมลที่ใช้ลงทะเบียน เราจะส่งลิงก์สำหรับรีเซ็ตรหัสผ่านไปให้คุณ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
+            fontSize: 15,
             height: 1.5,
           ),
         ),
@@ -242,8 +238,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       children: [
         Text(
           'จำรหัสผ่านได้แล้ว? ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
             fontSize: 14,
           ),
         ),
@@ -251,16 +247,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.login);
           },
-          child: const Text(
+          child: Text(
             'เข้าสู่ระบบ',
-            style: TextStyle(
-              color: AppColors.primary,
+            style: SacredText.kanit(
+              color: AppColors.accent,
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
       ],
     );
   }
-} 
+}

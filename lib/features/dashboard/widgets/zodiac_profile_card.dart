@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 
 class ZodiacProfileCard extends StatelessWidget {
@@ -15,14 +16,28 @@ class ZodiacProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.ivorySilk, AppColors.ricePaper],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22.0),
+        border: Border.all(
+          color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.templeIndigo.withValues(alpha: 0.16),
+            blurRadius: 22.0,
+            offset: const Offset(0, 11),
+          ),
+        ],
       ),
-      color: AppColors.darkSurface,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -50,17 +65,17 @@ class ZodiacProfileCard extends StatelessWidget {
                     children: [
                       Text(
                         zodiacSign,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: GoogleFonts.kanit(
+                          color: AppColors.deepText,
                           fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4.0),
                       Text(
                         '21 มีนาคม - 19 เมษายน',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                        style: GoogleFonts.kanit(
+                          color: AppColors.mutedText,
                           fontSize: 14.0,
                         ),
                       ),
@@ -71,7 +86,7 @@ class ZodiacProfileCard extends StatelessWidget {
                 IconButton(
                   icon: const Icon(
                     Icons.edit_outlined,
-                    color: Colors.white54,
+                    color: AppColors.mutedText,
                   ),
                   onPressed: () {
                     // Navigate to edit profile
@@ -124,8 +139,8 @@ class ZodiacProfileCard extends StatelessWidget {
             const SizedBox(width: 4.0),
             Text(
               label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+              style: GoogleFonts.kanit(
+                color: AppColors.softInk,
                 fontSize: 12.0,
               ),
             ),
@@ -134,8 +149,8 @@ class ZodiacProfileCard extends StatelessWidget {
         const SizedBox(height: 4.0),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
             fontSize: 12.0,
             fontWeight: FontWeight.w500,
           ),

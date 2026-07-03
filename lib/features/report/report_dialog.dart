@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/report_model.dart';
 import '../../core/services/report_service.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/sacred_ui.dart';
 
 class ReportContentDialog extends ConsumerStatefulWidget {
   final String contentId;
@@ -60,7 +62,7 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('ขอบคุณสำหรับการรายงาน เราจะตรวจสอบโดยเร็วที่สุด'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         duration: Duration(seconds: 3),
       ),
     );
@@ -91,11 +93,22 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: AppColors.lightSurface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       title: Row(
         children: [
-          Icon(Icons.flag, color: Colors.red.shade700),
+          const Icon(Icons.flag, color: AppColors.error),
           const SizedBox(width: 8),
-          const Text('รายงานเนื้อหา'),
+          Text(
+            'รายงานเนื้อหา',
+            style: SacredText.kanit(
+              color: AppColors.deepText,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
       content: SingleChildScrollView(
@@ -103,15 +116,26 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'กรุณาเลือกเหตุผลในการรายงาน:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: SacredText.kanit(
+                color: AppColors.deepText,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 16),
             ...ReportReason.values.map((reason) => RadioListTile<ReportReason>(
-                  title: Text(reason.displayName),
+                  title: Text(
+                    reason.displayName,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 14,
+                    ),
+                  ),
                   value: reason,
                   groupValue: _selectedReason,
+                  activeColor: AppColors.deepGoldBrown,
                   onChanged: (value) {
                     setState(() {
                       _selectedReason = value;
@@ -122,11 +146,10 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
             const SizedBox(height: 16),
             TextField(
               controller: _additionalDetailsController,
-              decoration: const InputDecoration(
-                labelText: 'รายละเอียดเพิ่มเติม (ถ้ามี)',
-                hintText: 'อธิบายปัญหาที่พบ...',
-                border: OutlineInputBorder(),
-                alignLabelWithHint: true,
+              style: SacredText.kanit(color: AppColors.deepText, fontSize: 14),
+              decoration: sacredInputDecoration(
+                label: 'รายละเอียดเพิ่มเติม (ถ้ามี)',
+                hint: 'อธิบายปัญหาที่พบ...',
               ),
               maxLines: 3,
             ),
@@ -140,13 +163,23 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
               : () {
                   Navigator.of(context).pop(false);
                 },
-          child: const Text('ยกเลิก'),
+          child: Text(
+            'ยกเลิก',
+            style: SacredText.kanit(
+              color: AppColors.mutedText,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: _isSubmitting ? null : _submitReport,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
             foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           child: _isSubmitting
               ? const SizedBox(
@@ -157,7 +190,14 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
                 )
-              : const Text('ส่งรายงาน'),
+              : Text(
+                  'ส่งรายงาน',
+                  style: SacredText.kanit(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
         ),
       ],
     );

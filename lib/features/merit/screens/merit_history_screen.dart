@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
+import '../widgets/merit_ui.dart';
 
 /// หน้าประวัติการสั่งซื้อ
 class MeritHistoryScreen extends StatefulWidget {
@@ -40,17 +43,8 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
+      body: SilkCandleBackdrop(
+        warmHero: false,
         child: SafeArea(
           child: Column(
             children: [
@@ -58,7 +52,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
               Expanded(
                 child: _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(color: AppColors.primary),
+                        child: CircularProgressIndicator(color: MeritColors.accent),
                       )
                     : _orders.isEmpty
                         ? _buildEmptyState()
@@ -73,21 +67,29 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.deepText),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
           ),
-          const Expanded(
-            child: Text(
-              'ประวัติการสั่งซื้อ',
-              style: TextStyle(
-                color: AppColors.deepText,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const MeritOverline('Merit · บุญของฉัน', color: AppColors.onBackdropMuted),
+                const SizedBox(height: 2),
+                Text(
+                  'บุญของฉัน',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -101,15 +103,16 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.history,
+            // Scroll/timeline status motif — rounded line, not a receipt.
+            Icons.history_rounded,
             size: 80,
-            color: AppColors.mutedText.withValues(alpha: 0.5),
+            color: AppColors.onBackdropMuted.withValues(alpha: 0.6),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'ยังไม่มีประวัติการสั่งซื้อ',
-            style: TextStyle(
-              color: AppColors.mutedText,
+          Text(
+            'ยังไม่มีบุญที่ร่วมไว้',
+            style: GoogleFonts.kanit(
+              color: AppColors.onBackdrop,
               fontSize: 16,
             ),
           ),
@@ -160,10 +163,11 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
               children: [
                 Text(
                   order.orderNumber ?? '-',
-                  style: const TextStyle(
-                    color: AppColors.primary,
+                  style: GoogleFonts.fraunces(
+                    color: MeritColors.accentDark,
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
                   ),
                 ),
                 _buildStatusBadge(order.status),
@@ -180,7 +184,8 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
-                    Icons.temple_buddhist,
+                    // Outlined temple — matches the calm line-icon language.
+                    Icons.temple_buddhist_outlined,
                     color: AppColors.primary,
                     size: 24,
                   ),
@@ -192,15 +197,15 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                     children: [
                       Text(
                         order.location?.nameTh ?? order.locationId,
-                        style: const TextStyle(
+                        style: GoogleFonts.kanit(
                           color: AppColors.deepText,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         order.package?.nameTh ?? order.packageId,
-                        style: const TextStyle(
+                        style: GoogleFonts.kanit(
                           color: AppColors.mutedText,
                           fontSize: 12,
                         ),
@@ -210,10 +215,10 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 ),
                 Text(
                   order.priceFormatted,
-                  style: const TextStyle(
-                    color: MeritColors.accentDark,
+                  style: GoogleFonts.fraunces(
+                    color: MeritColors.price,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -229,7 +234,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                 const SizedBox(width: 4),
                 Text(
                   order.prayerName,
-                  style: const TextStyle(
+                  style: GoogleFonts.kanit(
                     color: AppColors.mutedText,
                     fontSize: 12,
                   ),
@@ -245,7 +250,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                   order.createdAt != null
                       ? DateFormat('d MMM yyyy HH:mm', 'th').format(order.createdAt!)
                       : '-',
-                  style: const TextStyle(
+                  style: GoogleFonts.kanit(
                     color: AppColors.mutedText,
                     fontSize: 12,
                   ),
@@ -268,27 +273,29 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
       ),
       child: Text(
         status.displayName,
-        style: TextStyle(
+        style: GoogleFonts.kanit(
           color: _getStatusColor(status),
           fontSize: 12,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
   }
 
+  /// Calm, temple-toned status palette (same mapping/logic — only the color
+  /// VALUES are tuned to the Sacred Astrology temple tones).
   Color _getStatusColor(MeritOrderStatus status) {
     switch (status) {
       case MeritOrderStatus.pending:
-        return const Color(0xFFFFC107);
+        return AppColors.mutedGold; // awaiting — muted gold
       case MeritOrderStatus.paid:
-        return const Color(0xFF00BCD4);
+        return AppColors.softPlum; // paid — soft plum
       case MeritOrderStatus.processing:
-        return const Color(0xFFFFD700);
+        return AppColors.candleGold; // in progress — candle gold
       case MeritOrderStatus.completed:
-        return const Color(0xFF4CAF50);
+        return AppColors.bodhiGreen; // delivered — bodhi green
       case MeritOrderStatus.cancelled:
-        return const Color(0xFFF44336);
+        return AppColors.error; // failed — temple vermilion
     }
   }
 
@@ -330,12 +337,12 @@ class _OrderDetailSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'รายละเอียดคำสั่งซื้อ',
-            style: TextStyle(
+          Text(
+            'รายละเอียดคำสั่งบุญ',
+            style: GoogleFonts.kanit(
               color: AppColors.deepText,
               fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 20),
@@ -354,9 +361,9 @@ class _OrderDetailSheet extends StatelessWidget {
             _buildDetailRow('เบอร์โทร', order.prayerPhone!),
           if (order.prayerWish != null && order.prayerWish!.isNotEmpty) ...[
             const SizedBox(height: 12),
-            const Text(
-              'คำขอพร',
-              style: TextStyle(
+            Text(
+              'คำอธิษฐาน',
+              style: GoogleFonts.kanit(
                 color: AppColors.mutedText,
                 fontSize: 14,
               ),
@@ -364,7 +371,7 @@ class _OrderDetailSheet extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               order.prayerWish!,
-              style: const TextStyle(
+              style: GoogleFonts.kanit(
                 color: AppColors.deepText,
                 fontSize: 14,
               ),
@@ -372,12 +379,12 @@ class _OrderDetailSheet extends StatelessWidget {
           ],
           if (order.proofUrls != null && order.proofUrls!.isNotEmpty) ...[
             const Divider(color: AppColors.divider, height: 32),
-            const Text(
+            Text(
               'หลักฐานการไหว้',
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 color: AppColors.deepText,
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),
@@ -409,15 +416,19 @@ class _OrderDetailSheet extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: MeritColors.accent,
+                foregroundColor: AppColors.deepText,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'ปิด',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: GoogleFonts.kanit(
+                  color: AppColors.deepText,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -435,14 +446,14 @@ class _OrderDetailSheet extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: GoogleFonts.kanit(
               color: AppColors.mutedText,
               fontSize: 14,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.kanit(
               color: AppColors.deepText,
               fontSize: 14,
             ),

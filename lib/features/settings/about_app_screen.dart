@@ -1,47 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 
 class AboutAppScreen extends StatelessWidget {
   const AboutAppScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'เกี่ยวกับแอป',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SacredHeader(
+              title: 'เกี่ยวกับแอป',
+              overline: 'ABOUT',
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
                 _buildAppLogo(),
                 const SizedBox(height: 24),
                 _buildAppInfo(),
@@ -76,9 +57,11 @@ class AboutAppScreen extends StatelessWidget {
                 _buildContactInfo(),
                 const SizedBox(height: 32),
                 _buildCopyright(),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -91,30 +74,34 @@ class AboutAppScreen extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
+            color: AppColors.candleGold.withValues(alpha: 0.16),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.candleGold.withValues(alpha: 0.45),
+              width: 1.2,
+            ),
           ),
           child: const Icon(
             Icons.auto_awesome,
-            color: AppColors.primary,
+            color: AppColors.deepGoldBrown,
             size: 60,
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Horora',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+          style: SacredText.display(
+            color: AppColors.onBackdrop,
+            fontSize: 26,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'เวอร์ชัน 1.0.0',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
+            fontSize: 15,
           ),
         ),
       ],
@@ -124,9 +111,9 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildAppInfo() {
     return Text(
       'แอปพลิเคชันฝากมูออนไลน์ที่ครบวงจร บริการรับฝากทำบุญ ไหว้พระ สักการะสิ่งศักดิ์สิทธิ์ ณ สถานที่มงคลทั่วประเทศ พร้อมดูดวง อ่านไพ่ทาโรต์ และสนทนากับผู้เชี่ยวชาญด้านโหราศาสตร์',
-      style: TextStyle(
-        color: AppColors.lightText.withValues(alpha: 0.7),
-        fontSize: 16,
+      style: SacredText.kanit(
+        color: AppColors.onBackdropMuted,
+        fontSize: 15,
         height: 1.5,
       ),
       textAlign: TextAlign.center,
@@ -136,64 +123,59 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildDivider() {
     return Container(
       height: 1,
-      color: AppColors.lightText.withValues(alpha: 0.1),
+      color: AppColors.onBackdrop.withValues(alpha: 0.12),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.lightText,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SacredSectionTitle(title),
     );
   }
 
   Widget _buildAboutUs() {
-    return Text(
-      'Horora คือแพลตฟอร์มฝากมูออนไลน์ที่เชื่อมต่อคุณกับสถานที่ศักดิ์สิทธิ์ทั่วประเทศไทย เราให้บริการรับฝากทำบุญ ไหว้พระ ถวายสังฆทาน บูชาสิ่งศักดิ์สิทธิ์ และพิธีกรรมมงคลต่างๆ ณ วัดและศาลเจ้าที่มีชื่อเสียง\n\nไม่ว่าคุณจะอยู่ที่ไหน ก็สามารถทำบุญเสริมดวงได้อย่างสะดวกสบาย เรามีทีมงานที่พร้อมเดินทางไปทำบุญแทนคุณ พร้อมส่งหลักฐานการทำบุญและรายงานผลให้ทราบทุกขั้นตอน\n\nสถานที่มงคลที่ให้บริการ:\n• ศาลพระพรหม เอราวัณ - ขอพรทุกด้าน\n• วัดระฆังโฆสิตาราม - โชคลาภ การเงิน\n• พระพิฆเนศ เซ็นทรัลเวิลด์ - การศึกษา ศิลปะ\n• วัดโสธรวรารามฯ - สุขภาพ ความปลอดภัย\n• และสถานที่ศักดิ์สิทธิ์อื่นๆ อีกมากมาย',
-      style: TextStyle(
-        color: AppColors.lightText.withValues(alpha: 0.7),
-        fontSize: 14,
-        height: 1.5,
+    return SacredCard(
+      radius: 18,
+      child: Text(
+        'Horora คือแพลตฟอร์มฝากมูออนไลน์ที่เชื่อมต่อคุณกับสถานที่ศักดิ์สิทธิ์ทั่วประเทศไทย เราให้บริการรับฝากทำบุญ ไหว้พระ ถวายสังฆทาน บูชาสิ่งศักดิ์สิทธิ์ และพิธีกรรมมงคลต่างๆ ณ วัดและศาลเจ้าที่มีชื่อเสียง\n\nไม่ว่าคุณจะอยู่ที่ไหน ก็สามารถทำบุญเสริมดวงได้อย่างสะดวกสบาย เรามีทีมงานที่พร้อมเดินทางไปทำบุญแทนคุณ พร้อมส่งหลักฐานการทำบุญและรายงานผลให้ทราบทุกขั้นตอน\n\nสถานที่มงคลที่ให้บริการ:\n• ศาลพระพรหม เอราวัณ - ขอพรทุกด้าน\n• วัดระฆังโฆสิตาราม - โชคลาภ การเงิน\n• พระพิฆเนศ เซ็นทรัลเวิลด์ - การศึกษา ศิลปะ\n• วัดโสธรวรารามฯ - สุขภาพ ความปลอดภัย\n• และสถานที่ศักดิ์สิทธิ์อื่นๆ อีกมากมาย',
+        style: SacredText.kanit(
+          color: AppColors.mutedText,
+          fontSize: 14,
+          height: 1.5,
+        ),
       ),
     );
   }
 
   Widget _buildPolicyItem(String title, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        onTap: onTap,
+        radius: 16,
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: Row(
           children: [
             const Icon(
               Icons.description_outlined,
-              color: AppColors.primary,
+              color: AppColors.deepGoldBrown,
               size: 24,
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.lightText.withValues(alpha: 0.5),
+              color: AppColors.mutedText.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -236,7 +218,7 @@ class AboutAppScreen extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: AppColors.primary,
+            color: AppColors.candleGold,
             size: 24,
           ),
           const SizedBox(width: 16),
@@ -246,17 +228,17 @@ class AboutAppScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.lightText,
+                  style: SacredText.kanit(
+                    color: AppColors.onBackdrop,
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.7),
+                  style: SacredText.kanit(
+                    color: AppColors.onBackdropMuted,
                     fontSize: 14,
                   ),
                 ),
@@ -271,8 +253,8 @@ class AboutAppScreen extends StatelessWidget {
   Widget _buildCopyright() {
     return Text(
       '© 2025 Horora. All rights reserved.',
-      style: TextStyle(
-        color: AppColors.lightText.withValues(alpha: 0.5),
+      style: SacredText.kanit(
+        color: AppColors.onBackdropMuted.withValues(alpha: 0.7),
         fontSize: 12,
       ),
       textAlign: TextAlign.center,

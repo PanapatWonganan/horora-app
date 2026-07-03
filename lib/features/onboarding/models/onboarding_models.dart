@@ -1,6 +1,35 @@
 /// Models สำหรับ Onboarding Quiz และ A/B Testing
 import '../../../core/utils/app_icons.dart';
 
+/// ช่องทางที่ผู้ใช้รู้จักแอป (attribution — เก็บตั้งแต่ต้น flow)
+enum ReferralSource {
+  tiktok,
+  instagram,
+  facebook,
+  youtube,
+  friend, // เพื่อน / คนรู้จักแนะนำ
+  appStore, // ค้นหาเจอใน App Store / Google
+}
+
+extension ReferralSourceExtension on ReferralSource {
+  String get thaiName {
+    switch (this) {
+      case ReferralSource.tiktok:
+        return 'TikTok';
+      case ReferralSource.instagram:
+        return 'Instagram';
+      case ReferralSource.facebook:
+        return 'Facebook';
+      case ReferralSource.youtube:
+        return 'YouTube';
+      case ReferralSource.friend:
+        return 'เพื่อน / คนรู้จักแนะนำ';
+      case ReferralSource.appStore:
+        return 'ค้นหาเจอใน App Store / Google';
+    }
+  }
+}
+
 /// ความสนใจหลักของผู้ใช้
 enum PrimaryInterest {
   finance, // การเงิน โชคลาภ
@@ -149,7 +178,10 @@ class OnboardingData {
   final String? name;
   final DateTime? birthDate;
   final TimeOfDay? birthTime;
-  final PrimaryInterest? primaryInterest;
+  final ReferralSource? referralSource;
+
+  /// เป้าหมายที่เลือก (เลือกได้มากกว่า 1 ในหน้า Goal)
+  final Set<PrimaryInterest> interests;
   final SpiritualStyle? spiritualStyle;
   final MeritFrequency? meritFrequency;
   final bool? wantsNotifications;
@@ -158,17 +190,24 @@ class OnboardingData {
     this.name,
     this.birthDate,
     this.birthTime,
-    this.primaryInterest,
+    this.referralSource,
+    this.interests = const {},
     this.spiritualStyle,
     this.meritFrequency,
     this.wantsNotifications,
   });
 
+  /// ความสนใจหลัก = ตัวแรกที่เลือก (คงไว้เพื่อ backward-compat กับ
+  /// QuizResult/recommendedTemple และ register prefill เดิม)
+  PrimaryInterest? get primaryInterest =>
+      interests.isNotEmpty ? interests.first : null;
+
   OnboardingData copyWith({
     String? name,
     DateTime? birthDate,
     TimeOfDay? birthTime,
-    PrimaryInterest? primaryInterest,
+    ReferralSource? referralSource,
+    Set<PrimaryInterest>? interests,
     SpiritualStyle? spiritualStyle,
     MeritFrequency? meritFrequency,
     bool? wantsNotifications,
@@ -177,7 +216,8 @@ class OnboardingData {
       name: name ?? this.name,
       birthDate: birthDate ?? this.birthDate,
       birthTime: birthTime ?? this.birthTime,
-      primaryInterest: primaryInterest ?? this.primaryInterest,
+      referralSource: referralSource ?? this.referralSource,
+      interests: interests ?? this.interests,
       spiritualStyle: spiritualStyle ?? this.spiritualStyle,
       meritFrequency: meritFrequency ?? this.meritFrequency,
       wantsNotifications: wantsNotifications ?? this.wantsNotifications,
@@ -191,6 +231,8 @@ class OnboardingData {
       'birth_time': birthTime != null
           ? '${birthTime!.hour}:${birthTime!.minute}'
           : null,
+      'referral_source': referralSource?.name,
+      'interests': interests.map((e) => e.name).toList(),
       'primary_interest': primaryInterest?.name,
       'spiritual_style': spiritualStyle?.name,
       'merit_frequency': meritFrequency?.name,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/services/laravel_auth_service.dart';
 
 class EmailConfirmationScreen extends StatefulWidget {
@@ -65,81 +66,64 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
+    return SacredScaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SacredCard(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_isVerifying) ...[
                     const CircularProgressIndicator(
-                      color: AppColors.primary,
+                      color: AppColors.deepGoldBrown,
                       strokeWidth: 3,
                     ),
                     const SizedBox(height: 24),
                     Text(
                       _message,
-                      style: const TextStyle(
-                        color: AppColors.lightText,
-                        fontSize: 18,
+                      style: SacredText.kanit(
+                        color: AppColors.deepText,
+                        fontSize: 17,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ] else ...[
-                    Icon(
-                      _isSuccess ? Icons.check_circle : Icons.error,
-                      color: _isSuccess ? Colors.green : AppColors.error,
-                      size: 80,
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: (_isSuccess
+                                ? AppColors.success
+                                : AppColors.error)
+                            .withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _isSuccess ? Icons.check_circle : Icons.error,
+                        color: _isSuccess ? AppColors.success : AppColors.error,
+                        size: 56,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       _message,
-                      style: const TextStyle(
-                        color: AppColors.lightText,
+                      style: SacredText.kanit(
+                        color: AppColors.deepText,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 28),
                     if (!_isSuccess)
-                      ElevatedButton(
-                        onPressed: () {
-                          AppRouter.navigateAndClearStack(context, AppRoutes.login);
+                      SacredPrimaryButton(
+                        label: 'กลับไปยังหน้าเข้าสู่ระบบ',
+                        filled: true,
+                        onTap: () {
+                          AppRouter.navigateAndClearStack(
+                              context, AppRoutes.login);
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'กลับไปยังหน้าเข้าสู่ระบบ',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                       ),
                   ],
                 ],

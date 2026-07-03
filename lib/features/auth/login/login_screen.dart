@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/utils/app_icons.dart';
 import '../../shared/widgets/gradient_button.dart';
@@ -73,39 +74,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 40),
-                  _buildHeader(),
-                  const SizedBox(height: 40),
-                  _buildLoginForm(),
-                  const SizedBox(height: 24),
-                  _buildForgotPassword(),
-                  const SizedBox(height: 40),
-                  _buildSocialLogin(),
-                  const SizedBox(height: 40),
-                  _buildRegisterLink(),
-                ],
-              ),
+    return SacredScaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                _buildHeader(),
+                const SizedBox(height: 28),
+                SacredCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLoginForm(),
+                      const SizedBox(height: 16),
+                      _buildForgotPassword(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                _buildSocialLogin(),
+                _buildRegisterLink(),
+              ],
             ),
           ),
         ),
@@ -117,20 +110,23 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        const SacredOverline('Welcome back'),
+        const SizedBox(height: 6),
+        Text(
           'เข้าสู่ระบบ',
-          style: TextStyle(
-            color: AppColors.lightText,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 32,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.4,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'ยินดีต้อนรับกลับมา! กรุณาเข้าสู่ระบบเพื่อใช้งาน',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
+            fontSize: 15,
           ),
         ),
       ],
@@ -203,19 +199,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildForgotPassword() {
     return Align(
-      alignment: Alignment.center,
-      child: TextButton(
-        onPressed: () {
+      alignment: Alignment.centerRight,
+      child: SacredTextAction(
+        label: 'ลืมรหัสผ่าน?',
+        onTap: () {
           AppRouter.navigateTo(context, AppRoutes.forgotPassword);
         },
-        child: const Text(
-          'ลืมรหัสผ่าน?',
-          style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
       ),
     );
   }
@@ -297,8 +286,8 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           'ยังไม่มีบัญชี? ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
             fontSize: 14,
           ),
         ),
@@ -306,12 +295,12 @@ class _LoginScreenState extends State<LoginScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.register);
           },
-          child: const Text(
+          child: Text(
             'สมัครสมาชิก',
-            style: TextStyle(
-              color: AppColors.primary,
+            style: SacredText.kanit(
+              color: AppColors.accent,
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

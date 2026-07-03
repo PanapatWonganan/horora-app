@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/api_client.dart';
 import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/sacred_ui.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -56,18 +57,26 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ประวัติการสนทนากับนักพยากรณ์'),
-        backgroundColor: AppColors.darkSurface,
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SacredHeader(
+              title: 'ประวัติการสนทนากับนักพยากรณ์',
+              overline: 'CHAT HISTORY',
+            ),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent),
+                    )
+                  : _chatHistory.isEmpty
+                      ? _buildEmptyState()
+                      : _buildHistoryList(),
+            ),
+          ],
+        ),
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
-          : _chatHistory.isEmpty
-              ? _buildEmptyState()
-              : _buildHistoryList(),
     );
   }
 
@@ -80,24 +89,24 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
           children: [
             Icon(
               Icons.chat_bubble_outline,
-              color: AppColors.primary.withValues(alpha: 0.5),
+              color: AppColors.candleGold.withValues(alpha: 0.6),
               size: 64,
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'ยังไม่มีประวัติการสนทนา',
-              style: TextStyle(
-                color: AppColors.lightText,
+              style: SacredText.kanit(
+                color: AppColors.onBackdrop,
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               'เมื่อคุณสนทนากับนักพยากรณ์ ประวัติจะปรากฏที่นี่',
-              style: TextStyle(
-                color: AppColors.lightText.withValues(alpha: 0.7),
+              style: SacredText.kanit(
+                color: AppColors.onBackdropMuted,
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -111,7 +120,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   Widget _buildHistoryList() {
     return RefreshIndicator(
       onRefresh: _loadChatHistory,
-      color: AppColors.primary,
+      color: AppColors.deepGoldBrown,
+      backgroundColor: AppColors.ivorySilk,
       child: ListView.builder(
         padding: const EdgeInsets.all(16.0),
         itemCount: _chatHistory.length,
@@ -129,13 +139,10 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     final topic = item['topic'] ?? 'ไม่ระบุหัวข้อ';
     final summary = item['summary'] ?? '';
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      elevation: 2.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Padding(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: SacredCard(
+        radius: 18,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,48 +152,55 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
               children: [
                 Text(
                   astrologer,
-                  style: const TextStyle(
+                  style: SacredText.kanit(
+                    color: AppColors.deepText,
                     fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
                   formattedDate,
-                  style: TextStyle(
+                  style: SacredText.kanit(
                     fontSize: 14.0,
-                    color: Colors.grey[600],
+                    color: AppColors.mutedText,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8.0),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4.0),
+                color: AppColors.candleGold.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: Text(
                 topic,
-                style: const TextStyle(
+                style: SacredText.kanit(
                   fontSize: 12.0,
-                  color: AppColors.primary,
+                  color: AppColors.deepGoldBrown,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             if (summary.isNotEmpty) ...[
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'สรุปการสนทนา',
-                style: TextStyle(
+                style: SacredText.kanit(
+                  color: AppColors.deepGoldBrown,
                   fontSize: 16.0,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8.0),
               Text(
                 summary,
-                style: const TextStyle(fontSize: 14.0),
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
+                  fontSize: 14.0,
+                  height: 1.5,
+                ),
               ),
             ],
           ],

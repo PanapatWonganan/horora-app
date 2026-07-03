@@ -61,6 +61,7 @@ class AppRoutes {
   static const String meritOrder = '/merit/order';
   static const String meritPayment = '/merit/payment';
   static const String meritHistory = '/merit/history';
+  static const String meritOrderStatus = '/merit/status';
 
   // Affiliate (ระบบตัวแทน)
   static const String affiliateDashboard = '/affiliate';

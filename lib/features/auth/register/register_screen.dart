@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/routes/routes.dart';
 import '../../../core/theme/theme.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
@@ -194,40 +195,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildRegisterForm(),
-                  const SizedBox(height: 24),
-                  _buildTermsAndConditions(),
-                  const SizedBox(height: 32),
-                  _buildSocialLogin(),
-                  const SizedBox(height: 32),
-                  _buildLoginLink(),
-                  const SizedBox(height: 20),
-                ],
-              ),
+    return SacredScaffold(
+      showSpecks: false,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                _buildHeader(),
+                const SizedBox(height: 24),
+                SacredCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildRegisterForm(),
+                      const SizedBox(height: 18),
+                      _buildTermsAndConditions(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _buildSocialLogin(),
+                _buildLoginLink(),
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),
@@ -239,20 +233,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        const SacredOverline('Create account'),
+        const SizedBox(height: 6),
+        Text(
           'สมัครสมาชิก',
-          style: TextStyle(
-            color: AppColors.lightText,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 32,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.4,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'สร้างบัญชีเพื่อเริ่มต้นการเดินทางค้นหาดวงดาวของคุณ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
+            fontSize: 15,
           ),
         ),
       ],
@@ -492,7 +489,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return Colors.transparent;
             }),
             side: BorderSide(
-              color: AppColors.lightText.withValues(alpha: 0.7),
+              color: AppColors.mutedText.withValues(alpha: 0.7),
               width: 1.5,
             ),
             shape: RoundedRectangleBorder(
@@ -505,17 +502,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: RichText(
             text: TextSpan(
               text: 'ฉันยอมรับ ',
-              style: TextStyle(
-                color: AppColors.lightText.withValues(alpha: 0.7),
+              style: SacredText.kanit(
+                color: AppColors.mutedText,
                 fontSize: 14,
               ),
-              children: const [
+              children: [
                 TextSpan(
                   text: 'ข้อกำหนดและเงื่อนไขการใช้งาน',
-                  style: TextStyle(
-                    color: AppColors.primary,
+                  style: SacredText.kanit(
+                    color: AppColors.deepGoldBrown,
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -603,8 +600,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Text(
           'มีบัญชีอยู่แล้ว? ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
+          style: SacredText.kanit(
+            color: AppColors.onBackdropMuted,
             fontSize: 14,
           ),
         ),
@@ -612,12 +609,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           onTap: () {
             AppRouter.navigateToReplacement(context, AppRoutes.login);
           },
-          child: const Text(
+          child: Text(
             'เข้าสู่ระบบ',
-            style: TextStyle(
-              color: AppColors.primary,
+            style: SacredText.kanit(
+              color: AppColors.accent,
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

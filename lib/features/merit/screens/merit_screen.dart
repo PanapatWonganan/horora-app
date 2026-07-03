@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/merit_colors.dart';
+import '../widgets/merit_ui.dart';
 import 'weekly_schedule_screen.dart';
 
 /// หน้าหลักบริการทำบุญออนไลน์ - redirect ไปหน้าตารางประจำสัปดาห์
@@ -32,10 +34,13 @@ class _MeritScreenState extends State<MeritScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading while redirecting
+    // Show loading on the deep celestial backdrop while redirecting, so the
+    // transition into the merit hero never flashes a bright screen.
     return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+      body: SilkCandleBackdrop(
+        child: Center(
+          child: CircularProgressIndicator(color: MeritColors.accent),
+        ),
       ),
     );
   }

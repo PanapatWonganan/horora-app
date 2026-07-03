@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../models/affiliate_models.dart';
 import '../services/affiliate_service.dart';
 
@@ -40,7 +41,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('คัดลอกลิงก์แล้ว'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         duration: Duration(seconds: 2),
       ),
     );
@@ -62,7 +63,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('คัดลอกรหัสแล้ว'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
         duration: Duration(seconds: 2),
       ),
     );
@@ -70,19 +71,29 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('แชร์ลิงก์แนะนำ'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _referralLink == null
-              ? const Center(child: Text('ไม่สามารถโหลดข้อมูลได้'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SacredHeader(
+              title: 'แชร์ลิงก์แนะนำ',
+              overline: 'REFERRAL',
+            ),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent))
+                  : _referralLink == null
+                      ? Center(
+                          child: Text(
+                            'ไม่สามารถโหลดข้อมูลได้',
+                            style: SacredText.kanit(
+                                color: AppColors.onBackdrop, fontSize: 15),
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                          child: Column(
                     children: [
                       // Referral code card
                       Container(
@@ -90,17 +101,22 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: AppColors.primaryGradient,
+                            colors: [AppColors.softPlum, AppColors.nightPlum],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: AppColors.candleGold.withValues(alpha: 0.4),
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           children: [
                             Text(
                               'รหัสแนะนำของคุณ',
-                              style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
+                              style: SacredText.kanit(
+                                  color: AppColors.onBackdropMuted, fontSize: 14),
                             ),
                             const SizedBox(height: 8),
                             GestureDetector(
@@ -108,7 +124,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.lightSurface.withValues(alpha: 0.7),
+                                  color: AppColors.ivorySilk,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -116,15 +132,15 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                                   children: [
                                     Text(
                                       _referralLink!.referralCode,
-                                      style: const TextStyle(
+                                      style: SacredText.display(
                                         color: AppColors.deepText,
                                         fontSize: 28,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w700,
                                         letterSpacing: 4,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
-                                    Icon(Icons.copy, color: AppColors.deepText.withValues(alpha: 0.6), size: 20),
+                                    Icon(Icons.copy, color: AppColors.deepGoldBrown.withValues(alpha: 0.7), size: 20),
                                   ],
                                 ),
                               ),
@@ -150,14 +166,18 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                         ),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'QR Code',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: SacredText.kanit(
+                                  color: AppColors.deepText,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'ให้เพื่อนสแกนเพื่อสั่งฝากบุญ',
-                              style: TextStyle(color: Colors.grey, fontSize: 13),
+                              style: SacredText.kanit(
+                                  color: AppColors.mutedText, fontSize: 13),
                             ),
                             const SizedBox(height: 16),
                             QrImageView(
@@ -167,11 +187,11 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               backgroundColor: Colors.white,
                               eyeStyle: const QrEyeStyle(
                                 eyeShape: QrEyeShape.square,
-                                color: AppColors.primary,
+                                color: AppColors.templeIndigo,
                               ),
                               dataModuleStyle: const QrDataModuleStyle(
                                 dataModuleShape: QrDataModuleShape.square,
-                                color: AppColors.secondary,
+                                color: AppColors.deepGoldBrown,
                               ),
                             ),
                           ],
@@ -183,21 +203,27 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: AppColors.ricePaper,
                           borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+                            width: 1,
+                          ),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: Text(
                                 _referralLink!.referralLink,
-                                style: const TextStyle(fontSize: 13),
+                                style: SacredText.kanit(
+                                    color: AppColors.deepText, fontSize: 13),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             IconButton(
                               onPressed: _copyLink,
-                              icon: const Icon(Icons.copy, size: 20),
+                              icon: const Icon(Icons.copy,
+                                  size: 20, color: AppColors.deepGoldBrown),
                             ),
                           ],
                         ),
@@ -213,7 +239,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           icon: const Icon(Icons.share),
                           label: const Text('แชร์ให้เพื่อน', style: TextStyle(fontSize: 16)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: AppColors.deepGoldBrown,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -228,8 +254,9 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           icon: const Icon(Icons.link),
                           label: const Text('คัดลอกลิงก์', style: TextStyle(fontSize: 16)),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.primary,
-                            side: const BorderSide(color: AppColors.primary),
+                            foregroundColor: AppColors.onBackdrop,
+                            side: BorderSide(
+                                color: AppColors.candleGold.withValues(alpha: 0.55)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
@@ -237,44 +264,49 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                       const SizedBox(height: 24),
 
                       // Tips
-                      Container(
-                        width: double.infinity,
+                      SacredCard(
+                        radius: 16,
                         padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.info.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
-                        ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.lightbulb, color: AppColors.info, size: 20),
-                                SizedBox(width: 8),
+                                const Icon(Icons.lightbulb,
+                                    color: AppColors.deepGoldBrown, size: 20),
+                                const SizedBox(width: 8),
                                 Text(
                                   'เทคนิคเพิ่มยอดขาย',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.info,
+                                  style: SacredText.kanit(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                    color: AppColors.deepGoldBrown,
                                   ),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               '1. แชร์ลิงก์ใน Social Media เช่น LINE, Facebook\n'
                               '2. โพสต์รีวิวพร้อมรูปหลักฐานการไหว้\n'
                               '3. แนะนำแพ็คเกจที่เหมาะกับความต้องการ\n'
                               '4. เน้นวันสำคัญ เช่น วันพระ ตรุษจีน สงกรานต์',
-                              style: TextStyle(fontSize: 13, height: 1.5),
+                              style: SacredText.kanit(
+                                color: AppColors.deepText,
+                                fontSize: 13,
+                                height: 1.5,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                ),
+                          ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

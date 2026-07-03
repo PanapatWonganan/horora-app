@@ -298,7 +298,7 @@ class _PromoBannerSliderState extends State<PromoBannerSlider> {
             ),
             const SizedBox(height: 8),
             Text(
-              'โปรโมชั่น',
+              'ของมงคล',
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.6),
                 fontSize: 14,

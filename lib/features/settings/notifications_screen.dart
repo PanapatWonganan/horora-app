@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../shared/widgets/gradient_button.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -23,41 +24,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'การแจ้งเตือน',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SacredHeader(
+              title: 'การแจ้งเตือน',
+              overline: 'NOTIFICATIONS',
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 _buildSectionTitle('การแจ้งเตือนดวงชะตา'),
                 const SizedBox(height: 16),
                 _buildNotificationSwitch(
@@ -111,8 +92,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 _buildSectionTitle('การแจ้งเตือนอื่นๆ'),
                 const SizedBox(height: 16),
                 _buildNotificationSwitch(
-                  'โปรโมชั่นและข้อเสนอพิเศษ',
-                  'รับการแจ้งเตือนเกี่ยวกับโปรโมชั่นและข้อเสนอพิเศษ',
+                  'ข่าวสารและสิ่งดีๆ',
+                  'รับการแจ้งเตือนข่าวสารและสิ่งดีๆ ที่คัดสรรมาเพื่อคุณ',
                   _promotionsEnabled,
                   (value) {
                     setState(() {
@@ -132,23 +113,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
                 const SizedBox(height: 32),
                 _buildSaveButton(),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.lightText,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+    return SacredSectionTitle(title);
   }
 
   Widget _buildNotificationSwitch(
@@ -157,107 +133,102 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     bool value,
     Function(bool) onChanged,
   ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.darkSurface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        radius: 16,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.7),
-                    fontSize: 14,
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppColors.primary,
-            activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
-            inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey.withValues(alpha: 0.3),
-          ),
-        ],
+            Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: AppColors.candleGold,
+              activeTrackColor: AppColors.candleGold.withValues(alpha: 0.35),
+              inactiveThumbColor: AppColors.mutedText.withValues(alpha: 0.6),
+              inactiveTrackColor: AppColors.mutedText.withValues(alpha: 0.2),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildTimeSelector() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.darkSurface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'เวลาที่ต้องการรับการแจ้งเตือน',
-                  style: TextStyle(
-                    color: AppColors.lightText,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        radius: 16,
+        highlight: true,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'เวลาที่ต้องการรับการแจ้งเตือน',
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ดวงประจำวันจะถูกส่งในเวลานี้',
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            InkWell(
+              onTap: _selectTime,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.candleGold.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _formatTimeOfDay(_dailyHoroscopeTime),
+                  style: SacredText.kanit(
+                    color: AppColors.deepGoldBrown,
                     fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w700,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'ดวงประจำวันจะถูกส่งในเวลานี้',
-                  style: TextStyle(
-                    color: AppColors.lightText.withValues(alpha: 0.7),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: _selectTime,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                _formatTimeOfDay(_dailyHoroscopeTime),
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -270,7 +241,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
+              primary: AppColors.deepGoldBrown,
               onPrimary: Colors.white,
               surface: AppColors.lightSurface,
               onSurface: AppColors.deepText,
@@ -299,7 +270,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       text: 'บันทึกการตั้งค่า',
       onPressed: _saveSettings,
       gradient: const LinearGradient(
-        colors: AppColors.primaryGradient,
+        colors: AppColors.goldGradient,
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ),
@@ -314,7 +285,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('บันทึกการตั้งค่าการแจ้งเตือนเรียบร้อยแล้ว'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
       ),
     );
     

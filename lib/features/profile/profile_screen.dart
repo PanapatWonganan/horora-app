@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/auth_guard.dart';
@@ -231,56 +232,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ),
-                )
-              : _hasError
-                  ? _buildErrorView()
-                  : RefreshIndicator(
-                      onRefresh: _loadUserProfile,
-                      color: AppColors.primary,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildHeader(),
-                            const SizedBox(height: 32),
-                            _buildProfileInfo(),
-                            const SizedBox(height: 32),
-                            _buildSubscriptionCard(),
-                            const SizedBox(height: 32),
-                            _buildMenuItems(),
-                            const SizedBox(height: 24),
-                            const SizedBox(height: 24),
-                            _buildLogoutButton(),
-                            const SizedBox(height: 32),
-                          ],
-                        ),
+    return SacredScaffold(
+      bottomNavigationBar: const AppBottomNavigation(currentIndex: 4),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.accent,
+                ),
+              )
+            : _hasError
+                ? _buildErrorView()
+                : RefreshIndicator(
+                    onRefresh: _loadUserProfile,
+                    color: AppColors.deepGoldBrown,
+                    backgroundColor: AppColors.ivorySilk,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(),
+                          const SizedBox(height: 24),
+                          _buildProfileInfo(),
+                          const SizedBox(height: 28),
+                          _buildSubscriptionCard(),
+                          const SizedBox(height: 28),
+                          _buildMenuItems(),
+                          const SizedBox(height: 28),
+                          _buildLogoutButton(),
+                          const SizedBox(height: 12),
+                        ],
                       ),
                     ),
-        ),
+                  ),
       ),
-      bottomNavigationBar: const AppBottomNavigation(currentIndex: 4),
     );
   }
 
@@ -298,8 +285,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
             Text(
               _errorMessage,
-              style: const TextStyle(
-                color: AppColors.lightText,
+              style: SacredText.kanit(
+                color: AppColors.onBackdrop,
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -309,10 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               text: 'ลองใหม่อีกครั้ง',
               onPressed: _loadUserProfile,
               gradient: const LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.secondary,
-                ],
+                colors: AppColors.goldGradient,
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -324,28 +308,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'โปรไฟล์',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SacredOverline('MY PROFILE'),
+              const SizedBox(height: 3),
+              Text(
+                'โปรไฟล์',
+                style: SacredText.kanit(
+                  color: AppColors.onBackdrop,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
           ),
-        ),
-        IconButton(
-          icon: const SvgIcon(
-            AppIcons.settings,
-            size: 24,
-            color: AppColors.lightText,
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, AppRoutes.settings);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(13),
+                border: Border.all(
+                  color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                  width: 1,
+                ),
+              ),
+              child: const Center(
+                child: SvgIcon(
+                  AppIcons.settings,
+                  size: 22,
+                  color: AppColors.onBackdrop,
+                ),
+              ),
+            ),
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.settings);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -363,7 +374,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    return Row(
+    return SacredCard(
+      radius: 22,
+      child: Row(
       children: [
         Container(
           width: 80,
@@ -371,7 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.primary,
+              color: AppColors.candleGold,
               width: 2,
             ),
           ),
@@ -379,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(40),
             child: CircleAvatar(
               radius: 40,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+              backgroundColor: AppColors.candleGold.withValues(alpha: 0.18),
               child: _userData['profile_image_url'] != null &&
                       _userData['profile_image_url'].isNotEmpty
                   ? Image.network(
@@ -388,13 +401,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       errorBuilder: (context, error, stackTrace) => const SvgIcon(
                         AppIcons.personFilled,
                         size: 40,
-                        color: AppColors.primary,
+                        color: AppColors.deepGoldBrown,
                       ),
                     )
                   : const SvgIcon(
                       AppIcons.personFilled,
                       size: 40,
-                      color: AppColors.primary,
+                      color: AppColors.deepGoldBrown,
                     ),
             ),
           ),
@@ -406,25 +419,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 _userData['full_name'] ?? 'ผู้ใช้งาน',
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 _userData['email'] ?? '',
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'วันเกิด: $birthDateText',
-                style: TextStyle(
-                  color: AppColors.lightText.withValues(alpha: 0.7),
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
                   fontSize: 14,
                 ),
               ),
@@ -439,8 +452,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
+                        color: AppColors.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.25),
+                          width: 1,
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -472,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 return 'ไม่ทราบปีนักษัตร';
                               }
                             }(),
-                            style: const TextStyle(
+                            style: SacredText.kanit(
                               color: AppColors.primary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -492,28 +509,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [
-                            Colors.amber,
-                            Colors.orange,
+                            AppColors.candleGold,
+                            AppColors.deepGoldBrown,
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          SvgIcon(
+                          const SvgIcon(
                             AppIcons.starFilled,
                             size: 12,
                             color: Colors.white,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
                             'พรีเมียม',
-                            style: TextStyle(
+                            style: SacredText.kanit(
                               color: Colors.white,
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -528,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           icon: const SvgIcon(
             AppIcons.edit,
             size: 20,
-            color: Colors.amber,
+            color: AppColors.deepGoldBrown,
           ),
           onPressed: () async {
             final result =
@@ -540,6 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         ),
       ],
+      ),
     );
   }
 
@@ -550,45 +568,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return _buildPremiumCard();
     }
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.lightSurface,
-            AppColors.surfaceMuted,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.10),
-            blurRadius: 16,
-            spreadRadius: 0,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+    return SacredCard(
+      radius: 18,
+      highlight: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              SvgIcon(
-                AppIcons.starFilled,
-                size: 24,
-                color: AppColors.accent,
-              ),
-              SizedBox(width: 12),
+              const SacredIconCoin(AppIcons.starFilled, size: 22, padding: 9),
+              const SizedBox(width: 12),
               Text(
                 'อัพเกรดเป็นพรีเมียม',
-                style: TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -596,8 +591,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Text(
             'รับสิทธิประโยชน์เพิ่มเติมและปลดล็อกฟีเจอร์ทั้งหมด',
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.7),
+            style: SacredText.kanit(
+              color: AppColors.mutedText,
               fontSize: 14,
               height: 1.5,
             ),
@@ -618,27 +613,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    backgroundColor: AppColors.darkSurface,
+                    backgroundColor: AppColors.lightSurface,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    title: const Row(
+                    title: Row(
                       children: [
-                        SvgIcon(AppIcons.info, size: 24, color: AppColors.primary),
-                        SizedBox(width: 8),
+                        const SvgIcon(AppIcons.info, size: 24, color: AppColors.deepGoldBrown),
+                        const SizedBox(width: 8),
                         Text(
                           'แจ้งให้ทราบ',
-                          style: TextStyle(
-                            color: AppColors.lightText,
-                            fontWeight: FontWeight.bold,
+                          style: SacredText.kanit(
+                            color: AppColors.deepText,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
                     ),
-                    content: const Text(
+                    content: Text(
                       'กำลังพัฒนาส่วนนี้',
-                      style: TextStyle(
-                        color: AppColors.lightText,
+                      style: SacredText.kanit(
+                        color: AppColors.deepText,
+                        fontSize: 14,
                       ),
                     ),
                     actions: [
@@ -646,10 +643,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: const Text(
+                        child: Text(
                           'ตกลง',
-                          style: TextStyle(
-                            color: AppColors.primary,
+                          style: SacredText.kanit(
+                            color: AppColors.deepGoldBrown,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -659,10 +658,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             },
             gradient: const LinearGradient(
-              colors: [
-                Colors.amber,
-                Colors.orange,
-              ],
+              colors: AppColors.goldGradient,
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -681,41 +677,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
-            Colors.amber.shade700,
-            Colors.orange.shade800,
+            AppColors.candleGold,
+            AppColors.deepGoldBrown,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
+            color: AppColors.deepGoldBrown.withValues(alpha: 0.35),
+            blurRadius: 16,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              SvgIcon(
+              const SvgIcon(
                 AppIcons.diamond,
                 size: 24,
                 color: Colors.white,
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Text(
                 'สมาชิกพรีเมียม',
-                style: TextStyle(
+                style: SacredText.kanit(
                   color: Colors.white,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -723,8 +719,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Text(
             'ขอบคุณที่เป็นสมาชิกพรีเมียม คุณสามารถใช้งานฟีเจอร์ทั้งหมดได้ไม่จำกัด',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
+            style: SacredText.kanit(
+              color: Colors.white.withValues(alpha: 0.92),
               fontSize: 14,
               height: 1.5,
             ),
@@ -744,18 +740,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgIcon(
+                const SvgIcon(
                   AppIcons.calendar,
                   size: 16,
                   color: Colors.white,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   'สมาชิกภาพของคุณจะหมดอายุในวันที่ 31/12/2024',
-                  style: TextStyle(
+                  style: SacredText.kanit(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -776,13 +772,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SvgIcon(
             AppIcons.checkCircle,
             size: 16,
+            color: AppColors.bodhiGreen,
           ),
           const SizedBox(width: 4),
           Flexible(
             child: Text(
               text,
-              style: const TextStyle(
-                color: AppColors.lightText,
+              style: SacredText.kanit(
+                color: AppColors.deepText,
                 fontSize: 12,
               ),
               overflow: TextOverflow.ellipsis,
@@ -806,7 +803,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Flexible(
             child: Text(
               text,
-              style: const TextStyle(
+              style: SacredText.kanit(
                 color: Colors.white,
                 fontSize: 12,
               ),
@@ -822,15 +819,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'การตั้งค่า',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 16),
+          child: SacredSectionTitle('การตั้งค่า', overline: 'SETTINGS'),
         ),
-        const SizedBox(height: 16),
         // ซ่อนเมนูที่ยังไม่พร้อมใช้งาน
         // ProfileMenuItem(
         //   icon: Icons.history,
@@ -925,16 +917,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       gradient: LinearGradient(
         colors: [
-          Colors.red.shade300,
-          Colors.red.shade500,
+          AppColors.error.withValues(alpha: 0.85),
+          AppColors.error,
         ],
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ),
-      icon: SvgIcon(
+      icon: const SvgIcon(
         AppIcons.logout,
         size: 20,
-        color: Colors.red.shade400,
+        color: AppColors.error,
       ),
     );
   }
@@ -945,27 +937,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final shouldLogout = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: AppColors.darkSurface,
-          title: const Text(
+          backgroundColor: AppColors.lightSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
             'ยืนยันการออกจากระบบ',
-            style: TextStyle(
-              color: AppColors.lightText,
-              fontWeight: FontWeight.bold,
+            style: SacredText.kanit(
+              color: AppColors.deepText,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
           ),
           content: Text(
             'คุณต้องการออกจากระบบใช่หรือไม่?',
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.8),
+            style: SacredText.kanit(
+              color: AppColors.mutedText,
+              fontSize: 14,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
+              child: Text(
                 'ยกเลิก',
-                style: TextStyle(
-                  color: AppColors.primary,
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -973,8 +972,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 'ออกจากระบบ',
-                style: TextStyle(
-                  color: Colors.red.shade400,
+                style: SacredText.kanit(
+                  color: AppColors.error,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 
 class ProfileMenuItem extends StatelessWidget {
@@ -30,6 +31,10 @@ class ProfileMenuItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.darkSurface,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
@@ -37,7 +42,7 @@ class ProfileMenuItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.candleGold.withValues(alpha: 0.16),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -45,11 +50,11 @@ class ProfileMenuItem extends StatelessWidget {
                     ? SvgIcon(
                         svgIconPath!,
                         size: 20,
-                        color: AppColors.primary,
+                        color: AppColors.deepGoldBrown,
                       )
                     : Icon(
                         icon ?? Icons.circle,
-                        color: AppColors.primary,
+                        color: AppColors.deepGoldBrown,
                         size: 20,
                       ),
               ),
@@ -58,8 +63,8 @@ class ProfileMenuItem extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: AppColors.lightText,
+                style: SacredText.kanit(
+                  color: AppColors.deepText,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -69,7 +74,7 @@ class ProfileMenuItem extends StatelessWidget {
                 SvgIcon(
                   AppIcons.arrowForward,
                   size: 16,
-                  color: AppColors.lightText.withValues(alpha: 0.5),
+                  color: AppColors.mutedText.withValues(alpha: 0.6),
                 ),
           ],
         ),

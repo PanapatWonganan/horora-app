@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/routes/app_router.dart';
 import '../../core/services/auth_service.dart';
@@ -32,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('เกิดข้อผิดพลาดในการออกจากระบบ: ${e.toString()}'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -47,72 +48,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'การตั้งค่า',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSettingsHeader(),
-                      const SizedBox(height: 24),
-                      _buildAccountSettings(),
-                      const SizedBox(height: 24),
-                      _buildAppSettings(),
-                      const SizedBox(height: 24),
-                      _buildSupportSettings(),
-                      const SizedBox(height: 32),
-                      _buildLogoutButton(),
-                    ],
-                  ),
+    return SacredScaffold(
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.accent,
                 ),
-        ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SacredHeader(
+                    title: 'การตั้งค่า',
+                    overline: 'SETTINGS',
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildAccountSettings(),
+                          const SizedBox(height: 24),
+                          _buildAppSettings(),
+                          const SizedBox(height: 24),
+                          _buildSupportSettings(),
+                          const SizedBox(height: 32),
+                          _buildLogoutButton(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }
 
-  Widget _buildSettingsHeader() {
-    return const Text(
-      'การตั้งค่าทั่วไป',
-      style: TextStyle(
-        color: AppColors.lightText,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
+  Widget _buildSectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      child: SacredOverline(label),
     );
   }
 
@@ -120,15 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'บัญชีผู้ใช้',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel('บัญชีผู้ใช้'),
         _buildSettingItem(
           svgIconPath: AppIcons.person,
           title: 'โปรไฟล์ของฉัน',
@@ -155,63 +124,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildAppSettings() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'แอปพลิเคชัน',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // _buildSettingItem(
-        //   icon: Icons.language,
-        //   title: 'ภาษา',
-        //   onTap: () {
-        //     AppRouter.navigateTo(context, AppRoutes.language);
-        //   },
-        // ),
-        // _buildSettingItem(
-        //   icon: Icons.history,
-        //   title: 'ประวัติการดูดวง',
-        //   onTap: () {
-        //     AppRouter.navigateTo(context, AppRoutes.historyHoroscope);
-        //   },
-        // ),
-        // _buildSettingItem(
-        //   icon: Icons.auto_awesome,
-        //   title: 'ประวัติการอ่านไพ่',
-        //   onTap: () {
-        //     AppRouter.navigateTo(context, AppRoutes.historyTarot);
-        //   },
-        // ),
-        // _buildSettingItem(
-        //   icon: Icons.chat_bubble_outline,
-        //   title: 'ประวัติการสนทนา',
-        //   onTap: () {
-        //     AppRouter.navigateTo(context, AppRoutes.historyChat);
-        //   },
-        // ),
-      ],
-    );
+    // All app-setting entries are currently disabled (see commented routes in
+    // history below); render nothing so the section label doesn't appear alone.
+    return const SizedBox.shrink();
   }
 
   Widget _buildSupportSettings() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'ความช่วยเหลือ',
-          style: TextStyle(
-            color: AppColors.lightText.withValues(alpha: 0.7),
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 12),
+        _buildSectionLabel('ความช่วยเหลือ'),
         _buildSettingItem(
           icon: Icons.help_outline,
           title: 'ช่วยเหลือและสนับสนุน',
@@ -236,57 +158,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SacredCard(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: svgIconPath != null
-                    ? SvgIcon(
-                        svgIconPath,
-                        size: 20,
-                        color: AppColors.primary,
-                      )
-                    : Icon(
-                        icon ?? Icons.circle,
-                        color: AppColors.primary,
-                        size: 20,
-                      ),
-              ),
+      radius: 16,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.candleGold.withValues(alpha: 0.16),
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.lightText,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
+            child: Center(
+              child: svgIconPath != null
+                  ? SvgIcon(
+                      svgIconPath,
+                      size: 20,
+                      color: AppColors.deepGoldBrown,
+                    )
+                  : Icon(
+                      icon ?? Icons.circle,
+                      color: AppColors.deepGoldBrown,
+                      size: 20,
+                    ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              title,
+              style: SacredText.kanit(
+                color: AppColors.deepText,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            SvgIcon(
-              AppIcons.arrowForward,
-              size: 16,
-              color: AppColors.lightText.withValues(alpha: 0.5),
-            ),
-          ],
-        ),
+          ),
+          SvgIcon(
+            AppIcons.arrowForward,
+            size: 16,
+            color: AppColors.mutedText.withValues(alpha: 0.6),
+          ),
+        ],
+      ),
       ),
     );
   }
@@ -298,27 +216,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: ElevatedButton(
         onPressed: _logout,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red.shade600,
+          backgroundColor: AppColors.error,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.logout,
               size: 20,
               color: Colors.white,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'ออกจากระบบ',
-              style: TextStyle(
+              style: SacredText.kanit(
                 color: Colors.white,
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],

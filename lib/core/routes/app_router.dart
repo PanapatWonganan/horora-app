@@ -30,8 +30,10 @@ import '../../features/settings/language_screen.dart';
 import '../../features/settings/help_support_screen.dart';
 import '../../features/settings/about_app_screen.dart';
 // Import merit screens
-import '../../features/merit/screens/merit_screen.dart';
+import '../../features/merit/screens/weekly_schedule_screen.dart';
 import '../../features/merit/screens/merit_history_screen.dart';
+import '../../features/merit/screens/merit_order_status_screen.dart';
+import '../../features/merit/models/merit_models.dart';
 // Import affiliate screens
 import '../../features/affiliate/screens/affiliate_dashboard_screen.dart';
 import '../../features/affiliate/screens/affiliate_register_screen.dart';
@@ -108,7 +110,8 @@ class AppRouter {
         debugPrint('HoroscopeDetail Route - Horoscope: ${args['horoscope']}');
         debugPrint(
             'HoroscopeDetail Route - ZodiacSignThai: ${args['zodiacSignThai']}');
-        debugPrint('HoroscopeDetail Route - ZodiacSignEn: ${args['zodiacSignEn']}');
+        debugPrint(
+            'HoroscopeDetail Route - ZodiacSignEn: ${args['zodiacSignEn']}');
 
         return MaterialPageRoute(
           builder: (_) => HoroscopeDetailScreen(
@@ -156,15 +159,31 @@ class AppRouter {
 
       // Merit Screens (ทำบุญออนไลน์)
       case AppRoutes.merit:
-        return MaterialPageRoute(builder: (_) => const MeritScreen());
+        return MaterialPageRoute(builder: (_) => const WeeklyScheduleScreen());
       case AppRoutes.meritHistory:
         return MaterialPageRoute(builder: (_) => const MeritHistoryScreen());
+      case AppRoutes.meritOrderStatus:
+        final args = settings.arguments;
+        if (args is MeritOrder) {
+          return MaterialPageRoute(
+            builder: (_) => MeritOrderStatusScreen(order: args),
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => const Scaffold(
+            body: Center(
+              child: Text('ไม่พบข้อมูลคำสั่งบุญสำหรับแสดงสถานะ'),
+            ),
+          ),
+        );
 
       // Affiliate Screens (ระบบตัวแทน)
       case AppRoutes.affiliateDashboard:
-        return MaterialPageRoute(builder: (_) => const AffiliateDashboardScreen());
+        return MaterialPageRoute(
+            builder: (_) => const AffiliateDashboardScreen());
       case AppRoutes.affiliateRegister:
-        return MaterialPageRoute(builder: (_) => const AffiliateRegisterScreen());
+        return MaterialPageRoute(
+            builder: (_) => const AffiliateRegisterScreen());
       case AppRoutes.affiliateShare:
         return MaterialPageRoute(builder: (_) => const AffiliateShareScreen());
 

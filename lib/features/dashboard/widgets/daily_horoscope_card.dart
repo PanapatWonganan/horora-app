@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 
 class DailyHoroscopeCard extends StatelessWidget {
@@ -23,12 +24,26 @@ class DailyHoroscopeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.ivorySilk, AppColors.ricePaper],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22.0),
+        border: Border.all(
+          color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.templeIndigo.withValues(alpha: 0.16),
+            blurRadius: 22.0,
+            offset: const Offset(0, 11),
+          ),
+        ],
       ),
-      color: AppColors.darkSurface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,27 +51,27 @@ class DailyHoroscopeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.2),
+              color: AppColors.primary.withValues(alpha: 0.10),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                topRight: Radius.circular(16.0),
+                topLeft: Radius.circular(22.0),
+                topRight: Radius.circular(22.0),
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'ดวงประจำวัน',
-                  style: TextStyle(
-                    color: Colors.white,
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
                     fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
                   date,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                  style: GoogleFonts.kanit(
+                    color: AppColors.mutedText,
                     fontSize: 14.0,
                   ),
                 ),
@@ -70,20 +85,21 @@ class DailyHoroscopeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'ภาพรวม',
-                  style: TextStyle(
-                    color: Colors.white,
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepText,
                     fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8.0),
                 Text(
                   overview,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                  style: GoogleFonts.kanit(
+                    color: AppColors.mutedText,
                     fontSize: 14.0,
+                    height: 1.5,
                   ),
                 ),
                 
@@ -93,9 +109,11 @@ class DailyHoroscopeCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildRatingItem('ความรัก', loveRating, Colors.pink),
-                    _buildRatingItem('การงาน', careerRating, Colors.blue),
-                    _buildRatingItem('สุขภาพ', healthRating, Colors.green),
+                    _buildRatingItem('ความรัก', loveRating, AppColors.accent),
+                    _buildRatingItem(
+                        'การงาน', careerRating, AppColors.deepGoldBrown),
+                    _buildRatingItem(
+                        'สุขภาพ', healthRating, AppColors.bodhiGreen),
                   ],
                 ),
                 
@@ -131,11 +149,21 @@ class DailyHoroscopeCard extends StatelessWidget {
                       // Navigate to full horoscope
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
+                      foregroundColor: AppColors.deepGoldBrown,
+                      side: BorderSide(
+                          color: AppColors.candleGold.withValues(alpha: 0.7),
+                          width: 1.2),
+                      backgroundColor:
+                          AppColors.candleGold.withValues(alpha: 0.10),
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                     ),
-                    child: const Text('ดูดวงเพิ่มเติม'),
+                    child: Text(
+                      'ดูดวงเพิ่มเติม',
+                      style: GoogleFonts.kanit(
+                        color: AppColors.deepGoldBrown,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -151,8 +179,8 @@ class DailyHoroscopeCard extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.7),
+          style: GoogleFonts.kanit(
+            color: AppColors.softInk,
             fontSize: 12.0,
           ),
         ),
@@ -162,7 +190,7 @@ class DailyHoroscopeCard extends StatelessWidget {
           children: List.generate(5, (index) {
             return Icon(
               index < rating ? Icons.star : Icons.star_border,
-              color: index < rating ? color : Colors.grey[600],
+              color: index < rating ? color : AppColors.divider,
               size: 16.0,
             );
           }),
@@ -189,15 +217,15 @@ class DailyHoroscopeCard extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
+              style: GoogleFonts.kanit(
+                color: AppColors.softInk,
                 fontSize: 12.0,
               ),
             ),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
                 fontSize: 14.0,
                 fontWeight: FontWeight.w500,
               ),

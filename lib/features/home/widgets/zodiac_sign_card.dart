@@ -14,7 +14,9 @@ class ZodiacSignCard extends StatelessWidget {
     required this.name,
     this.date,
     required this.imagePath,
-    this.icon = Icons.star,
+    // Sacred Astrology default: a soft sparkle (guidance) rather than a generic
+    // star — calmer and on-theme for the celestial companion.
+    this.icon = Icons.auto_awesome,
     required this.onTap,
   }) : super(key: key);
 

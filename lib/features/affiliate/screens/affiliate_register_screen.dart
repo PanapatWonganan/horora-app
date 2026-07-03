@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../services/affiliate_service.dart';
 import 'affiliate_dashboard_screen.dart';
 
@@ -60,7 +61,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('ไม่สามารถสมัครได้ กรุณาลองใหม่'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -68,48 +69,57 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('สมัครเป็นตัวแทน'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return SacredScaffold(
+      showSpecks: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SacredHeader(
+              title: 'สมัครเป็นตัวแทน',
+              overline: 'JOIN AFFILIATE',
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
               // Benefits card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient,
+                    colors: [AppColors.softPlum, AppColors.nightPlum],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppColors.candleGold.withValues(alpha: 0.4),
+                    width: 1,
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.handshake, color: AppColors.deepText, size: 40),
+                    const Icon(Icons.handshake, color: AppColors.candleGold, size: 40),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'เป็นตัวแทน Horora',
-                      style: TextStyle(
-                        color: AppColors.deepText,
+                      style: SacredText.kanit(
+                        color: AppColors.onBackdrop,
                         fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'แชร์ลิงก์ให้เพื่อน เมื่อเพื่อนสั่งฝากบุญ\nคุณได้รับค่าแนะนำสูงสุด 23%',
-                      style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
+                      style: SacredText.kanit(
+                          color: AppColors.onBackdropMuted, fontSize: 14),
                     ),
                   ],
                 ),
@@ -117,9 +127,12 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
               const SizedBox(height: 24),
 
               // Commission rates
-              const Text(
+              Text(
                 'อัตราค่าแนะนำ',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: SacredText.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 12),
               _buildRateRow('ไหว้มงคล (฿199)', '15%'),
@@ -129,17 +142,28 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
               const SizedBox(height: 8),
               Text(
                 '* อัตราเริ่มต้น ระดับ Bronze - ยิ่งขายมาก ยิ่งได้มาก!',
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                style: SacredText.kanit(
+                    fontSize: 12, color: AppColors.onBackdropMuted),
               ),
               const SizedBox(height: 24),
 
               // Payment method
-              const Text(
+              Text(
                 'ข้อมูลรับเงิน',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: SacredText.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 12),
               SegmentedButton<String>(
+                style: SegmentedButton.styleFrom(
+                  foregroundColor: AppColors.onBackdropMuted,
+                  selectedForegroundColor: AppColors.deepText,
+                  selectedBackgroundColor: AppColors.candleGold.withValues(alpha: 0.85),
+                  side: BorderSide(
+                      color: AppColors.candleGold.withValues(alpha: 0.5)),
+                ),
                 segments: const [
                   ButtonSegment(value: 'promptpay', label: Text('พร้อมเพย์')),
                   ButtonSegment(value: 'bank', label: Text('โอนธนาคาร')),
@@ -152,11 +176,12 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
               if (_paymentMethod == 'promptpay') ...[
                 TextFormField(
                   controller: _promptpayController,
-                  decoration: const InputDecoration(
-                    labelText: 'เลขพร้อมเพย์',
-                    hintText: 'เบอร์โทรหรือเลขบัตรประชาชน',
-                    prefixIcon: Icon(Icons.phone_android),
-                    border: OutlineInputBorder(),
+                  style: SacredText.kanit(color: AppColors.deepText, fontSize: 14),
+                  decoration: sacredInputDecoration(
+                    label: 'เลขพร้อมเพย์',
+                    hint: 'เบอร์โทรหรือเลขบัตรประชาชน',
+                    prefixIcon: const Icon(Icons.phone_android,
+                        color: AppColors.deepGoldBrown),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) => v == null || v.isEmpty ? 'กรุณากรอกเลขพร้อมเพย์' : null,
@@ -164,21 +189,23 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
               ] else ...[
                 TextFormField(
                   controller: _bankNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'ธนาคาร',
-                    hintText: 'เช่น กสิกรไทย, กรุงเทพ',
-                    prefixIcon: Icon(Icons.account_balance),
-                    border: OutlineInputBorder(),
+                  style: SacredText.kanit(color: AppColors.deepText, fontSize: 14),
+                  decoration: sacredInputDecoration(
+                    label: 'ธนาคาร',
+                    hint: 'เช่น กสิกรไทย, กรุงเทพ',
+                    prefixIcon: const Icon(Icons.account_balance,
+                        color: AppColors.deepGoldBrown),
                   ),
                   validator: (v) => v == null || v.isEmpty ? 'กรุณากรอกชื่อธนาคาร' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _bankAccountController,
-                  decoration: const InputDecoration(
-                    labelText: 'เลขบัญชี',
-                    prefixIcon: Icon(Icons.credit_card),
-                    border: OutlineInputBorder(),
+                  style: SacredText.kanit(color: AppColors.deepText, fontSize: 14),
+                  decoration: sacredInputDecoration(
+                    label: 'เลขบัญชี',
+                    prefixIcon: const Icon(Icons.credit_card,
+                        color: AppColors.deepGoldBrown),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) => v == null || v.isEmpty ? 'กรุณากรอกเลขบัญชี' : null,
@@ -186,10 +213,11 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _bankAccountNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'ชื่อบัญชี',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
+                  style: SacredText.kanit(color: AppColors.deepText, fontSize: 14),
+                  decoration: sacredInputDecoration(
+                    label: 'ชื่อบัญชี',
+                    prefixIcon: const Icon(Icons.person,
+                        color: AppColors.deepGoldBrown),
                   ),
                   validator: (v) => v == null || v.isEmpty ? 'กรุณากรอกชื่อบัญชี' : null,
                 ),
@@ -202,7 +230,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.deepGoldBrown,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
@@ -215,8 +243,12 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-            ],
-          ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -228,18 +260,21 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(packageName, style: const TextStyle(fontSize: 14)),
+          Text(packageName,
+              style: SacredText.kanit(
+                  color: AppColors.onBackdrop, fontSize: 14)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
+              color: AppColors.candleGold.withValues(alpha: 0.18),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               rate,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
+              style: SacredText.kanit(
+                color: AppColors.candleGold,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
               ),
             ),
           ),

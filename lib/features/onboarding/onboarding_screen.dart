@@ -22,21 +22,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: 'ดูดวงรายวัน',
       description: 'รับคำทำนายดวงชะตาประจำวันที่แม่นยำ ครอบคลุมทั้งเรื่องความรัก การงาน และสุขภาพ',
       imagePath: 'assets/images/onboarding/horoscope.png',
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: AppColors.templeIndigo,
       icon: Icons.star,
     ),
     OnboardingPageData(
       title: 'อ่านไพ่ทาโรต์',
       description: 'ค้นหาคำตอบและแนวทางในชีวิตผ่านการอ่านไพ่ทาโรต์ที่ลึกซึ้งและแม่นยำ',
       imagePath: 'assets/images/onboarding/tarot.png',
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: AppColors.nightPlum,
       icon: Icons.auto_awesome,
     ),
     OnboardingPageData(
       title: 'สนทนากับที่ปรึกษาดวงดาว',
       description: 'พูดคุยกับ AI ที่ปรึกษาด้านดวงดาวของเราเพื่อรับคำแนะนำและคำทำนายที่เฉพาะเจาะจงสำหรับคุณ',
       imagePath: 'assets/images/onboarding/chat.png',
-      backgroundColor: const Color(0xFF0F3460),
+      backgroundColor: AppColors.softPlum,
       icon: Icons.chat_bubble_outline,
     ),
   ];
@@ -72,6 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.templeIndigo,
       body: Stack(
         children: [
           PageView.builder(
@@ -107,8 +108,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               effect: ExpandingDotsEffect(
                 dotHeight: 8,
                 dotWidth: 8,
-                activeDotColor: AppColors.primary,
-                dotColor: Colors.white.withValues(alpha: 0.5),
+                activeDotColor: AppColors.accent,
+                dotColor: AppColors.onBackdrop.withValues(alpha: 0.35),
                 spacing: 8,
               ),
             ),

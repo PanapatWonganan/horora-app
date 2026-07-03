@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_colors.dart';
+
 class SocialLoginButton extends StatelessWidget {
   final Widget icon;
   final VoidCallback onPressed;
   final double size;
   final Color backgroundColor;
-  final Color borderColor;
+  final Color? borderColor;
 
   const SocialLoginButton({
     Key? key,
@@ -13,7 +15,7 @@ class SocialLoginButton extends StatelessWidget {
     required this.onPressed,
     this.size = 50,
     this.backgroundColor = Colors.transparent,
-    this.borderColor = Colors.white30,
+    this.borderColor,
   }) : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class SocialLoginButton extends StatelessWidget {
           shape: BoxShape.circle,
           color: backgroundColor,
           border: Border.all(
-            color: borderColor,
+            color: borderColor ?? AppColors.warmCardBorder,
             width: 1,
           ),
         ),

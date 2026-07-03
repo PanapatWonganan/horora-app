@@ -45,7 +45,7 @@ void main() {
     final data = OnboardingData(
       name: 'มินทร์',
       birthDate: DateTime(1995, 4, 12),
-      primaryInterest: PrimaryInterest.finance,
+      interests: {PrimaryInterest.finance},
     );
 
     await pumpRegister(tester, args: data);

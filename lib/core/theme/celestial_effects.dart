@@ -10,16 +10,19 @@ import 'app_colors.dart';
 /// and a staggered entrance reveal. Pure visual helpers — no logic/state of the
 /// app passes through here.
 
-/// A multi-stop "mesh-like" celestial gradient for full-screen backdrops.
-/// Layer ambient radial glows (see [CelestialGlow]) on top for the mesh feel.
+/// A multi-stop "mesh-like" Sacred-Astrology backdrop for full-screen surfaces:
+/// a deep temple indigo → night-plum → soft-plum descent (a quiet temple sky at
+/// dusk). Layer ambient candle/plum glows (see [CelestialGlow]) on top for the
+/// mesh feel. NOT a saturated/neon purple — the stops stay muted and dark so
+/// gilt accents and ivory cards read premium against them.
 const LinearGradient celestialBackdrop = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    Color(0xFFFBF7FF), // sky
-    Color(0xFFF6F0FF), // faint lavender
-    Color(0xFFFFF4F0), // warm peach wash
-    Color(0xFFFFF7EC), // cream
+    Color(0xFF241C35), // deep temple indigo
+    Color(0xFF2B2140), // indigo→plum
+    Color(0xFF332647), // warm night plum
+    Color(0xFF3D2C50), // soft plum glow at the foot
   ],
   stops: [0.0, 0.4, 0.75, 1.0],
 );
@@ -93,7 +96,9 @@ class _GrainPainter extends CustomPainter {
       final dx = rng.nextDouble() * size.width;
       final dy = rng.nextDouble() * size.height;
       final a = opacity * (0.4 + rng.nextDouble() * 0.6);
-      paint.color = (rng.nextBool() ? AppColors.deepText : AppColors.primary)
+      // Light gilt/ivory specks read as faint stardust over the deep indigo
+      // backdrop (dark ink grain would vanish into the plum).
+      paint.color = (rng.nextBool() ? AppColors.candleGold : AppColors.onBackdrop)
           .withValues(alpha: a);
       canvas.drawCircle(Offset(dx, dy), rng.nextDouble() * 0.9 + 0.2, paint);
     }

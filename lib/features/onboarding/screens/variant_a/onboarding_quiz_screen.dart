@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter/material.dart' as material show TimeOfDay;
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/sacred_ui.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/services/guest_session_service.dart';
@@ -64,20 +65,8 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.mysticalGradient[1].withValues(alpha: 0.35),
-              AppColors.cosmicGradient[1].withValues(alpha: 0.30),
-            ],
-            stops: const [0.0, 0.65, 1.0],
-          ),
-        ),
+      backgroundColor: AppColors.templeIndigo,
+      body: SacredBackground(
         child: SafeArea(
           child: Column(
             children: [
@@ -89,20 +78,17 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: AppColors.lightSurface,
+                          color: AppColors.onBackdrop.withValues(alpha: 0.06),
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.10),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                          border: Border.all(
+                            color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                            width: 1,
+                          ),
                         ),
                         child: IconButton(
                           onPressed: _previousPage,
                           icon: const SvgIcon(AppIcons.arrowBack,
-                              size: 20, color: AppColors.deepText),
+                              size: 20, color: AppColors.onBackdrop),
                         ),
                       ),
                       Expanded(
@@ -185,7 +171,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
             'ค้นพบเส้นทางมงคล\nของคุณ',
             textAlign: TextAlign.center,
             style: GoogleFonts.kanit(
-              color: AppColors.deepText,
+              color: AppColors.onBackdrop,
               fontSize: 30,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -197,7 +183,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
             'ตอบคำถามง่ายๆ 4 ข้อ\nเพื่อรับคำทำนายที่เหมาะกับคุณโดยเฉพาะ',
             textAlign: TextAlign.center,
             style: GoogleFonts.kanit(
-              color: AppColors.mutedText,
+              color: AppColors.onBackdropMuted,
               fontSize: 16,
               height: 1.5,
             ),
@@ -264,7 +250,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'คุณต้องการเสริมดวง\nด้านไหนมากที่สุด?',
             style: GoogleFonts.kanit(
-              color: AppColors.deepText,
+              color: AppColors.onBackdrop,
               fontSize: 27,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -274,7 +260,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'เลือก 1 ข้อที่ตรงกับคุณมากที่สุด',
             style: GoogleFonts.kanit(
-              color: AppColors.mutedText,
+              color: AppColors.onBackdropMuted,
               fontSize: 14,
             ),
           ),
@@ -295,7 +281,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                   isSelected: isSelected,
                   onTap: () {
                     setState(() {
-                      _data = _data.copyWith(primaryInterest: interest);
+                      _data = _data.copyWith(interests: {interest});
                     });
                     Future.delayed(const Duration(milliseconds: 300), _nextPage);
                   },
@@ -319,7 +305,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'วันเกิดของคุณ',
             style: GoogleFonts.kanit(
-              color: AppColors.deepText,
+              color: AppColors.onBackdrop,
               fontSize: 28,
               fontWeight: FontWeight.w700,
             ),
@@ -328,7 +314,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'เพื่อวิเคราะห์ดวงชะตาตามราศีและปีนักษัตร',
             style: GoogleFonts.kanit(
-              color: AppColors.mutedText,
+              color: AppColors.onBackdropMuted,
               fontSize: 14,
             ),
           ),
@@ -503,7 +489,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'คุณชอบเสริมดวง\nแบบไหน?',
             style: GoogleFonts.kanit(
-              color: AppColors.deepText,
+              color: AppColors.onBackdrop,
               fontSize: 27,
               fontWeight: FontWeight.w700,
               height: 1.35,
@@ -513,7 +499,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'เราจะแนะนำบริการที่เหมาะกับคุณ',
             style: GoogleFonts.kanit(
-              color: AppColors.mutedText,
+              color: AppColors.onBackdropMuted,
               fontSize: 14,
             ),
           ),
@@ -598,7 +584,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                   'ผลวิเคราะห์ของคุณ',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
+                    color: AppColors.onBackdrop,
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
@@ -673,7 +659,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                       Text(
                         'คำทำนายประจำวันของคุณ',
                         style: GoogleFonts.kanit(
-                          color: AppColors.deepText,
+                          color: AppColors.onBackdrop,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -683,7 +669,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
                         'สมัครสมาชิกเพื่อดูคำทำนายฉบับเต็ม\nและรับการแจ้งเตือนวันมงคล',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.kanit(
-                          color: AppColors.mutedText,
+                          color: AppColors.onBackdropMuted,
                           fontSize: 14,
                           height: 1.4,
                         ),
@@ -807,7 +793,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'สมัครสมาชิก',
             style: GoogleFonts.kanit(
-              color: AppColors.deepText,
+              color: AppColors.onBackdrop,
               fontSize: 28,
               fontWeight: FontWeight.w700,
             ),
@@ -816,7 +802,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
           Text(
             'รับคำทำนายส่วนตัวและการแจ้งเตือนวันมงคล',
             style: GoogleFonts.kanit(
-              color: AppColors.mutedText,
+              color: AppColors.onBackdropMuted,
               fontSize: 14,
             ),
           ),
@@ -938,7 +924,7 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
               child: Text(
                 'มีบัญชีแล้ว? เข้าสู่ระบบ',
                 style: GoogleFonts.kanit(
-                  color: AppColors.mutedText,
+                  color: AppColors.onBackdropMuted,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -969,24 +955,21 @@ class _OnboardingQuizScreenState extends State<OnboardingQuizScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primary.withValues(alpha: 0.16),
-                AppColors.secondary.withValues(alpha: 0.18),
-              ],
-            ),
+            color: AppColors.accent.withValues(alpha: 0.16),
             shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.accent.withValues(alpha: 0.30),
+              width: 1,
+            ),
           ),
-          child: SvgIcon(svgIconPath, color: AppColors.primary, size: 20),
+          child: SvgIcon(svgIconPath, color: AppColors.accent, size: 20),
         ),
         const SizedBox(width: 14),
         Expanded(
           child: Text(
             text,
             style: GoogleFonts.kanit(
-              color: AppColors.deepText.withValues(alpha: 0.88),
+              color: AppColors.onBackdrop.withValues(alpha: 0.92),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utils/app_icons.dart';
@@ -11,12 +12,12 @@ class QuickActions extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'ทางลัด',
-          style: TextStyle(
-            color: Colors.white,
+          style: GoogleFonts.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 20.0,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 16.0),
@@ -95,8 +96,8 @@ class QuickActions extends StatelessWidget {
           const SizedBox(height: 8.0),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: GoogleFonts.kanit(
+              color: AppColors.onBackdropMuted,
               fontSize: 12.0,
             ),
           ),

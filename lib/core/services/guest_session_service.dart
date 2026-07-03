@@ -90,6 +90,8 @@ class GuestSessionService {
           ? '${birthTime.hour.toString().padLeft(2, '0')}:'
               '${birthTime.minute.toString().padLeft(2, '0')}'
           : null,
+      'referral_source': data.referralSource?.name,
+      'interests': data.interests.map((e) => e.name).toList(),
       'primary_interest': data.primaryInterest?.name,
       'spiritual_style': data.spiritualStyle?.name,
       'merit_frequency': data.meritFrequency?.name,
@@ -102,10 +104,11 @@ class GuestSessionService {
       name: map['name'] as String?,
       birthDate: _parseDate(map['birth_date']),
       birthTime: _parseTime(map['birth_time']),
-      primaryInterest: _parseEnum(
-        PrimaryInterest.values,
-        map['primary_interest'],
+      referralSource: _parseEnum(
+        ReferralSource.values,
+        map['referral_source'],
       ),
+      interests: _parseInterests(map),
       spiritualStyle: _parseEnum(
         SpiritualStyle.values,
         map['spiritual_style'],
@@ -131,6 +134,21 @@ class GuestSessionService {
     final minute = int.tryParse(parts[1]);
     if (hour == null || minute == null) return null;
     return BirthTime(hour: hour, minute: minute);
+  }
+
+  /// อ่านชุดความสนใจ — รองรับทั้งฟอร์แมตใหม่ (interests: [...]) และ
+  /// ข้อมูลเก่าที่มีแค่ primary_interest เดี่ยว
+  Set<PrimaryInterest> _parseInterests(Map<String, dynamic> map) {
+    final raw = map['interests'];
+    if (raw is List) {
+      final parsed = raw
+          .map((e) => _parseEnum(PrimaryInterest.values, e))
+          .whereType<PrimaryInterest>()
+          .toSet();
+      if (parsed.isNotEmpty) return parsed;
+    }
+    final legacy = _parseEnum(PrimaryInterest.values, map['primary_interest']);
+    return legacy != null ? {legacy} : <PrimaryInterest>{};
   }
 
   /// แปลงชื่อ enum (.name) กลับเป็นค่า enum; null ถ้าไม่ตรง

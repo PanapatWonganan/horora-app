@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../report/report_dialog.dart';
 
@@ -25,6 +26,9 @@ class ChatMessageItem extends StatelessWidget {
       return _buildSystemMessage(context);
     }
     
+    final bubbleTextColor =
+        isUser ? AppColors.onBackdrop : AppColors.deepText;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -33,16 +37,23 @@ class ChatMessageItem extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isUser
-              ? AppColors.primary.withValues(alpha: 0.2)
-              : AppColors.darkSurface,
+          // USER bubble = saturated soft plum with light text; BOT/assistant
+          // bubble = warm ivory with dark ink (keeps the Sacred card language).
+          color: isUser ? AppColors.chatBubble : AppColors.lightSurface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isUser
-                ? AppColors.primary.withValues(alpha: 0.3)
-                : Colors.grey.withValues(alpha: 0.3),
+                ? AppColors.softPlum.withValues(alpha: 0.5)
+                : AppColors.warmCardBorder.withValues(alpha: 0.7),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.templeIndigo.withValues(alpha: 0.14),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -58,18 +69,20 @@ class ChatMessageItem extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 12,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                          backgroundColor:
+                              AppColors.candleGold.withValues(alpha: 0.18),
                           child: const Icon(
                             Icons.auto_awesome,
-                            color: AppColors.primary,
+                            color: AppColors.deepGoldBrown,
                             size: 12,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           'นักพยากรณ์',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.kanit(
+                            color: AppColors.deepGoldBrown,
+                            fontWeight: FontWeight.w700,
                             fontSize: 12,
                           ),
                         ),
@@ -81,7 +94,7 @@ class ChatMessageItem extends StatelessWidget {
                         child: Icon(
                           Icons.flag_outlined,
                           size: 16,
-                          color: Colors.grey.withValues(alpha: 0.6),
+                          color: AppColors.mutedText.withValues(alpha: 0.7),
                         ),
                       ),
                   ],
@@ -92,9 +105,10 @@ class ChatMessageItem extends StatelessWidget {
                   ? _buildTypingIndicator()
                   : Text(
                       message,
-                      style: TextStyle(
-                        color: isUser ? Colors.white : Colors.white,
+                      style: GoogleFonts.kanit(
+                        color: bubbleTextColor,
                         fontSize: 14,
+                        height: 1.45,
                       ),
                     ),
             ],
@@ -131,22 +145,22 @@ class ChatMessageItem extends StatelessWidget {
     Color elementColor = AppColors.primary;
     
     if (zodiacSign != null) {
-      // กำหนดธาตุตามราศี
+      // กำหนดธาตุตามราศี — temple-toned element colors
       if (['เมษ', 'สิงห์', 'ธนู'].contains(zodiacSign)) {
         element = 'ไฟ';
-        elementColor = Colors.orange;
+        elementColor = AppColors.fireElement;
         zodiacIcon = Icons.local_fire_department;
       } else if (['พฤษภ', 'กันย์', 'มังกร'].contains(zodiacSign)) {
         element = 'ดิน';
-        elementColor = Colors.brown;
+        elementColor = AppColors.earthElement;
         zodiacIcon = Icons.landscape;
       } else if (['เมถุน', 'ตุลย์', 'กุมภ์'].contains(zodiacSign)) {
         element = 'ลม';
-        elementColor = Colors.lightBlue;
+        elementColor = AppColors.airElement;
         zodiacIcon = Icons.air;
       } else if (['กรกฎ', 'พิจิก', 'มีน'].contains(zodiacSign)) {
         element = 'น้ำ';
-        elementColor = Colors.blue;
+        elementColor = AppColors.waterElement;
         zodiacIcon = Icons.water_drop;
       }
     }
@@ -156,23 +170,27 @@ class ChatMessageItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: isZodiacMessage
-            ? (element != null ? elementColor.withValues(alpha: 0.15) : AppColors.primary.withValues(alpha: 0.15))
-            : AppColors.darkSurface.withValues(alpha: 0.7),
+            ? (element != null
+                ? elementColor.withValues(alpha: 0.12)
+                : AppColors.candleGold.withValues(alpha: 0.12))
+            : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isZodiacMessage
-              ? (element != null ? elementColor.withValues(alpha: 0.3) : AppColors.primary.withValues(alpha: 0.3))
-              : AppColors.primary.withValues(alpha: 0.1),
+              ? (element != null
+                  ? elementColor.withValues(alpha: 0.4)
+                  : AppColors.candleGold.withValues(alpha: 0.5))
+              : AppColors.warmCardBorder.withValues(alpha: 0.7),
           width: 1,
         ),
-        boxShadow: isZodiacMessage ? [
+        boxShadow: [
           BoxShadow(
-            color: element != null ? elementColor.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
-            blurRadius: 8,
+            color: AppColors.templeIndigo.withValues(alpha: 0.12),
+            blurRadius: 10,
             spreadRadius: 0,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           )
-        ] : null,
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,19 +200,21 @@ class ChatMessageItem extends StatelessWidget {
               Icon(
                 isZodiacMessage ? zodiacIcon : Icons.info_outline,
                 size: 18,
-                color: isZodiacMessage 
-                    ? (element != null ? elementColor : AppColors.primary)
-                    : AppColors.lightText.withValues(alpha: 0.7),
+                color: isZodiacMessage
+                    ? (element != null ? elementColor : AppColors.deepGoldBrown)
+                    : AppColors.deepGoldBrown,
               ),
               const SizedBox(width: 8),
               Text(
                 isZodiacMessage ? 'ข้อมูลดวงดาวของคุณ' : 'ข้อความจากระบบ',
-                style: TextStyle(
-                  color: isZodiacMessage 
-                      ? (element != null ? elementColor : AppColors.primary)
-                      : AppColors.lightText,
+                style: GoogleFonts.kanit(
+                  color: isZodiacMessage
+                      ? (element != null
+                          ? elementColor
+                          : AppColors.deepGoldBrown)
+                      : AppColors.deepText,
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               if (element != null) ...[
@@ -202,15 +222,15 @@ class ChatMessageItem extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: elementColor.withValues(alpha: 0.2),
+                    color: elementColor.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'ธาตุ$element',
-                    style: TextStyle(
+                    style: GoogleFonts.kanit(
                       color: elementColor,
                       fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -220,8 +240,8 @@ class ChatMessageItem extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             message,
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.9),
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
               fontSize: 13,
               height: 1.5,
             ),

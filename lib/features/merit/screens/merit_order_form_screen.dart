@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
+import '../widgets/merit_ui.dart';
 import 'merit_payment_screen.dart';
 
 /// หน้ากรอกข้อมูลสั่งซื้อ
@@ -98,7 +101,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedPackage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('กรุณาเลือกแพ็คเกจ')),
+        const SnackBar(content: Text('กรุณาเลือกชุดร่วมบุญ')),
       );
       return;
     }
@@ -126,17 +129,8 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
+      body: SilkCandleBackdrop(
+        warmHero: false,
         child: SafeArea(
           child: Column(
             children: [
@@ -175,21 +169,29 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: AppColors.deepText),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
           ),
-          const Expanded(
-            child: Text(
-              'กรอกข้อมูล',
-              style: TextStyle(
-                color: AppColors.deepText,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const MeritOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted),
+                const SizedBox(height: 2),
+                Text(
+                  'กรอกข้อมูลร่วมบุญ',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -232,16 +234,16 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               children: [
                 Text(
                   widget.location.nameTh,
-                  style: const TextStyle(
+                  style: GoogleFonts.kanit(
                     color: AppColors.deepText,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 if (widget.location.belief != null)
                   Text(
                     widget.location.belief!,
-                    style: const TextStyle(
+                    style: GoogleFonts.kanit(
                       color: MeritColors.accentDark,
                       fontSize: 12,
                     ),
@@ -258,13 +260,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'เลือกแพ็คเกจ',
-          style: TextStyle(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        const MeritSectionTitle(
+          'เลือกชุดร่วมบุญ',
+          overline: 'Choose package',
+          icon: AppIcons.star,
         ),
         const SizedBox(height: 16),
         ..._packages.map((package) => _buildPackageCard(package)),
@@ -298,10 +297,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               children: [
                 Text(
                   package.nameTh,
-                  style: TextStyle(
+                  style: GoogleFonts.kanit(
                     color: isSelected ? MeritColors.accentDark : AppColors.deepText,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Container(
@@ -315,9 +314,9 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                   ),
                   child: Text(
                     package.priceFormatted,
-                    style: TextStyle(
+                    style: GoogleFonts.fraunces(
                       color: isSelected ? AppColors.deepText : MeritColors.accentDark,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -390,13 +389,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'ข้อมูลผู้ขอพร',
-          style: TextStyle(
-            color: AppColors.deepText,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+        const MeritSectionTitle(
+          'ข้อมูลผู้ร่วมบุญ',
+          overline: 'Your details',
+          icon: AppIcons.heart,
         ),
         const SizedBox(height: 16),
 
@@ -463,9 +459,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: GoogleFonts.kanit(
             color: AppColors.deepText,
             fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 8),
@@ -474,10 +471,10 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
           maxLines: maxLines,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(color: AppColors.deepText),
+          style: GoogleFonts.kanit(color: AppColors.deepText),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.mutedText),
+            hintStyle: GoogleFonts.kanit(color: AppColors.mutedText),
             filled: true,
             fillColor: MeritColors.inputBackground,
             border: OutlineInputBorder(
@@ -522,12 +519,12 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
         ),
         child: Text(
           _selectedPackage != null
-              ? 'ดำเนินการต่อ ${_selectedPackage!.priceFormatted}'
-              : 'เลือกแพ็คเกจก่อน',
-          style: const TextStyle(
+              ? 'ร่วมบุญ ${_selectedPackage!.priceFormatted}'
+              : 'เลือกชุดร่วมบุญก่อน',
+          style: GoogleFonts.kanit(
             color: AppColors.deepText,
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),

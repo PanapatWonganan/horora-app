@@ -133,7 +133,9 @@ class InAppMessageDialog extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
-                              Icons.close,
+                              // Rounded dismiss — matches the app's rounded
+                              // line-icon language.
+                              Icons.close_rounded,
                               color: AppColors.mutedText,
                               size: 20,
                             ),

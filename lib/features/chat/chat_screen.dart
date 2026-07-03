@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/routes/routes.dart';
 import '../../core/services/auth_guard.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -84,45 +86,53 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
       value: _viewModel,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.home);
-            },
-          ),
-          title: Consumer<ChatViewModel>(
-            builder: (context, viewModel, _) {
-              return Text(
-                viewModel.currentSession?.topic ?? 'สนทนากับนักพยากรณ์',
-              );
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                _showOptionsMenu();
-              },
-            ),
-          ],
-        ),
+      child: SacredScaffold(
+        showSpecks: false,
         body: Column(
           children: [
+            SafeArea(
+              bottom: false,
+              child: Consumer<ChatViewModel>(
+                builder: (context, viewModel, _) {
+                  return SacredHeader(
+                    overline: 'DUANGJAI ORACLE',
+                    title: viewModel.currentSession?.topic ??
+                        'สนทนากับนักพยากรณ์',
+                    onBack: () {
+                      Navigator.pushReplacementNamed(context, AppRoutes.home);
+                    },
+                    trailing: _SacredHeaderAction(
+                      icon: Icons.more_vert,
+                      onTap: _showOptionsMenu,
+                    ),
+                  );
+                },
+              ),
+            ),
             // Messages list
             Expanded(
               child: Consumer<ChatViewModel>(
                 builder: (context, viewModel, _) {
                   if (viewModel.state == ChatViewState.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.candleGold,
+                      ),
+                    );
                   }
 
                   if (viewModel.state == ChatViewState.error) {
                     return Center(
-                      child: Text(
-                        viewModel.errorMessage ?? 'เกิดข้อผิดพลาด',
-                        style: const TextStyle(color: Colors.red),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          viewModel.errorMessage ?? 'เกิดข้อผิดพลาด',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.kanit(
+                            color: AppColors.error,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     );
                   }
@@ -135,13 +145,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           Icon(
                             Icons.chat_bubble_outline,
                             size: 64,
-                            color: AppColors.primary.withValues(alpha: 0.5),
+                            color: AppColors.onBackdrop.withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'เริ่มสนทนากับนักพยากรณ์',
-                            style: TextStyle(
-                              color: AppColors.lightText.withValues(alpha: 0.7),
+                            style: GoogleFonts.kanit(
+                              color: AppColors.onBackdropMuted,
                               fontSize: 16,
                             ),
                           ),
@@ -204,7 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _showOptionsMenu() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.darkSurface,
+      backgroundColor: AppColors.lightSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -213,9 +223,14 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.refresh),
-                title: const Text('เริ่มการสนทนาใหม่'),
+                leading:
+                    const Icon(Icons.refresh, color: AppColors.deepGoldBrown),
+                title: Text(
+                  'เริ่มการสนทนาใหม่',
+                  style: GoogleFonts.kanit(color: AppColors.deepText),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _viewModel.endSession();
@@ -223,26 +238,43 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.history),
-                title: const Text('ประวัติการสนทนา'),
+                leading:
+                    const Icon(Icons.history, color: AppColors.deepGoldBrown),
+                title: Text(
+                  'ประวัติการสนทนา',
+                  style: GoogleFonts.kanit(color: AppColors.deepText),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.pushReplacementNamed(context, AppRoutes.historyChat);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: const Text('วิธีใช้งาน'),
+                leading: const Icon(Icons.help_outline,
+                    color: AppColors.deepGoldBrown),
+                title: Text(
+                  'วิธีใช้งาน',
+                  style: GoogleFonts.kanit(color: AppColors.deepText),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _showHelpDialog();
                 },
               ),
-              const Divider(height: 1),
+              const Divider(height: 1, color: AppColors.divider),
               ListTile(
-                leading: Icon(Icons.flag, color: Colors.red.shade400),
-                title: const Text('รายงานเนื้อหา'),
-                subtitle: const Text('รายงาน AI content ที่ไม่เหมาะสม'),
+                leading: const Icon(Icons.flag, color: AppColors.error),
+                title: Text(
+                  'รายงานเนื้อหา',
+                  style: GoogleFonts.kanit(color: AppColors.deepText),
+                ),
+                subtitle: Text(
+                  'รายงาน AI content ที่ไม่เหมาะสม',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.mutedText,
+                    fontSize: 12,
+                  ),
+                ),
                 onTap: () {
                   Navigator.pop(context);
                   _showReportOptions();
@@ -259,31 +291,57 @@ class _ChatScreenState extends State<ChatScreen> {
     showDialog(
       context: context,
       builder: (context) {
+        final bodyStyle = GoogleFonts.kanit(
+          color: AppColors.deepText,
+          fontSize: 14,
+          height: 1.5,
+        );
         return AlertDialog(
-          title: const Text('วิธีใช้งานการสนทนากับนักพยากรณ์'),
-          content: const SingleChildScrollView(
+          backgroundColor: AppColors.lightSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            'วิธีใช้งานการสนทนากับนักพยากรณ์',
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontWeight: FontWeight.w700,
+              fontSize: 17,
+            ),
+          ),
+          content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                    '1. เลือกหัวข้อที่ต้องการสนทนา เช่น ความรัก การงาน สุขภาพ'),
-                SizedBox(height: 8),
-                Text('2. พิมพ์คำถามที่ต้องการถาม'),
-                SizedBox(height: 8),
-                Text('3. นักพยากรณ์ AI จะวิเคราะห์และตอบคำถามของคุณ'),
-                SizedBox(height: 8),
-                Text('4. คุณสามารถถามคำถามเพิ่มเติมได้ตลอดการสนทนา'),
-                SizedBox(height: 8),
+                    '1. เลือกหัวข้อที่ต้องการสนทนา เช่น ความรัก การงาน สุขภาพ',
+                    style: bodyStyle),
+                const SizedBox(height: 8),
+                Text('2. พิมพ์คำถามที่ต้องการถาม', style: bodyStyle),
+                const SizedBox(height: 8),
+                Text('3. นักพยากรณ์ AI จะวิเคราะห์และตอบคำถามของคุณ',
+                    style: bodyStyle),
+                const SizedBox(height: 8),
+                Text('4. คุณสามารถถามคำถามเพิ่มเติมได้ตลอดการสนทนา',
+                    style: bodyStyle),
+                const SizedBox(height: 8),
                 Text(
-                    '5. เมื่อต้องการเริ่มการสนทนาใหม่ ให้กดที่เมนูและเลือก "เริ่มการสนทนาใหม่"'),
+                    '5. เมื่อต้องการเริ่มการสนทนาใหม่ ให้กดที่เมนูและเลือก "เริ่มการสนทนาใหม่"',
+                    style: bodyStyle),
               ],
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('เข้าใจแล้ว'),
+              child: Text(
+                'เข้าใจแล้ว',
+                style: GoogleFonts.kanit(
+                  color: AppColors.deepGoldBrown,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         );
@@ -304,32 +362,51 @@ class _ChatScreenState extends State<ChatScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: AppColors.lightSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         title: Row(
           children: [
-            Icon(Icons.flag, color: Colors.red.shade700),
+            const Icon(Icons.flag, color: AppColors.error),
             const SizedBox(width: 8),
-            const Text('รายงานเนื้อหา AI'),
+            Text(
+              'รายงานเนื้อหา AI',
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontWeight: FontWeight.w700,
+                fontSize: 17,
+              ),
+            ),
           ],
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'คุณต้องการรายงานข้อความใด?',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            SizedBox(height: 16),
-            Text('• กดไอคอนธงในข้อความ AI ที่ต้องการรายงาน'),
-            SizedBox(height: 8),
-            Text('• หรือรายงานการสนทนาทั้งหมด'),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
+            Text('• กดไอคอนธงในข้อความ AI ที่ต้องการรายงาน',
+                style: GoogleFonts.kanit(color: AppColors.mutedText)),
+            const SizedBox(height: 8),
+            Text('• หรือรายงานการสนทนาทั้งหมด',
+                style: GoogleFonts.kanit(color: AppColors.mutedText)),
+            const SizedBox(height: 16),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('ยกเลิก'),
+            child: Text(
+              'ยกเลิก',
+              style: GoogleFonts.kanit(color: AppColors.mutedText),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -350,10 +427,19 @@ class _ChatScreenState extends State<ChatScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('รายงานข้อความล่าสุด'),
+            child: Text(
+              'รายงานข้อความล่าสุด',
+              style: GoogleFonts.kanit(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -365,5 +451,35 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+}
+
+/// Calm header icon action drawn on the indigo backdrop — a faint ivory chip
+/// matching the Sacred back chip, used for the chat options menu.
+class _SacredHeaderAction extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _SacredHeaderAction({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: AppColors.onBackdrop.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: AppColors.onBackdrop.withValues(alpha: 0.12),
+            width: 1,
+          ),
+        ),
+        child: Icon(icon, size: 20, color: AppColors.onBackdrop),
+      ),
+    );
   }
 }

@@ -98,63 +98,40 @@ class WeeklyMeritSchedule {
   });
 
   /// ตารางการไปมูประจำสัปดาห์ (Default)
+  ///
+  /// จำกัดไว้ 3 สถานที่ตามขอบเขตการเดินทางของทีมงาน: พระตรีมูรติ (จันทร์),
+  /// พระพิฆเนศ ห้วยขวาง (พุธ), พระแม่ลักษมี (ศุกร์).
   static List<WeeklyMeritSchedule> get defaultSchedule => [
-    // วันจันทร์ - ศาลหลักเมือง
+    // วันจันทร์ - พระตรีมูรติ เซ็นทรัลเวิลด์
     const WeeklyMeritSchedule(
       day: MeritDay.monday,
-      locationId: 'city_pillar',
-      locationName: 'ศาลหลักเมือง',
-      belief: 'ความสำเร็จ การงาน ความมั่นคง',
+      locationId: 'trimurti_centralworld',
+      locationName: 'พระตรีมูรติ เซ็นทรัลเวิลด์',
+      belief: 'ความรัก คู่ครอง ความสัมพันธ์',
       requiredItems: [
-        MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
-        MeritOfferingItem(id: 'candle_1', name: 'เทียน 1 เล่ม', isRequired: true),
-        MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
-        MeritOfferingItem(id: 'lotus', name: 'ดอกบัว', isRequired: true),
+        MeritOfferingItem(id: 'incense_9', name: 'ธูปแดง 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'candle_pair', name: 'เทียนคู่', isRequired: true),
+        MeritOfferingItem(id: 'red_rose_9', name: 'กุหลาบแดง 9 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'garland_red', name: 'พวงมาลัยสีแดง', isRequired: true),
       ],
       addons: [
         MeritAddon(
-          id: 'lamp_oil',
-          name: 'น้ำมันเติมตะเกียง',
-          description: 'สื่อถึงการต่อช่วงโชติช่วงชัชวาล',
-          price: 99,
-        ),
-        MeritAddon(
-          id: 'silk_3_colors',
-          name: 'ผ้าแพร 3 สี',
-          description: 'ผ้าแพรมงคล 3 สี ถวายเพื่อเสริมบารมี',
+          id: 'lover_cloth',
+          name: 'ผ้าแดงคู่รัก',
+          description: 'ผ้าแดงถวายขอพรเรื่องคู่ครอง',
           price: 199,
         ),
-      ],
-    ),
-    // วันอังคาร - ศาลเจ้าพ่อเสือ
-    const WeeklyMeritSchedule(
-      day: MeritDay.tuesday,
-      locationId: 'tiger_shrine',
-      locationName: 'ศาลเจ้าพ่อเสือ',
-      belief: 'โชคลาภ การค้าขาย ป้องกันภัย',
-      requiredItems: [
-        MeritOfferingItem(id: 'pork_belly', name: 'หมูสามชั้นดิบ', isRequired: true),
-        MeritOfferingItem(id: 'raw_egg', name: 'ไข่ไก่ดิบ', isRequired: true),
-        MeritOfferingItem(id: 'sticky_rice_sweet', name: 'ข้าวเหนียวหวาน', isRequired: true),
-      ],
-      addons: [
         MeritAddon(
-          id: 'joss_paper',
-          name: 'กระดาษไหว้เจ้า',
-          description: 'เผาเพื่อส่งคำขอถึงเจ้าพ่อเสือ',
-          price: 129,
+          id: 'love_elephant_pair',
+          name: 'ช้างคู่ทองคำเปลว',
+          description: 'สื่อถึงความรักที่มั่นคงยืนยาว',
+          price: 249,
         ),
         MeritAddon(
-          id: 'lucky_orange',
-          name: 'ส้มมงคล 4 ลูก',
-          description: 'ส้มมงคลนำโชค เสริมความเป็นสิริมงคล',
-          price: 79,
-        ),
-        MeritAddon(
-          id: 'indian_incense',
-          name: 'ธูปหอมอินเดีย',
-          description: 'ธูปหอมเฉพาะจากอินเดีย',
-          price: 149,
+          id: 'jasmine_garland',
+          name: 'พวงมาลัยดอกมะลิ',
+          description: 'ดอกมะลิสื่อถึงความรักบริสุทธิ์',
+          price: 99,
         ),
       ],
     ),
@@ -191,116 +168,36 @@ class WeeklyMeritSchedule {
         ),
       ],
     ),
-    // วันพฤหัสบดี - วัดระฆังโฆสิตาราม (หลวงพ่อโต)
-    const WeeklyMeritSchedule(
-      day: MeritDay.thursday,
-      locationId: 'wat_rakang',
-      locationName: 'วัดระฆังโฆสิตาราม',
-      belief: 'โชคลาภ การเงิน ค้าขายร่ำรวย',
-      requiredItems: [
-        MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
-        MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        MeritOfferingItem(id: 'lotus_9', name: 'ดอกบัว 9 ดอก', isRequired: true),
-        MeritOfferingItem(id: 'gold_leaf', name: 'ทองคำเปลว', isRequired: true),
-      ],
-      addons: [
-        MeritAddon(
-          id: 'bell_offering',
-          name: 'ตีระฆังขอพร',
-          description: 'ตีระฆังส่งเสียงถึงสวรรค์',
-          price: 99,
-        ),
-        MeritAddon(
-          id: 'sanghathan',
-          name: 'ชุดสังฆทาน',
-          description: 'ถวายสังฆทานเสริมบุญ',
-          price: 299,
-        ),
-      ],
-    ),
-    // วันศุกร์ - วัดเล่งเน่ยยี่ (วัดมังกรกมลาวาส) - เจ้าแม่กวนอิม
+    // วันศุกร์ - พระแม่ลักษมี เซ็นทรัลลาดพร้าว
     const WeeklyMeritSchedule(
       day: MeritDay.friday,
-      locationId: 'wat_leng_noei_yi',
-      locationName: 'วัดเล่งเน่ยยี่ (วัดมังกรกมลาวาส)',
-      belief: 'เจ้าแม่กวนอิม - สุขภาพ ลูกหลาน ครอบครัว ขอบุตร',
+      locationId: 'lakshmi_central_ladprao',
+      locationName: 'พระแม่ลักษมี เซ็นทรัลลาดพร้าว',
+      belief: 'โชคลาภ ความมั่งคั่ง ความอุดมสมบูรณ์',
       requiredItems: [
-        MeritOfferingItem(id: 'incense_3', name: 'ธูป 3 ดอก', isRequired: true),
+        MeritOfferingItem(id: 'incense_9', name: 'ธูปหอมทอง 9 ดอก', isRequired: true),
         MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        MeritOfferingItem(id: 'fruit_5', name: 'ผลไม้ 5 อย่าง', isRequired: true),
-        MeritOfferingItem(id: 'flower_white', name: 'ดอกไม้สีขาว', isRequired: true),
+        MeritOfferingItem(id: 'pink_lotus', name: 'ดอกบัวชมพู', isRequired: true),
+        MeritOfferingItem(id: 'fruit_gold_9', name: 'ผลไม้สีทอง 9 อย่าง', isRequired: true),
       ],
       addons: [
         MeritAddon(
-          id: 'vegetarian_set',
-          name: 'ชุดอาหารเจ',
-          description: 'อาหารเจถวายเจ้าแม่กวนอิม',
+          id: 'gold_leaf_lakshmi',
+          name: 'ทองคำเปลวถวาย',
+          description: 'ปิดทององค์พระแม่ลักษมีเสริมโชคลาภ',
           price: 199,
         ),
         MeritAddon(
-          id: 'tea_offering',
-          name: 'ชาถวาย 3 ถ้วย',
-          description: 'ชาหอมถวายเจ้าแม่',
-          price: 79,
+          id: 'coin_offering',
+          name: 'เหรียญโปรยทรัพย์',
+          description: 'เหรียญมงคลถวายขอพรด้านการเงิน',
+          price: 129,
         ),
         MeritAddon(
-          id: 'joss_paper_gold',
-          name: 'กระดาษทอง',
-          description: 'กระดาษทองเผาถวาย',
-          price: 149,
-        ),
-      ],
-    ),
-    // วันเสาร์ - ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)
-    const WeeklyMeritSchedule(
-      day: MeritDay.saturday,
-      locationId: 'vessavana_sampheng',
-      locationName: 'ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)',
-      belief: 'ป้องกันภัย โชคลาภ เสริมดวง',
-      requiredItems: [
-        MeritOfferingItem(id: 'incense_9', name: 'ธูป 9 ดอก', isRequired: true),
-        MeritOfferingItem(id: 'candle_2', name: 'เทียน 2 เล่ม', isRequired: true),
-        MeritOfferingItem(id: 'red_water', name: 'น้ำแดง', isRequired: true),
-        MeritOfferingItem(id: 'garland_red', name: 'พวงมาลัยสีแดง', isRequired: true),
-      ],
-      addons: [
-        MeritAddon(
-          id: 'yantra',
-          name: 'ผ้ายันต์ท้าวเวสสุวรรณ',
-          description: 'ผ้ายันต์ป้องกันภัย',
-          price: 299,
-        ),
-        MeritAddon(
-          id: 'gold_leaf_9',
-          name: 'ทองคำเปลว 9 แผ่น',
-          description: 'ปิดทององค์ท้าวเวสสุวรรณ',
-          price: 199,
-        ),
-      ],
-    ),
-    // วันอาทิตย์ - ท้าวมหาพรหม เอราวัณ
-    const WeeklyMeritSchedule(
-      day: MeritDay.sunday,
-      locationId: 'brahma_erawan',
-      locationName: 'ท้าวมหาพรหม เอราวัณ',
-      belief: 'ขอพรทุกด้าน โชคลาภ ความสำเร็จ',
-      requiredItems: [
-        MeritOfferingItem(id: 'garland_7_colors', name: 'มาลัยเจ็ดสีเจ็ดศอก 4 พวง (4 พักตร์)', isRequired: true),
-        MeritOfferingItem(id: 'incense_12', name: 'ธูป 12 ดอก', isRequired: true),
-        MeritOfferingItem(id: 'candle_4', name: 'เทียน 4 เล่ม', isRequired: true),
-      ],
-      addons: [
-        MeritAddon(
-          id: 'thai_dance',
-          name: 'รำถวาย',
-          description: 'รำถวายบูชาองค์พระพรหม',
-          price: 599,
-        ),
-        MeritAddon(
-          id: 'gold_elephant',
-          name: 'ช้างทองคำเปลว',
-          description: 'ช้างมงคลปิดทองคำเปลว',
-          price: 299,
+          id: 'marigold_garland',
+          name: 'พวงมาลัยดอกดาวเรือง',
+          description: 'ดอกดาวเรืองสีทอง เสริมสิริมงคลด้านการเงิน',
+          price: 99,
         ),
       ],
     ),
@@ -395,68 +292,28 @@ class MeritLocation {
   // Default locations (fallback when offline)
   static List<MeritLocation> get defaultLocations => [
     const MeritLocation(
-      id: 'erawan',
-      nameTh: 'ศาลพระพรหม เอราวัณ',
-      nameEn: 'Erawan Shrine',
-      description: 'ศาลพระพรหมที่มีชื่อเสียงที่สุดในประเทศไทย',
-      belief: 'ขอพรทุกด้าน โชคลาภ ความสำเร็จ',
+      id: 'trimurti_centralworld',
+      nameTh: 'พระตรีมูรติ เซ็นทรัลเวิลด์',
+      nameEn: 'Trimurti Shrine CentralWorld',
+      description: 'ศาลพระตรีมูรติ ด้านหลังเซ็นทรัลเวิลด์',
+      belief: 'ความรัก คู่ครอง ความสัมพันธ์',
       sortOrder: 1,
     ),
     const MeritLocation(
-      id: 'city_pillar',
-      nameTh: 'ศาลหลักเมือง',
-      nameEn: 'City Pillar Shrine',
-      description: 'ศาลหลักเมืองกรุงเทพมหานคร',
-      belief: 'ความสำเร็จ การงาน ความมั่นคง',
+      id: 'ganesha_huaykwang',
+      nameTh: 'พระพิฆเนศ ห้วยขวาง',
+      nameEn: 'Ganesha Shrine Huai Khwang',
+      description: 'ศาลพระพิฆเนศที่ศักดิ์สิทธิ์ ใกล้สถานีรถไฟฟ้า MRT ห้วยขวาง',
+      belief: 'ขอโชคลาภ การงาน การเรียน ขจัดอุปสรรค',
       sortOrder: 2,
     ),
     const MeritLocation(
-      id: 'wat_rakang',
-      nameTh: 'วัดระฆังโฆสิตาราม',
-      nameEn: 'Wat Rakang',
-      description: 'วัดเก่าแก่ริมแม่น้ำเจ้าพระยา',
-      belief: 'การเงิน โชคลาภ ค้าขาย',
+      id: 'lakshmi_central_ladprao',
+      nameTh: 'พระแม่ลักษมี เซ็นทรัลลาดพร้าว',
+      nameEn: 'Lakshmi Shrine Central Ladprao',
+      description: 'ศาลพระแม่ลักษมี หน้าห้างเซ็นทรัลลาดพร้าว',
+      belief: 'โชคลาภ ความมั่งคั่ง ความอุดมสมบูรณ์',
       sortOrder: 3,
-    ),
-    const MeritLocation(
-      id: 'ganesha_central',
-      nameTh: 'พระพิฆเนศ เซ็นทรัลเวิลด์',
-      nameEn: 'Ganesha Central World',
-      description: 'พระพิฆเนศองค์ใหญ่หน้าเซ็นทรัลเวิลด์',
-      belief: 'การศึกษา ศิลปะ ความสำเร็จ',
-      sortOrder: 4,
-    ),
-    const MeritLocation(
-      id: 'guanyin_yaowarat',
-      nameTh: 'เจ้าแม่กวนอิม เยาวราช',
-      nameEn: 'Guanyin Yaowarat',
-      description: 'ศาลเจ้าแม่กวนอิมที่เก่าแก่ในย่านเยาวราช',
-      belief: 'สุขภาพ ลูกหลาน ครอบครัว',
-      sortOrder: 5,
-    ),
-    const MeritLocation(
-      id: 'wat_pho',
-      nameTh: 'วัดโพธิ์',
-      nameEn: 'Wat Pho',
-      description: 'วัดที่มีพระพุทธไสยาสน์ที่ใหญ่ที่สุด',
-      belief: 'สุขภาพ ปัดเป่าโรคภัย',
-      sortOrder: 6,
-    ),
-    const MeritLocation(
-      id: 'wat_suthat',
-      nameTh: 'วัดสุทัศนเทพวราราม',
-      nameEn: 'Wat Suthat',
-      description: 'วัดที่มีพระศรีศากยมุนี',
-      belief: 'ความสงบ สติปัญญา',
-      sortOrder: 7,
-    ),
-    const MeritLocation(
-      id: 'vessavana_sampheng',
-      nameTh: 'ท้าวเวสสุวรรณ วัดจุฬามณี (สำเพ็ง)',
-      nameEn: 'Vessavana Wat Chulamani Sampheng',
-      description: 'ท้าวเวสสุวรรณที่ศักดิ์สิทธิ์ย่านสำเพ็ง เยาวราช กทม.',
-      belief: 'ป้องกันภัย โชคลาภ ค้าขาย',
-      sortOrder: 8,
     ),
   ];
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
+import '../widgets/merit_ui.dart';
 import 'merit_payment_screen.dart';
 
 /// หน้าสั่งจองฝากมูตามตารางสัปดาห์
@@ -100,17 +102,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     final dateStr = DateFormat('d MMMM yyyy', 'th_TH').format(widget.selectedDate);
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
+      body: SilkCandleBackdrop(
         child: SafeArea(
           child: Column(
             children: [
@@ -123,26 +115,39 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Location & Date Info
-                        _buildInfoCard(dateStr),
+                        // Destination temple — make the real endpoint of the
+                        // merit unmistakable and verified before anything else.
+                        MeritDestinationBanner(
+                          templeName: widget.schedule.locationName,
+                          belief: widget.schedule.belief,
+                          subline: '${widget.schedule.day.displayName} · $dateStr',
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Faith-service trust signals (หลักฐาน / ปลายทาง / อนุโมทนา).
+                        const MeritTrustStrip(),
                         const SizedBox(height: 24),
 
                         // Package Selection
-                        _buildSectionTitle('📦 เลือกแพ็คเกจ'),
+                        _buildSectionTitle('🤍 เลือกชุดร่วมบุญ'),
                         const SizedBox(height: 12),
                         _buildPackageSelector(),
                         const SizedBox(height: 24),
 
                         // Add-ons
-                        _buildSectionTitle('✨ เพิ่มของไหว้พิเศษ'),
+                        _buildSectionTitle('✨ เพิ่มของถวายพิเศษ'),
                         const SizedBox(height: 12),
                         _buildAddonsSelector(),
                         const SizedBox(height: 24),
 
                         // Form Fields
-                        _buildSectionTitle('🙏 ข้อมูลผู้ขอพร'),
+                        _buildSectionTitle('🙏 ข้อมูลผู้ร่วมบุญ'),
                         const SizedBox(height: 12),
                         _buildFormFields(),
+                        const SizedBox(height: 20),
+
+                        // Dedication / wish — premium temple-paper input.
+                        MeritWishInput(controller: _wishController),
                         const SizedBox(height: 24),
 
                         // Price Summary
@@ -166,74 +171,26 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.deepText),
+            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
           ),
-          const Expanded(
-            child: Text(
-              'สั่งจองฝากมู',
-              style: TextStyle(
-                color: AppColors.deepText,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(String dateStr) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            MeritColors.accent.withValues(alpha: 0.25),
-            AppColors.secondary.withValues(alpha: 0.25),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: MeritColors.accent.withValues(alpha: 0.4),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const SvgIcon(AppIcons.temple, size: 28, color: AppColors.deepText),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const MeritOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted),
+                const SizedBox(height: 2),
                 Text(
-                  widget.schedule.locationName,
-                  style: const TextStyle(
-                    color: AppColors.deepText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${widget.schedule.day.displayName} - $dateStr',
-                  style: TextStyle(
-                    color: AppColors.deepText.withValues(alpha: 0.8),
-                    fontSize: 14,
+                  'รายละเอียดคำสั่งบุญ',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.onBackdrop,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
                   ),
                 ),
               ],
@@ -244,13 +201,16 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     );
   }
 
+
   Widget _buildSectionTitle(String title) {
+    // Section titles here sit directly on the deep celestial backdrop, so they
+    // use the light on-backdrop ink (not dark deepText, which is for ivory cards).
     return Text(
       title,
-      style: const TextStyle(
-        color: AppColors.deepText,
+      style: GoogleFonts.kanit(
+        color: AppColors.onBackdrop,
         fontSize: 18,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w700,
       ),
     );
   }
@@ -273,23 +233,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: MeritColors.accentGradient,
-                    )
-                  : null,
-              color: isSelected ? null : MeritColors.cardBackground,
+              color: isSelected ? AppColors.ricePaper : MeritColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
-              border: isSelected
-                  ? null
-                  : Border.all(color: AppColors.divider),
+              border: Border.all(
+                color: isSelected
+                    ? MeritColors.accent.withValues(alpha: 0.55)
+                    : AppColors.divider,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: (isSelected ? MeritColors.accent : AppColors.primary)
-                      .withValues(alpha: isSelected ? 0.3 : 0.06),
-                  blurRadius: isSelected ? 14 : 8,
+                      .withValues(alpha: isSelected ? 0.14 : 0.06),
+                  blurRadius: isSelected ? 12 : 8,
                   offset: const Offset(0, 6),
                 ),
               ],
@@ -308,11 +263,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: isSelected
-                                ? Colors.white
+                                ? MeritColors.accent.withValues(alpha: 0.16)
                                 : Colors.transparent,
                             border: Border.all(
                               color: isSelected
-                                  ? Colors.transparent
+                                  ? MeritColors.accentDark
                                   : AppColors.mutedText,
                               width: 2,
                             ),
@@ -351,7 +306,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.white.withValues(alpha: 0.45)
+                            ? MeritColors.accent.withValues(alpha: 0.12)
                             : AppColors.surfaceMuted,
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -585,15 +540,6 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             decoration: _inputDecoration('📞 เบอร์โทรศัพท์'),
             validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุเบอร์โทร' : null,
           ),
-          const SizedBox(height: 16),
-
-          // Wish
-          TextFormField(
-            controller: _wishController,
-            style: const TextStyle(color: AppColors.deepText),
-            maxLines: 3,
-            decoration: _inputDecoration('🙏 คำอธิษฐาน / สิ่งที่ต้องการขอ'),
-          ),
         ],
       ),
     );
@@ -652,7 +598,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'รวมทั้งหมด',
+                'ยอดร่วมบุญ',
                 style: TextStyle(
                   color: AppColors.deepText,
                   fontSize: 18,
@@ -723,7 +669,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             const SvgIcon(AppIcons.heart, size: 22, color: AppColors.deepText),
             const SizedBox(width: 10),
             Text(
-              'ยืนยันสั่งจอง ฿${_totalPrice.toStringAsFixed(0)}',
+              'ร่วมบุญ ฿${_totalPrice.toStringAsFixed(0)}',
               style: const TextStyle(
                 color: AppColors.deepText,
                 fontSize: 18,

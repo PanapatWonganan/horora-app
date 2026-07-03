@@ -1,0 +1,262 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: 'Sarabun', 'Kanit', sans-serif; margin: 40px; color: #333; }
+h1 { color: #6A1B9A; font-size: 28px; border-bottom: 3px solid #6A1B9A; padding-bottom: 10px; }
+h2 { color: #7B1FA2; font-size: 22px; margin-top: 30px; border-bottom: 1px solid #CE93D8; padding-bottom: 5px; }
+h3 { color: #8E24AA; font-size: 18px; margin-top: 20px; }
+table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+th { background-color: #6A1B9A; color: white; padding: 10px 14px; text-align: left; font-size: 14px; }
+td { border: 1px solid #ddd; padding: 8px 14px; font-size: 14px; }
+tr:nth-child(even) { background-color: #F3E5F5; }
+tr:hover { background-color: #E1BEE7; }
+.price { font-weight: bold; color: #E65100; }
+.highlight { background-color: #FFF9C4; padding: 2px 6px; border-radius: 4px; }
+.section-note { background-color: #F3E5F5; border-left: 4px solid #7B1FA2; padding: 12px 16px; margin: 15px 0; font-size: 14px; }
+.footer { margin-top: 40px; padding-top: 15px; border-top: 2px solid #CE93D8; font-size: 12px; color: #888; }
+.badge { display: inline-block; background-color: #FFD700; color: #333; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Horora Astrology App — Price List &amp; Service Guide</h1>
+<p style="font-size:14px; color:#666;">Version 1.1.0 | อัปเดต: 27 มีนาคม 2569 (2026)</p>
+
+<!-- ============================================================ -->
+<h2>1. แพ็คเกจทำบุญหลัก (Merit Packages)</h2>
+
+<div class="section-note">
+แพ็คเกจหลักที่ลูกค้าเลือกเมื่อสั่งทำบุญ แต่ละแพ็คเกจมีระดับบริการและสิ่งที่ได้รับต่างกัน
+</div>
+
+<table>
+<tr>
+  <th>แพ็คเกจ</th>
+  <th>ชื่อไทย</th>
+  <th>ราคา (฿)</th>
+  <th>รูปถ่าย</th>
+  <th>วิดีโอ</th>
+  <th>รายงาน LINE</th>
+  <th>ใบรับรอง</th>
+  <th>พิเศษ</th>
+</tr>
+<tr>
+  <td>Basic</td>
+  <td>ไหว้มงคล</td>
+  <td class="price">฿199</td>
+  <td>3 รูป</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>Standard</td>
+  <td>ไหว้เสริมดวง</td>
+  <td class="price">฿399</td>
+  <td>5 รูป</td>
+  <td>30 วินาที</td>
+  <td>&#10003;</td>
+  <td>&#10003;</td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>Premium</td>
+  <td>ไหว้ครบเครื่อง</td>
+  <td class="price">฿699</td>
+  <td>10 รูป</td>
+  <td>3 นาที</td>
+  <td>&#10003;</td>
+  <td>&#10003;</td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>VIP</td>
+  <td>VIP บูชาใหญ่</td>
+  <td class="price">฿1,299</td>
+  <td>15 รูป</td>
+  <td>วิดีโอเต็ม</td>
+  <td>&#10003;</td>
+  <td>&#10003;</td>
+  <td>Live Stream + ของพิเศษ</td>
+</tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>2. แพ็คเกจสั่งรายสัปดาห์ (Weekly Order Packages)</h2>
+
+<div class="section-note">
+ราคาสำหรับลูกค้าที่สั่งผ่านระบบตารางประจำสัปดาห์ (ราคาต่างจากแพ็คเกจปกติ)
+</div>
+
+<table>
+<tr>
+  <th>แพ็คเกจ</th>
+  <th>ราคา (฿)</th>
+  <th>ส่วนต่างจากปกติ</th>
+</tr>
+<tr>
+  <td>Basic</td>
+  <td class="price">฿299</td>
+  <td>+฿100</td>
+</tr>
+<tr>
+  <td>Standard</td>
+  <td class="price">฿499</td>
+  <td>+฿100</td>
+</tr>
+<tr>
+  <td>Premium</td>
+  <td class="price">฿799</td>
+  <td>+฿100</td>
+</tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>3. ของเสริม (Add-ons) — แยกตามวัน/สถานที่</h2>
+
+<div class="section-note">
+ของเสริมที่ลูกค้าสามารถเพิ่มได้ในแต่ละวัน ตามสถานที่ที่กำหนด
+</div>
+
+<h3>วันจันทร์ — ศาลหลักเมือง</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>น้ำมันเติมตะเกียง</td><td class="price">฿99</td></tr>
+<tr><td>ผ้าแพร 3 สี</td><td class="price">฿199</td></tr>
+</table>
+
+<h3>วันอังคาร — ศาลเจ้าพ่อเสือ</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>กระดาษไหว้เจ้า</td><td class="price">฿129</td></tr>
+<tr><td>ส้มมงคล 4 ลูก</td><td class="price">฿79</td></tr>
+<tr><td>ธูปหอมอินเดีย</td><td class="price">฿149</td></tr>
+</table>
+
+<h3>วันพุธ — พระพิฆเนศ ห้วยขวาง</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>ขนมโมทกะ</td><td class="price">฿149</td></tr>
+<tr><td>ผ้าแดงถวาย</td><td class="price">฿199</td></tr>
+<tr><td>หญ้าแพรก</td><td class="price">฿79</td></tr>
+</table>
+
+<h3>วันพฤหัสบดี — วัดระฆังโฆสิตาราม</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>ตีระฆังขอพร</td><td class="price">฿99</td></tr>
+<tr><td>ชุดสังฆทาน</td><td class="price">฿299</td></tr>
+</table>
+
+<h3>วันศุกร์ — เจ้าแม่กวนอิม</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>ชุดอาหารเจ</td><td class="price">฿199</td></tr>
+<tr><td>ชาถวาย 3 ถ้วย</td><td class="price">฿79</td></tr>
+<tr><td>กระดาษทอง</td><td class="price">฿149</td></tr>
+</table>
+
+<h3>วันเสาร์ — ท้าวเวสสุวรรณ</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>ผ้ายันต์ท้าวเวสสุวรรณ</td><td class="price">฿299</td></tr>
+<tr><td>ทองคำเปลว 9 แผ่น</td><td class="price">฿199</td></tr>
+</table>
+
+<h3>วันอาทิตย์ — ท้าวมหาพรหม เอราวัณ</h3>
+<table>
+<tr><th>รายการ</th><th>ราคา (฿)</th></tr>
+<tr><td>รำถวาย</td><td class="price">฿599</td></tr>
+<tr><td>ช้างทองคำเปลว</td><td class="price">฿299</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>4. ระบบ Affiliate — อัตราค่าคอมมิชชั่น</h2>
+
+<div class="section-note">
+ค่าคอมมิชชั่นสำหรับตัวแทนที่แนะนำลูกค้ามาใช้บริการ สูงสุด 23% สำหรับระดับ Bronze ขึ้นไป
+</div>
+
+<table>
+<tr>
+  <th>แพ็คเกจที่ขายได้</th>
+  <th>ราคา (฿)</th>
+  <th>Commission %</th>
+  <th>รายได้ต่อออเดอร์ (฿)</th>
+</tr>
+<tr>
+  <td>ไหว้มงคล</td>
+  <td>฿199</td>
+  <td>15%</td>
+  <td class="price">฿29.85</td>
+</tr>
+<tr>
+  <td>ไหว้เสริมดวง</td>
+  <td>฿399</td>
+  <td>15%</td>
+  <td class="price">฿59.85</td>
+</tr>
+<tr>
+  <td>ไหว้ครบเครื่อง</td>
+  <td>฿699</td>
+  <td>12%</td>
+  <td class="price">฿83.88</td>
+</tr>
+<tr>
+  <td>VIP บูชาใหญ่</td>
+  <td>฿1,299</td>
+  <td>10%</td>
+  <td class="price">฿129.90</td>
+</tr>
+</table>
+
+<h3>เงื่อนไขการถอน</h3>
+<table>
+<tr><th>รายการ</th><th>รายละเอียด</th></tr>
+<tr><td>ยอดถอนขั้นต่ำ</td><td class="price">฿300</td></tr>
+<tr><td>ช่องทางถอน</td><td>PromptPay / โอนธนาคาร</td></tr>
+<tr><td>ปุ่มถอนด่วน</td><td>฿300 / ฿500 / ฿1,000</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>5. ช่องทางรับชำระเงิน</h2>
+
+<table>
+<tr><th>ช่องทาง</th><th>สถานะ</th></tr>
+<tr><td>ธ.กสิกรไทย (225-1-63533-4)</td><td><span class="badge">ใช้งานอยู่</span></td></tr>
+<tr><td>PromptPay / พร้อมเพย์</td><td><span class="badge">ใช้งานอยู่</span></td></tr>
+<tr><td>Credit Card / Debit Card</td><td>รองรับ (ผ่าน API)</td></tr>
+<tr><td>TrueMoney</td><td>รองรับ (ผ่าน API)</td></tr>
+<tr><td>Apple Pay / Google Pay</td><td>รองรับ (ผ่าน API)</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>6. Subscription Plans</h2>
+
+<div class="section-note">
+ราคา Subscription ดึงจาก Backend API (<code>/subscriptions/plans</code>) ไม่ได้ hardcode ใน app<br>
+ระดับ: Free → Basic → Premium → Ultimate
+</div>
+
+<!-- ============================================================ -->
+<h2>7. สรุปช่วงราคาทั้งหมด</h2>
+
+<table>
+<tr><th>หมวด</th><th>ราคาต่ำสุด (฿)</th><th>ราคาสูงสุด (฿)</th></tr>
+<tr><td>แพ็คเกจทำบุญ (ปกติ)</td><td>฿199</td><td class="price">฿1,299</td></tr>
+<tr><td>แพ็คเกจรายสัปดาห์</td><td>฿299</td><td class="price">฿799</td></tr>
+<tr><td>ของเสริม (Add-ons)</td><td>฿79</td><td class="price">฿599</td></tr>
+<tr><td>ยอดถอน Affiliate ขั้นต่ำ</td><td colspan="2">฿300</td></tr>
+</table>
+
+<div class="footer">
+<p>เอกสารนี้สร้างจากข้อมูลใน codebase ของ Horora Astrology App v1.1.0</p>
+<p>สำหรับใช้ภายในทีมเท่านั้น — ห้ามเผยแพร่</p>
+</div>
+
+</body>
+</html>

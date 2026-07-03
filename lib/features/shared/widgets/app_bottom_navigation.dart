@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/routes/app_routes.dart';
@@ -11,61 +13,97 @@ class AppBottomNavigation extends StatelessWidget {
     required this.currentIndex,
   }) : super(key: key);
 
+  // ── Sacred Astrology nav palette ──────────────────────────────────────────
+  // A muted plum/indigo translucent bar (the dusk-temple surface) with candle-
+  // gold for the active tab and muted lilac-grey for inactive ones.
+  static const Color _navActive = AppColors.candleGold; // active icon/text
+  static const Color _navInactive = AppColors.onBackdropMuted; // muted lilac
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.lightSurface,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.12),
-            blurRadius: 18,
-            spreadRadius: 0,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _buildNavItem(
-                context: context,
-                index: 0,
-                iconPath: AppIcons.home,
-                activeIconPath: AppIcons.homeFilled,
-                label: 'หน้าหลัก',
+    // Frosted plum surface: translucent night-plum with a blur so the indigo
+    // backdrop reads through it, plus a subtle candle-gold top hairline. No loud
+    // glow — only a soft deep-indigo lift below.
+    // Keep the frosted bar clipped, but draw the raised merit CTA in an
+    // unclipped Stack above it. The old top-level ClipRect was cutting the gold
+    // circle, so the button looked sliced instead of floating.
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.bottomCenter,
+      children: [
+        ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.nightPlum.withValues(alpha: 0.88),
+                border: Border(
+                  top: BorderSide(
+                    color: AppColors.candleGold.withValues(alpha: 0.22),
+                    width: 1,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.templeIndigo.withValues(alpha: 0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
-              _buildNavItem(
-                context: context,
-                index: 1,
-                iconPath: AppIcons.sparkle,
-                activeIconPath: AppIcons.sparkleFilled,
-                label: 'ดูดวง',
+              child: const SafeArea(
+                child: SizedBox(height: 56),
               ),
-              // ทำบุญ — core feature, raised center tab
-              _buildMeritTab(context),
-              _buildNavItem(
-                context: context,
-                index: 3,
-                iconPath: AppIcons.chat,
-                activeIconPath: AppIcons.chatFilled,
-                label: 'สนทนา',
-              ),
-              _buildNavItem(
-                context: context,
-                index: 4,
-                iconPath: AppIcons.person,
-                activeIconPath: AppIcons.personFilled,
-                label: 'โปรไฟล์',
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildNavItem(
+                  context: context,
+                  index: 0,
+                  iconPath: AppIcons.home,
+                  activeIconPath: AppIcons.homeFilled,
+                  label: 'หน้าหลัก',
+                ),
+                _buildNavItem(
+                  context: context,
+                  index: 1,
+                  iconPath: AppIcons.horoscopeWheel,
+                  activeIconPath: AppIcons.horoscopeWheelFilled,
+                  label: 'ดูดวง',
+                ),
+                // ทำบุญ — core revenue feature, always visually prominent as a
+                // floating CTA. The active state is still communicated separately
+                // by the label/indicator so it does not steal selection from Home.
+                _MeritCtaTab(
+                  isSelected: currentIndex == 2,
+                  onTap: () => _handleNavigation(context, 2),
+                ),
+                _buildNavItem(
+                  context: context,
+                  index: 3,
+                  iconPath: AppIcons.chat,
+                  activeIconPath: AppIcons.chatFilled,
+                  label: 'สนทนา',
+                ),
+                _buildNavItem(
+                  context: context,
+                  index: 4,
+                  iconPath: AppIcons.person,
+                  activeIconPath: AppIcons.personFilled,
+                  label: 'โปรไฟล์',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -77,37 +115,35 @@ class AppBottomNavigation extends StatelessWidget {
     required String label,
   }) {
     final isSelected = currentIndex == index;
-    // Stronger contrast: selected = brand lavender, unselected = a deeper
-    // muted ink (not the faint #8A82A0) so icons keep presence on white.
-    final color =
-        isSelected ? AppColors.primary : const Color(0xFF6E6688);
+    // On the dark plum bar: active = candle gold, inactive = muted lilac-grey.
+    final color = isSelected ? _navActive : _navInactive;
 
     return GestureDetector(
       onTap: () => _handleNavigation(context, index),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Selected items sit on a soft lavender pill for a premium,
-            // clearly-active feel.
+            // Active items sit on a soft candle-gold wash pill — calm and
+            // clearly-active, no loud glow.
             AnimatedContainer(
               duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.12)
+                    ? AppColors.candleGold.withValues(alpha: 0.16)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: SvgIcon(
                 isSelected ? activeIconPath : iconPath,
-                size: 26,
+                size: 25,
                 color: color,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
@@ -118,80 +154,6 @@ class AppBottomNavigation extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// ทำบุญ — the core feature: a raised, gold-accented center tab.
-  Widget _buildMeritTab(BuildContext context) {
-    final isSelected = currentIndex == 2;
-    return GestureDetector(
-      onTap: () => _handleNavigation(context, 2),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Transform.translate(
-            offset: const Offset(0, -14),
-            child: Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                // Deeper, richer gold ramp so a pure-white glyph reads with
-                // strong contrast (the old #F2C879→peach was too pale).
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF6B544), Color(0xFFE89A3C)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(color: AppColors.lightSurface, width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFE89A3C).withValues(alpha: 0.50),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              // Clean single-stroke temple glyph in pure white with a subtle
-              // shadow halo — clearly visible and intentional on the gold tab.
-              // (The old pray.svg was an 80x80 multi-colour illustration whose
-              // colorFilter flattened it into an invisible white blob.)
-              child: Center(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF8A5A14).withValues(alpha: 0.30),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: const SvgIcon(
-                    AppIcons.temple,
-                    size: 30,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Transform.translate(
-            offset: const Offset(0, -10),
-            child: Text(
-              'ทำบุญ',
-              style: TextStyle(
-                color: isSelected
-                    ? const Color(0xFFD98A2B)
-                    : AppColors.deepText,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -207,7 +169,7 @@ class AppBottomNavigation extends StatelessWidget {
         route = AppRoutes.home;
         break;
       case 1:
-        route = AppRoutes.tarot;
+        route = AppRoutes.horoscope;
         break;
       case 2:
         route = AppRoutes.merit;
@@ -224,5 +186,197 @@ class AppBottomNavigation extends StatelessWidget {
 
     // นำทางไปยังเส้นทางที่กำหนด พร้อม interstitial ad (70% probability)
     Navigator.pushReplacementNamed(context, route);
+  }
+}
+
+/// Revenue CTA animation for the center merit button.
+///
+/// - A slow, soft gold halo keeps the donation entry visually alive.
+/// - A quick press bounce gives tactile feedback before navigation.
+/// - Active selection is still shown by the label/underline so Home can remain
+///   clearly selected while the CTA stays prominent.
+class _MeritCtaTab extends StatefulWidget {
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MeritCtaTab({
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_MeritCtaTab> createState() => _MeritCtaTabState();
+}
+
+class _MeritCtaTabState extends State<_MeritCtaTab>
+    with TickerProviderStateMixin {
+  late final AnimationController _haloController;
+  late final AnimationController _bounceController;
+  late final Animation<double> _haloScale;
+  late final Animation<double> _haloOpacity;
+  late final Animation<double> _pressScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _haloController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    )..repeat(reverse: true);
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _haloScale = Tween<double>(begin: 1.0, end: 1.18).animate(
+      CurvedAnimation(parent: _haloController, curve: Curves.easeInOutCubic),
+    );
+    _haloOpacity = Tween<double>(begin: 0.10, end: 0.22).animate(
+      CurvedAnimation(parent: _haloController, curve: Curves.easeInOutCubic),
+    );
+    _pressScale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.92)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 42,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.92, end: 1.07)
+            .chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 34,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.07, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 24,
+      ),
+    ]).animate(_bounceController);
+  }
+
+  @override
+  void dispose() {
+    _haloController.dispose();
+    _bounceController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleTap() async {
+    if (_bounceController.isAnimating) return;
+    await _bounceController.forward(from: 0);
+    if (!mounted) return;
+    widget.onTap();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = widget.isSelected;
+    return GestureDetector(
+      onTap: _handleTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Transform.translate(
+            offset: const Offset(0, -22),
+            child: AnimatedBuilder(
+              animation: Listenable.merge([_haloController, _bounceController]),
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _pressScale.value,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      Transform.scale(
+                        scale: _haloScale.value,
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.candleGold
+                                  .withValues(alpha: _haloOpacity.value),
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.candleGold.withValues(
+                                  alpha: _haloOpacity.value * 0.8,
+                                ),
+                                blurRadius: 20,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      child!,
+                    ],
+                  ),
+                );
+              },
+              child: Container(
+                width: 66,
+                height: 66,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [AppColors.candleGold, AppColors.deepGoldBrown],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.onBackdrop
+                        : AppColors.onBackdrop.withValues(alpha: 0.34),
+                    width: isSelected ? 3 : 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.deepGoldBrown
+                          .withValues(alpha: isSelected ? 0.42 : 0.24),
+                      blurRadius: isSelected ? 20 : 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: SvgIcon(
+                    AppIcons.temple,
+                    size: 34,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: const Offset(0, -16),
+            child: Text(
+              'ทำบุญ',
+              style: TextStyle(
+                color: isSelected
+                    ? AppBottomNavigation._navActive
+                    : AppColors.onBackdrop,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Transform.translate(
+            offset: const Offset(0, -6),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: isSelected ? 24 : 0,
+              height: 2,
+              decoration: BoxDecoration(
+                color: AppColors.candleGold,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

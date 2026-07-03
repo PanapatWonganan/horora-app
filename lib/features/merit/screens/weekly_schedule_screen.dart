@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/celestial_effects.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
+import '../widgets/merit_ui.dart';
 import 'merit_weekly_order_screen.dart';
 
 /// หน้าแสดงตารางการไปมูประจำสัปดาห์ — "ทำบุญออนไลน์" hero screen.
@@ -23,7 +25,8 @@ class WeeklyScheduleScreen extends StatefulWidget {
 }
 
 class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
-  final List<WeeklyMeritSchedule> _schedules = WeeklyMeritSchedule.defaultSchedule;
+  final List<WeeklyMeritSchedule> _schedules =
+      WeeklyMeritSchedule.defaultSchedule;
   MeritDay? _selectedDay;
 
   @override
@@ -63,18 +66,23 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   }
 
   /// Small uppercase letter-spaced English overline above Thai section titles.
+  ///
+  /// These overlines sit directly on the dark celestial backdrop, so they use a
+  /// light muted-lilac tone for legibility.
   Widget _overline(String text, {Color? color}) {
     return Text(
       text.toUpperCase(),
       style: _displayStyle(
         fontSize: 11.5,
-        color: color ?? MeritColors.accentDark,
+        color: color ?? AppColors.onBackdropMuted,
         fontWeight: FontWeight.w600,
         letterSpacing: 2.6,
       ),
     );
   }
 
+  /// Section header drawn directly on the dark backdrop: light ivory title with
+  /// a candle-gold leading icon and muted-lilac overline.
   Widget _sectionTitle(String title, {String? overline, String? icon}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,14 +96,14 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             SvgIcon(
               icon ?? AppIcons.sparkle,
               size: 18,
-              color: MeritColors.accentDark,
+              color: MeritColors.accent,
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 title,
                 style: GoogleFonts.kanit(
-                  color: AppColors.deepText,
+                  color: AppColors.onBackdrop,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.2,
@@ -111,89 +119,113 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final selected = _selectedSchedule;
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: celestialBackdrop),
-        child: Stack(
-          children: [
-            // Layered ambient glows — gold / peach / lavender mesh atmosphere.
-            const Positioned(
-              top: -120,
-              right: -90,
-              child: CelestialGlow(
-                size: 320,
-                color: MeritColors.accent,
-                intensity: 0.42,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _navigateBackSafely();
+      },
+      child: Scaffold(
+        body: DecoratedBox(
+          decoration: const BoxDecoration(gradient: celestialBackdrop),
+          child: Stack(
+            children: [
+              // Layered ambient glows — gold / peach / lavender mesh atmosphere.
+              const Positioned(
+                top: -120,
+                right: -90,
+                child: CelestialGlow(
+                  size: 320,
+                  color: MeritColors.accent,
+                  intensity: 0.42,
+                ),
               ),
-            ),
-            Positioned(
-              top: 180,
-              left: -110,
-              child: CelestialGlow(
-                size: 300,
-                color: AppColors.secondary.withValues(alpha: 1),
-                intensity: 0.30,
+              Positioned(
+                top: 180,
+                left: -110,
+                child: CelestialGlow(
+                  size: 300,
+                  color: AppColors.secondary.withValues(alpha: 1),
+                  intensity: 0.30,
+                ),
               ),
-            ),
-            const Positioned(
-              bottom: -60,
-              right: -60,
-              child: CelestialGlow(
-                size: 280,
-                color: AppColors.primary,
-                intensity: 0.18,
+              const Positioned(
+                bottom: -60,
+                right: -60,
+                child: CelestialGlow(
+                  size: 280,
+                  color: AppColors.primary,
+                  intensity: 0.18,
+                ),
               ),
-            ),
-            const Positioned.fill(child: GrainOverlay()),
+              const Positioned.fill(child: GrainOverlay()),
 
-            SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const StaggeredReveal(index: 0, child: _HeroValueCard()),
-                          const SizedBox(height: 26),
-                          StaggeredReveal(
-                            index: 1,
-                            child: _sectionTitle(
-                              'ตารางฝากมูประจำสัปดาห์',
-                              overline: 'Weekly schedule',
-                              icon: AppIcons.calendar,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          StaggeredReveal(index: 2, child: _buildWeekSelector()),
-                          const SizedBox(height: 22),
-                          if (selected != null)
+              SafeArea(
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const StaggeredReveal(
+                                index: 0, child: _HeroValueCard()),
+                            const SizedBox(height: 26),
                             StaggeredReveal(
-                              index: 3,
-                              child: _buildScheduleDetail(selected),
-                            )
-                          else
-                            StaggeredReveal(index: 3, child: _buildNoSchedule()),
-                          const SizedBox(height: 34),
-                          // ── ผลบุญ / proof-of-merit trust section ──
-                          const StaggeredReveal(
-                            index: 4,
-                            child: _ProofOfMeritSection(),
-                          ),
-                        ],
+                              index: 1,
+                              child: _sectionTitle(
+                                'ตารางฝากมูประจำสัปดาห์',
+                                overline: 'Weekly schedule',
+                                icon: AppIcons.calendar,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            StaggeredReveal(
+                                index: 2, child: _buildWeekSelector()),
+                            const SizedBox(height: 22),
+                            if (selected != null)
+                              StaggeredReveal(
+                                index: 3,
+                                child: _buildScheduleDetail(selected),
+                              )
+                            else
+                              StaggeredReveal(
+                                  index: 3, child: _buildNoSchedule()),
+                            const SizedBox(height: 34),
+                            // ── ผลบุญ / proof-of-merit trust section ──
+                            const StaggeredReveal(
+                              index: 4,
+                              child: _ProofOfMeritSection(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  /// The merit entry can be opened from both a pushed Home card and the raised
+  /// bottom tab. In the tab case the route may be the root route, so a raw
+  /// `Navigator.pop` leaves Android on a blank/exiting state that feels like a
+  /// freeze. Prefer popping when there is a previous route; otherwise return to
+  /// Home explicitly.
+  void _navigateBackSafely() {
+    final navigator = Navigator.of(context);
+    if (navigator.canPop()) {
+      navigator.pop();
+    } else {
+      navigator.pushReplacementNamed(AppRoutes.home);
+    }
   }
 
   Widget _buildHeader() {
@@ -202,8 +234,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.deepText),
+            onPressed: _navigateBackSafely,
+            icon: const SvgIcon(AppIcons.arrowBack,
+                size: 20, color: AppColors.onBackdrop),
           ),
           Expanded(
             child: Column(
@@ -214,7 +247,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 Text(
                   'ฝากดวงใจไหว้ให้',
                   style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
+                    color: AppColors.onBackdrop,
                     fontSize: 21,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.3,
@@ -240,7 +273,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 ),
               ],
             ),
-            child: const SvgIcon(AppIcons.temple, size: 20, color: Colors.white),
+            child:
+                const SvgIcon(AppIcons.temple, size: 20, color: Colors.white),
           ),
         ],
       ),
@@ -281,18 +315,13 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
               width: 62,
               margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
               decoration: BoxDecoration(
-                gradient: isSelected
-                    ? const LinearGradient(
-                        colors: MeritColors.accentGradient,
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      )
-                    : null,
-                color: isSelected ? null : MeritColors.cardBackground,
+                color: isSelected
+                    ? AppColors.ricePaper
+                    : MeritColors.cardBackground,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isSelected
-                      ? Colors.white.withValues(alpha: 0.7)
+                      ? MeritColors.accent.withValues(alpha: 0.8)
                       : (isToday
                           ? MeritColors.accent.withValues(alpha: 0.6)
                           : AppColors.divider),
@@ -301,7 +330,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: isSelected
-                        ? MeritColors.accent.withValues(alpha: 0.4)
+                        ? MeritColors.accent.withValues(alpha: 0.18)
                         : AppColors.primary.withValues(alpha: 0.06),
                     blurRadius: isSelected ? 16 : 8,
                     offset: const Offset(0, 6),
@@ -315,7 +344,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     day.shortName,
                     style: GoogleFonts.kanit(
                       color: isSelected
-                          ? Colors.white
+                          ? MeritColors.accentDark
                           : AppColors.mutedText,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -326,7 +355,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     date.day.toString(),
                     style: _displayStyle(
                       fontSize: 20,
-                      color: isSelected ? Colors.white : AppColors.deepText,
+                      color:
+                          isSelected ? AppColors.deepText : AppColors.deepText,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -335,10 +365,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     Container(
                       width: 7,
                       height: 7,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.white
-                            : MeritColors.accentDark,
+                      decoration: const BoxDecoration(
+                        color: MeritColors.accentDark,
                         shape: BoxShape.circle,
                       ),
                     )
@@ -407,23 +435,21 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Hero temple card — warm gold/peach gradient with glass + gold hairline.
+        // Hero temple card — warm rice-paper card with gold accents only. The
+        // earlier full gold slab felt too heavy next to the Home source-of-truth.
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: MeritColors.accentGradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppColors.ricePaper,
             borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.55), width: 1),
+            border: Border.all(
+                color: MeritColors.accent.withValues(alpha: 0.45), width: 1),
             boxShadow: [
               BoxShadow(
-                color: MeritColors.accent.withValues(alpha: 0.38),
-                blurRadius: 22,
-                offset: const Offset(0, 12),
+                color: AppColors.templeIndigo.withValues(alpha: 0.16),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -435,9 +461,10 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                   Container(
                     padding: const EdgeInsets.all(13),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: MeritColors.accent.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+                      border: Border.all(
+                          color: MeritColors.accent.withValues(alpha: 0.32)),
                     ),
                     child: const SvgIcon(
                       AppIcons.temple,
@@ -455,7 +482,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                             Text(
                               schedule.day.displayName,
                               style: GoogleFonts.kanit(
-                                color: AppColors.deepText.withValues(alpha: 0.7),
+                                color:
+                                    AppColors.deepText.withValues(alpha: 0.7),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -466,7 +494,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.75),
+                                  color: MeritColors.accent
+                                      .withValues(alpha: 0.16),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
@@ -498,14 +527,18 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
               ),
               const SizedBox(height: 18),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: AppColors.ivorySilk,
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: MeritColors.accent.withValues(alpha: 0.22)),
                 ),
                 child: Row(
                   children: [
-                    const SvgIcon(AppIcons.sparkle, size: 16, color: AppColors.deepText),
+                    const SvgIcon(AppIcons.sparkle,
+                        size: 16, color: AppColors.deepText),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -632,7 +665,11 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     if (lower.contains('ส้ม') || lower.contains('ผลไม้')) return '🍊';
     if (lower.contains('ธูป') || lower.contains('หอม')) return '🪔';
     if (lower.contains('เทียน')) return '🕯️';
-    if (lower.contains('ดอกไม้') || lower.contains('มาลัย') || lower.contains('พวง')) return '💐';
+    if (lower.contains('ดอกไม้') ||
+        lower.contains('มาลัย') ||
+        lower.contains('พวง')) {
+      return '💐';
+    }
     if (lower.contains('น้ำ')) return '💧';
     if (lower.contains('ข้าว')) return '🍚';
     if (lower.contains('ขนม')) return '🍡';
@@ -770,7 +807,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             const SvgIcon(AppIcons.temple, size: 20, color: Colors.white),
             const SizedBox(width: 10),
             Text(
-              'ฝากมู · สั่งจองเลย',
+              'ฝากมู · ร่วมบุญ',
               style: GoogleFonts.kanit(
                 color: Colors.white,
                 fontSize: 18,
@@ -786,7 +823,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
 
 // ── Hero value card ───────────────────────────────────────────────────────────
 
-/// The warm gold/peach value-proposition card that opens the merit screen.
+/// The warm rice-paper value-proposition card that opens the merit screen.
 class _HeroValueCard extends StatelessWidget {
   const _HeroValueCard();
 
@@ -796,18 +833,15 @@ class _HeroValueCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: MeritColors.accentGradient,
-        ),
+        color: AppColors.ricePaper,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.55), width: 1),
+        border: Border.all(
+            color: MeritColors.accent.withValues(alpha: 0.45), width: 1),
         boxShadow: [
           BoxShadow(
-            color: MeritColors.accent.withValues(alpha: 0.40),
-            blurRadius: 26,
-            offset: const Offset(0, 14),
+            color: AppColors.templeIndigo.withValues(alpha: 0.16),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -820,7 +854,8 @@ class _HeroValueCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.65),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+              border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.8), width: 1.5),
               boxShadow: [
                 BoxShadow(
                   color: Colors.white.withValues(alpha: 0.4),
@@ -829,7 +864,8 @@ class _HeroValueCard extends StatelessWidget {
               ],
             ),
             child: const Center(
-              child: SvgIcon(AppIcons.temple, size: 30, color: AppColors.deepText),
+              child:
+                  SvgIcon(AppIcons.temple, size: 30, color: AppColors.deepText),
             ),
           ),
           const SizedBox(width: 18),
@@ -893,7 +929,7 @@ class _ProofOfMeritSection extends StatelessWidget {
               'PROOF OF MERIT',
               style: GoogleFonts.fraunces(
                 fontSize: 11.5,
-                color: MeritColors.accentDark,
+                color: AppColors.onBackdropMuted,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 2.6,
               ),
@@ -901,12 +937,13 @@ class _ProofOfMeritSection extends StatelessWidget {
             const SizedBox(height: 6),
             Row(
               children: [
-                const SvgIcon(AppIcons.heart, size: 18, color: MeritColors.accentDark),
+                const SvgIcon(AppIcons.heart,
+                    size: 18, color: MeritColors.accent),
                 const SizedBox(width: 8),
                 Text(
                   'ผลบุญที่ส่งมอบแล้ว',
                   style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
+                    color: AppColors.onBackdrop,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.2,
@@ -935,16 +972,20 @@ class _ProofOfMeritSection extends StatelessWidget {
 
         const SizedBox(height: 18),
 
-        // Trust strip — soft pastel chips.
-        const Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            _TrustChip(text: 'ทำบุญแล้ว 12,000+ ครั้ง'),
-            _TrustChip(text: 'รูป/วิดีโอยืนยันทุกออเดอร์'),
-            _TrustChip(text: 'วัดและศาลศักดิ์สิทธิ์ทั่วไทย'),
-          ],
+        // Trust strip — shared faith-service signals (ดูหลักฐาน / ปลายทางชัดเจน /
+        // ใบอนุโมทนา) for consistency across the whole merit flow.
+        const MeritTrustStrip(),
+
+        const SizedBox(height: 28),
+
+        // ── บุญของคุณไปถึงไหน — honest transparency / fee-split centrepiece. ──
+        const MeritSectionTitle(
+          'ความโปร่งใส',
+          overline: 'Transparency',
+          icon: AppIcons.info,
         ),
+        const SizedBox(height: 14),
+        const MeritTransparencyBlock(),
       ],
     );
   }
@@ -1039,7 +1080,8 @@ class _ProofCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.55),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.7)),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.7)),
                     ),
                     child: const SvgIcon(
                       AppIcons.temple,
@@ -1052,7 +1094,8 @@ class _ProofCard extends StatelessWidget {
                   top: 10,
                   right: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.85),
                       borderRadius: BorderRadius.circular(20),
@@ -1127,39 +1170,6 @@ class _ProofCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TrustChip extends StatelessWidget {
-  final String text;
-
-  const _TrustChip({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-      decoration: BoxDecoration(
-        color: MeritColors.cardBackground.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: MeritColors.accent.withValues(alpha: 0.35)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SvgIcon(AppIcons.checkCircle, size: 15, color: AppColors.success),
-          const SizedBox(width: 7),
-          Text(
-            text,
-            style: GoogleFonts.kanit(
-              color: AppColors.deepText,
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ],

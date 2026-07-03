@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/thai_zodiac_service.dart';
 import '../shared/widgets/gradient_button.dart';
@@ -122,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
+              primary: AppColors.deepGoldBrown,
               onPrimary: Colors.white,
               surface: AppColors.lightSurface,
               onSurface: AppColors.deepText,
@@ -172,7 +173,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('บันทึกข้อมูลสำเร็จ'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.success,
             ),
           );
           
@@ -201,59 +202,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'แก้ไขโปรไฟล์',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
+    return SacredScaffold(
+      showSpecks: false,
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.accent,
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SacredHeader(
+                    title: 'แก้ไขโปรไฟล์',
+                    overline: 'EDIT PROFILE',
                   ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildProfileImage(),
-                        const SizedBox(height: 32),
-                        _buildEditForm(),
-                        const SizedBox(height: 32),
-                        _buildSaveButton(),
-                      ],
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildProfileImage(),
+                            const SizedBox(height: 28),
+                            _buildEditForm(),
+                            const SizedBox(height: 28),
+                            _buildSaveButton(),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
-        ),
+                ],
+              ),
       ),
     );
   }
@@ -268,7 +252,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: AppColors.primary,
+                color: AppColors.candleGold,
                 width: 2,
               ),
             ),
@@ -276,7 +260,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(50),
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                backgroundColor: AppColors.candleGold.withValues(alpha: 0.18),
                 child: _userData['profile_image_url'] != null && _userData['profile_image_url'].isNotEmpty
                   ? Image.network(
                       _userData['profile_image_url'],
@@ -284,13 +268,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       errorBuilder: (context, error, stackTrace) => const Icon(
                         Icons.person,
                         size: 50,
-                        color: AppColors.primary,
+                        color: AppColors.deepGoldBrown,
                       ),
                     )
                   : const Icon(
                       Icons.person,
                       size: 50,
-                      color: AppColors.primary,
+                      color: AppColors.deepGoldBrown,
                     ),
               ),
             ),
@@ -298,8 +282,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: 16),
           Text(
             'อีเมล: ${_userData['email'] ?? ''}',
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.7),
+            style: SacredText.kanit(
+              color: AppColors.onBackdropMuted,
               fontSize: 14,
             ),
           ),
@@ -312,12 +296,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'ข้อมูลส่วนตัว',
-          style: TextStyle(
-            color: AppColors.lightText,
+          style: SacredText.kanit(
+            color: AppColors.onBackdrop,
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 16),
@@ -346,28 +330,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         if (_thaiZodiac != null && _selectedDate != null) ...[
           const SizedBox(height: 16),
-          Container(
+          SacredCard(
+            radius: 16,
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
             child: Row(
               children: [
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.2),
+                    color: AppColors.candleGold.withValues(alpha: 0.16),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.pets,
-                    color: AppColors.primary,
+                    color: AppColors.deepGoldBrown,
                     size: 20,
                   ),
                 ),
@@ -378,17 +355,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     children: [
                       Text(
                         _thaiZodiac!.thaiName,
-                        style: const TextStyle(
-                          color: AppColors.lightText,
+                        style: SacredText.kanit(
+                          color: AppColors.deepText,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${_thaiZodiac!.animalName} (${_thaiZodiac!.englishName})',
-                        style: TextStyle(
-                          color: AppColors.lightText.withValues(alpha: 0.7),
+                        style: SacredText.kanit(
+                          color: AppColors.mutedText,
                           fontSize: 14,
                         ),
                       ),
@@ -408,7 +385,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       text: 'บันทึกข้อมูล',
       onPressed: _saveProfile,
       gradient: const LinearGradient(
-        colors: AppColors.primaryGradient,
+        colors: AppColors.goldGradient,
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
       ),

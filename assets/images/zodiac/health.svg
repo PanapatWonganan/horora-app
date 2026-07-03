@@ -1,24 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
-  <defs>
-    <linearGradient id="health_bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#81C784"/>
-      <stop offset="100%" stop-color="#66BB6A"/>
-    </linearGradient>
-    <linearGradient id="heart_health" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#EF5350"/>
-      <stop offset="100%" stop-color="#E53935"/>
-    </linearGradient>
-  </defs>
-  <circle cx="40" cy="40" r="38" fill="url(#health_bg)"/>
-  <circle cx="40" cy="40" r="35" fill="#FFF" fill-opacity="0.15"/>
-  <path d="M40 58 L26 44 Q20 38 26 32 Q32 26 40 36 Q48 26 54 32 Q60 38 54 44 Z" fill="url(#heart_health)"/>
-  <path d="M40 52 L30 42 Q26 38 30 34" stroke="#FFF" stroke-width="2" stroke-linecap="round" fill="none"/>
-  <path d="M22 46 L18 46 L18 42 L14 42 L14 38 L18 38 L18 34 L22 34 L22 38 L26 38 L26 42 L22 42 Z" fill="#FFF"/>
-  <path d="M58 46 L54 46 L54 42 L50 42 L50 38 L54 38 L54 34 L58 34 L58 38 L62 38 L62 42 L58 42 Z" fill="#FFF"/>
-  <circle cx="34" cy="36" r="2" fill="#FFF" fill-opacity="0.6"/>
-  <path d="M16 20 L18 24 L16 22 L14 24 Z" fill="#FFF"/>
-  <path d="M64 18 L66 22 L64 20 L62 22 Z" fill="#FFF"/>
-  <circle cx="24" cy="60" r="2" fill="#FFF" fill-opacity="0.6"/>
-  <circle cx="56" cy="58" r="2" fill="#FFF" fill-opacity="0.6"/>
-  <path d="M36 16 Q40 12 44 16" stroke="#FFF" stroke-width="2" stroke-linecap="round" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M12 20.3c-3.9-2.35-6.6-5.65-6.6-9.6 0-3 1.8-5 4.3-5 1.1 0 2 .48 2.7 1.38.7-.9 1.6-1.38 2.7-1.38 2.5 0 4.3 2 4.3 5 0 3.95-2.7 7.25-7.4 9.6Z"/>
+<path d="M8.2 12h2.4l1-2.1 1.8 4.2 1.1-2.1h1.8"/>
+<path d="M18.4 4.1l.34.7.76.11-.55.54.13.76-.68-.36-.68.36.13-.76-.55-.54.76-.11.34-.7Z"/>
 </svg>

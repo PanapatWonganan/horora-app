@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -288,82 +286,41 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        // Warm ivory → rice-paper, matching the merit hero card language so the
+        // Daily Reading no longer competes with the main แนวทางวันนี้ hero. The
+        // loud plum-gradient glass card was the biggest visual competitor.
         gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
+          colors: [AppColors.ivorySilk, AppColors.ricePaper],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(28),
-        // Layered shadow for real depth (ambient + tinted lift).
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(
+          color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+          width: 1,
+        ),
+        // Single calm plum lift — no orange/secondary glow, minimal depth.
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.30),
-            blurRadius: 30,
-            spreadRadius: 0,
-            offset: const Offset(0, 16),
-          ),
-          BoxShadow(
-            color: AppColors.secondary.withValues(alpha: 0.18),
+            color: AppColors.templeIndigo.withValues(alpha: 0.16),
             blurRadius: 22,
-            spreadRadius: -4,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 11),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(26),
         child: Stack(
           children: [
-            // Soft celestial highlight glow in the corner.
+            // A single faint zodiac-toned watermark for quiet depth.
             Positioned(
-              top: -40,
               right: -30,
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      Colors.white.withValues(alpha: 0.45),
-                      Colors.white.withValues(alpha: 0.0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Second soft glow lower-left for the gradient-mesh feel.
-            Positioned(
-              bottom: -50,
-              left: -40,
-              child: Container(
-                width: 160,
-                height: 160,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppColors.tertiary.withValues(alpha: 0.28),
-                      AppColors.tertiary.withValues(alpha: 0.0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Glassmorphism wash + hairline border over the whole card so the
-            // content sits on frosted glass, not a flat pastel fill.
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.55),
-                      width: 1,
-                    ),
-                  ),
+              top: -24,
+              child: Opacity(
+                opacity: 0.05,
+                child: SvgIcon(
+                  AppIcons.getThaiZodiacIcon(_userZodiacSign ?? 'มะเมีย'),
+                  size: 150,
                 ),
               ),
             ),
@@ -379,11 +336,13 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Editorial English overline in the display serif.
+                          // Editorial English overline in the display serif —
+                          // muted ember on ivory.
                           Text(
                             'YOUR SIGN',
                             style: GoogleFonts.fraunces(
-                              color: AppColors.primary.withValues(alpha: 0.85),
+                              color: AppColors.deepGoldBrown
+                                  .withValues(alpha: 0.8),
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 2.4,
@@ -394,9 +353,9 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                             _userZodiacSignThai ?? widget.zodiacSign,
                             style: GoogleFonts.kanit(
                               color: AppColors.deepText,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.4,
+                              fontSize: 23,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: -0.3,
                               height: 1.05,
                             ),
                           ),
@@ -405,8 +364,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                             DateFormat('d MMMM yyyy', 'th_TH')
                                 .format(horoscope.date),
                             style: GoogleFonts.fraunces(
-                              color: AppColors.deepText.withValues(alpha: 0.78),
-                              fontSize: 14,
+                              color: AppColors.softInk,
+                              fontSize: 13.5,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.2,
                             ),
@@ -424,7 +383,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.22),
+                              color:
+                                  AppColors.templeIndigo.withValues(alpha: 0.16),
                               blurRadius: 12,
                               offset: const Offset(0, 5),
                             ),
@@ -441,18 +401,37 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
+                  // ── คำแนะนำประจำวัน — the reading body, under a clear heading.
+                  _readingHeading('คำแนะนำประจำวัน'),
+                  const SizedBox(height: 8),
                   Text(
                     horoscope.contentTh,
                     style: GoogleFonts.kanit(
-                      color: AppColors.deepText.withValues(alpha: 0.85),
-                      fontSize: 14,
+                      color: AppColors.mutedText,
+                      fontSize: 13.5,
                       height: 1.6,
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 18),
+                  // Gold hairline divider — sparing gold note.
+                  Container(
+                    height: 1,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.candleGold.withValues(alpha: 0.5),
+                          AppColors.candleGold.withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // ── พลังงานวันนี้ — the day's energy across love/work/health.
+                  _readingHeading('พลังงานวันนี้'),
+                  const SizedBox(height: 12),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -462,85 +441,56 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                       _buildLuckyItem('เลขนำโชค', horoscope.luckyNumber),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  // Align(
-                  //   alignment: Alignment.centerRight,
-                    // child: TextButton(
-                    //   onPressed: () {
-                    //     if (widget.onViewDetails != null) {
-                    //       widget.onViewDetails!();
-                    //     } else {
-                    //       try {
-                    //         // ตรวจสอบว่า _horoscope ไม่เป็น null ก่อนส่งข้อมูล
-                    //         if (_horoscope != null) {
-                    //           // แสดงข้อมูลเพื่อตรวจสอบ
-                    //           print('Navigating to HoroscopeDetailScreen directly');
-                    //           print('Horoscope data: ${_horoscope.toString()}');
-                    //           print('Horoscope content: ${_horoscope!.content}');
-                    //           print('Horoscope contentTh: ${_horoscope!.contentTh}');
-                    //           print('Horoscope zodiacSign: ${_horoscope!.zodiacSign}');
-                    //           print('ZodiacSignThai: ${_userZodiacSignThai ?? widget.zodiacSign}');
-                    //           print('ZodiacSignEn: ${_userZodiacSign ?? widget.zodiacSign}');
-                              
-                    //           // สร้างหน้า HoroscopeDetailScreen โดยตรง
-                    //           final detailScreen = HoroscopeDetailScreen(
-                    //             horoscope: _horoscope!,
-                    //             zodiacSignThai: _userZodiacSignThai ?? widget.zodiacSign,
-                    //             zodiacSignEn: _userZodiacSign ?? widget.zodiacSign,
-                    //           );
-                              
-                    //           // ใช้ Navigator.push โดยตรง
-                    //           Navigator.push(
-                    //             context,
-                    //             MaterialPageRoute(builder: (_) => detailScreen),
-                    //           ).then((value) {
-                    //             print('Returned from HoroscopeDetailScreen');
-                    //           }).catchError((error) {
-                    //             print('Error navigating to HoroscopeDetailScreen: $error');
-                    //             ScaffoldMessenger.of(context).showSnackBar(
-                    //               SnackBar(content: Text('เกิดข้อผิดพลาด: ${error.toString()}')),
-                    //             );
-                    //           });
-                    //         } else {
-                    //           // แสดงข้อความแจ้งเตือนเมื่อไม่มีข้อมูล
-                    //           ScaffoldMessenger.of(context).showSnackBar(
-                    //             const SnackBar(
-                    //               content: Text('ไม่สามารถโหลดข้อมูลดวงประจำวันได้'),
-                    //               duration: Duration(seconds: 2),
-                    //             ),
-                    //           );
-                    //         }
-                    //       } catch (e) {
-                    //         print('Exception when navigating: ${e.toString()}');
-                    //         ScaffoldMessenger.of(context).showSnackBar(
-                    //           SnackBar(content: Text('เกิดข้อผิดพลาด: ${e.toString()}')),
-                    //         );
-                    //       }
-                    //     }
-                    //   },
-                      // style: TextButton.styleFrom(
-                      //   foregroundColor: Colors.white,
-                      //   padding: EdgeInsets.zero,
-                      // ),
-                      // child: Row(
-                      //   mainAxisSize: MainAxisSize.min,
-                      //   children: [
-                      //     // Text(
-                      //     //   'ดูเพิ่มเติม',
-                      //     //   style: TextStyle(
-                      //     //     fontSize: 14,
-                      //     //     fontWeight: FontWeight.bold,
-                      //     //   ),
-                      //     // ),
-                      //     // SizedBox(width: 4),
-                      //     // Icon(
-                      //     //   Icons.arrow_forward_ios,
-                      //     //   size: 12,
-                      //     // ),
-                      //   ],
-                      // ),
-                    //),
-                  //),
+                  const SizedBox(height: 18),
+                  // ── สิ่งที่ควรระวัง — a gentle daily mindfulness note tied to
+                  // the lucky colour, framed softly (a reminder, never alarmist).
+                  Container(
+                    padding: const EdgeInsets.all(13),
+                    decoration: BoxDecoration(
+                      color: AppColors.ricePaper.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: AppColors.warmCardBorder.withValues(alpha: 0.55),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.spa_outlined,
+                          size: 17,
+                          color: AppColors.bodhiGreen.withValues(alpha: 0.9),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'สิ่งที่ควรระวัง',
+                                style: GoogleFonts.kanit(
+                                  color: AppColors.deepText,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'ใช้สติกับการตัดสินใจ และพกสี'
+                                '${horoscope.luckyColor}ติดตัวไว้เสริมความสบายใจ',
+                                style: GoogleFonts.kanit(
+                                  color: AppColors.mutedText,
+                                  fontSize: 12,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -550,13 +500,41 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
     );
   }
 
+  /// Small in-card section heading — a candle-gold tick + Kanit label. Keeps the
+  /// Daily Reading sections (คำแนะนำประจำวัน / พลังงานวันนี้) clearly delineated
+  /// without shouting, matching the calm hero hierarchy.
+  Widget _readingHeading(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 14,
+          decoration: BoxDecoration(
+            color: AppColors.candleGold.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.1,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildRatingItem(String label, int rating) {
     return Column(
       children: [
         Text(
           label,
           style: GoogleFonts.kanit(
-            color: AppColors.deepText.withValues(alpha: 0.85),
+            color: AppColors.mutedText,
             fontSize: 12,
           ),
         ),
@@ -567,8 +545,8 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
             (index) => Icon(
               index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
               color: index < rating
-                  ? AppColors.accent
-                  : AppColors.deepText.withValues(alpha: 0.25),
+                  ? AppColors.candleGold
+                  : AppColors.deepText.withValues(alpha: 0.2),
               size: 15,
             ),
           ),
@@ -583,7 +561,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         Text(
           label,
           style: GoogleFonts.kanit(
-            color: AppColors.deepText.withValues(alpha: 0.85),
+            color: AppColors.mutedText,
             fontSize: 12,
           ),
         ),
@@ -591,7 +569,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
         Text(
           value,
           style: GoogleFonts.fraunces(
-            color: AppColors.primary,
+            color: AppColors.deepGoldBrown,
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.3,

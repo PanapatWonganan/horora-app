@@ -1,81 +1,119 @@
 import 'package:flutter/material.dart';
 
-/// Soft Celestial palette — a calm, pastel Thai-astrology aesthetic.
+/// Sacred Astrology palette — muted temple indigo/plum, rice-paper cream and
+/// candle gold. The mood is a quiet temple at dusk: mystical and astrological,
+/// yet premium, calm and trustworthy for the ฝากทำบุญ (online merit) flow.
 ///
-/// Variable names are kept stable (primary, darkBackground, lightText, …) so the
-/// whole app re-themes by value change alone. For this LIGHT theme the historically
-/// "dark*" surfaces are remapped to soft cream/white and "lightText" becomes the
-/// deep ink used on pastel backgrounds.
+/// No neon purple/pink, no gambling-bright gold. Deep indigo/plum carries the
+/// full-screen backdrops; warm ivory/rice-paper carries the cards; muted candle
+/// gold is the single accent that ties Home and Merit together.
+///
+/// Variable NAMES are kept stable (primary, darkBackground, lightText, deepText,
+/// …) so the whole app re-themes by value change alone. Two readings to keep in
+/// mind:
+///   • Backdrops (Home, Merit) are now DEEP indigo/plum → text drawn directly on
+///     them uses [onBackdrop] / [onBackdropMuted] (light).
+///   • Cards/sheets stay warm IVORY/rice-paper → text on them uses [deepText] /
+///     [mutedText] (dark ink). These remain dark on purpose.
 class AppColors {
-  // Brand — lavender lead with peach/mint companions (no flat purple gradients).
-  static const Color primary = Color(0xFF8B6FE0); // soft lavender-violet
-  static const Color secondary = Color(0xFFFFB0A0); // warm peach
-  static const Color tertiary = Color(0xFF7FD6C2); // mint
+  // ── Sacred Astrology source palette ────────────────────────────────────────
+  static const Color templeIndigo = Color(0xFF241C35); // deep temple indigo
+  static const Color nightPlum = Color(0xFF332647); // warm night plum
+  static const Color softPlum = Color(0xFF4A3558); // soft plum
+  static const Color ivorySilk = Color(0xFFFBF4E8); // ivory silk
+  static const Color ricePaper = Color(0xFFF6EAD8); // rice paper
+  static const Color warmCardBorder = Color(0xFFE4CFA8); // warm card border
+  static const Color mutedGold = Color(0xFFC9A24B); // muted gold
+  static const Color candleGold = Color(0xFFE0B86A); // candle gold
+  static const Color deepGoldBrown = Color(0xFF8A6428); // deep gold brown
+  static const Color templeVermilion = Color(0xFF9E3B2E); // temple vermilion
+  static const Color bodhiGreen = Color(0xFF5F7A61); // bodhi green
+  static const Color ink = Color(0xFF2A2620); // ink (on ivory)
+  static const Color softInk = Color(0xFF786B5B); // soft ink (on ivory)
 
-  // Accent used for highlights / celestial sparkle.
-  static const Color accent = Color(0xFFF2C879); // soft gold star
+  // Brand — muted plum lead, candle-gold + bodhi-green companions. Calm, not
+  // neon. `primary` is the plum used for icon tints / accents on light cards.
+  static const Color primary = softPlum; // muted temple plum
+  static const Color secondary = candleGold; // candlelight warmth
+  static const Color tertiary = bodhiGreen; // temple green
 
-  // Background Colors — bg = celestial cream, "dark*" remapped to light surfaces.
-  static const Color lightBackground = Color(0xFFFBF7FF); // pastel sky
-  static const Color darkBackground = Color(0xFFFBF7FF); // (remapped) same cream
-  static const Color cream = Color(0xFFFFF7EC);
+  // Accent used for highlights / celestial sparkle — candle gold.
+  static const Color accent = candleGold;
 
-  // Surface Colors — clean white cards on the pastel canvas.
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color darkSurface = Color(0xFFFFFFFF); // (remapped) white cards
-  static const Color surfaceMuted = Color(0xFFF3ECFB); // very soft lavender wash
+  // Background Colors — full-screen backdrops are deep indigo; "light*" surfaces
+  // remain warm ivory for cards/sheets. (darkBackground == backdrop base.)
+  static const Color lightBackground = templeIndigo; // deep indigo canvas
+  static const Color darkBackground = templeIndigo; // (remapped) same indigo
+  static const Color cream = ivorySilk;
 
-  // Text Colors — deep plum-ink reads softly on pastel, not harsh black.
-  static const Color deepText = Color(0xFF2F2A40);
-  static const Color lightText = Color(0xFF2F2A40); // (remapped) deep ink for light UI
-  static const Color darkText = Color(0xFF2F2A40);
-  static const Color mutedText = Color(0xFF8A82A0);
+  // Surface Colors — warm ivory / rice-paper cards on the indigo canvas.
+  static const Color lightSurface = ivorySilk;
+  static const Color darkSurface = ivorySilk; // (remapped) ivory cards
+  static const Color surfaceMuted = ricePaper; // soft rice-paper wash
 
-  // Status Colors — kept pastel-friendly.
-  static const Color success = Color(0xFF5FB88E);
-  static const Color warning = Color(0xFFF2C879);
-  static const Color error = Color(0xFFE57C7C);
-  static const Color info = Color(0xFF7FB0E8);
+  // Text Colors — dark INK reads on ivory cards (kept dark on purpose).
+  static const Color deepText = ink;
+  static const Color lightText = ink; // (remapped) ink for content on cards
+  static const Color darkText = ink;
+  static const Color mutedText = softInk;
 
-  // Gradient Colors — gentle multi-pastel blends, never a flat purple ramp.
+  // On-backdrop text — light tones used ONLY for text/marks drawn directly on
+  // the deep indigo/plum backdrop (greeting, section titles, overlines).
+  static const Color onBackdrop = Color(0xFFF4ECDD); // warm ivory on indigo
+  static const Color onBackdropMuted = Color(0xFFB8A9C4); // muted lilac-grey
+
+  // Status Colors — temple-toned, calm.
+  static const Color success = bodhiGreen;
+  static const Color warning = candleGold;
+  static const Color error = templeVermilion;
+  static const Color info = Color(0xFF7C7A9E); // muted indigo-grey
+
+  // Gradient Colors — deep indigo→plum ramps for backdrops/wheels, never a
+  // saturated/neon purple ramp.
   static const List<Color> primaryGradient = [
-    Color(0xFFCDB7FF), // lavender
-    Color(0xFFFFD7C2), // peach
+    softPlum, // soft plum
+    nightPlum, // night plum
   ];
 
   static const List<Color> mysticalGradient = [
-    Color(0xFFB8A6F0), // lavender
-    Color(0xFFBEE8FF), // sky blue
+    nightPlum, // night plum
+    templeIndigo, // deep indigo
   ];
 
   static const List<Color> cosmicGradient = [
-    Color(0xFFBEE8FF), // sky
-    Color(0xFFC8F2DC), // mint
+    softPlum, // soft plum
+    templeIndigo, // deep indigo
   ];
 
-  // Zodiac Element Colors — softened to pastel.
-  static const Color fireElement = Color(0xFFFF9E80); // soft coral
-  static const Color earthElement = Color(0xFFA8D58F); // sage
-  static const Color airElement = Color(0xFF9CC9F0); // soft blue
-  static const Color waterElement = Color(0xFF8FD9D0); // aqua mint
+  // Candle-gold accent ramp (CTAs, gilt edges) — candle → muted, not bright.
+  static const List<Color> goldGradient = [
+    candleGold,
+    mutedGold,
+  ];
 
-  // Tarot Card Colors — pastel jewel tones.
-  static const Color majorArcana = Color(0xFFE79BB8); // rose
-  static const Color suitWands = Color(0xFFF2B873); // amber
-  static const Color suitCups = Color(0xFF9CC9F0); // blue
-  static const Color suitSwords = Color(0xFFA7B2C7); // slate
-  static const Color suitPentacles = Color(0xFFA8D58F); // green
+  // Zodiac Element Colors — muted, temple-toned (no neon).
+  static const Color fireElement = templeVermilion; // ember vermilion
+  static const Color earthElement = deepGoldBrown; // gold-brown earth
+  static const Color airElement = Color(0xFF8C86A8); // muted indigo air
+  static const Color waterElement = Color(0xFF5C7480); // slate teal water
+
+  // Tarot Card Colors — muted jewel/temple tones.
+  static const Color majorArcana = mutedGold; // gilt
+  static const Color suitWands = candleGold; // candle gold
+  static const Color suitCups = Color(0xFF5C7480); // slate teal
+  static const Color suitSwords = Color(0xFF8C86A8); // muted indigo
+  static const Color suitPentacles = bodhiGreen; // temple green
 
   // Misc Colors
-  static const Color divider = Color(0xFFEDE6F7);
-  static const Color disabled = Color(0xFFC5BED4);
-  static final Color overlay = const Color(0xFF2F2A40).withValues(alpha: 0.35);
+  static const Color divider = warmCardBorder; // warm hairline on cards
+  static const Color disabled = Color(0xFFCBBFA8); // warm muted
+  static final Color overlay = const Color(0xFF241C35).withValues(alpha: 0.45);
 
-  // Dashboard Feature Colors — pastel-coded per feature.
-  static const Color zodiacFire = Color(0xFFFF9E80);
-  static const Color tarotMajor = Color(0xFFE79BB8);
-  static const Color chatBubble = Color(0xFF9CC9F0);
-  static const Color focusMeditation = Color(0xFFA8D58F);
+  // Dashboard Feature Colors — temple-coded per feature.
+  static const Color zodiacFire = templeVermilion;
+  static const Color tarotMajor = mutedGold;
+  static const Color chatBubble = softPlum;
+  static const Color focusMeditation = bodhiGreen;
 
   // Get color for zodiac sign
   static Color getZodiacColor(String zodiacSign) {

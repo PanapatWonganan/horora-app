@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/routes/app_routes.dart';
-import '../shared/widgets/cosmic_background.dart';
 import 'widgets/daily_horoscope_card.dart';
 import 'widgets/feature_card.dart';
 import 'widgets/zodiac_profile_card.dart';
@@ -49,13 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      body: Stack(
-        children: [
-          // Cosmic background
-          const CosmicBackground(),
-          
-          // Main content
-          CustomScrollView(
+      body: SacredBackground(
+        child: CustomScrollView(
             controller: _scrollController,
             slivers: [
               // App bar
@@ -63,19 +59,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 expandedHeight: 120.0,
                 floating: false,
                 pinned: true,
-                backgroundColor: AppColors.lightSurface.withValues(alpha: _showAppBarTitle ? 1.0 : 0.0),
+                backgroundColor: AppColors.nightPlum
+                    .withValues(alpha: _showAppBarTitle ? 0.96 : 0.0),
                 elevation: _showAppBarTitle ? 2.0 : 0.0,
-                shadowColor: AppColors.primary.withValues(alpha: 0.15),
-                foregroundColor: AppColors.deepText,
-                iconTheme: const IconThemeData(color: AppColors.deepText),
+                shadowColor: AppColors.templeIndigo.withValues(alpha: 0.35),
+                foregroundColor: AppColors.onBackdrop,
+                iconTheme: const IconThemeData(color: AppColors.onBackdrop),
                 title: AnimatedOpacity(
                   opacity: _showAppBarTitle ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 200),
-                  child: const Text(
+                  child: Text(
                     'แดชบอร์ด',
-                    style: TextStyle(
-                      color: AppColors.deepText,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.kanit(
+                      color: AppColors.onBackdrop,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -83,24 +80,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   background: Container(
                     padding: const EdgeInsets.fromLTRB(16.0, 80.0, 16.0, 8.0),
                     alignment: Alignment.bottomLeft,
-                    child: const SingleChildScrollView(
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'สวัสดี, คุณเมษ',
-                            style: TextStyle(
-                              color: AppColors.deepText,
+                            style: GoogleFonts.kanit(
+                              color: AppColors.onBackdrop,
                               fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          SizedBox(height: 4.0),
+                          const SizedBox(height: 4.0),
                           Text(
                             'ยินดีต้อนรับกลับมา',
-                            style: TextStyle(
-                              color: AppColors.mutedText,
+                            style: GoogleFonts.kanit(
+                              color: AppColors.onBackdropMuted,
                               fontSize: 16.0,
                             ),
                           ),
@@ -160,15 +157,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 24.0),
                     
                     // Features section
-                    const Text(
+                    const SacredSectionTitle(
                       'บริการของเรา',
-                      style: TextStyle(
-                        color: AppColors.deepText,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      overline: 'OUR SERVICES',
                     ),
-                    
+
                     const SizedBox(height: 16.0),
                     
                     // Feature cards
@@ -214,24 +207,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     // Recent activity section
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        const Text(
-                          'กิจกรรมล่าสุด',
-                          style: TextStyle(
-                            color: AppColors.deepText,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
+                        const Expanded(
+                          child: SacredSectionTitle(
+                            'กิจกรรมล่าสุด',
+                            overline: 'RECENT ACTIVITY',
                           ),
                         ),
                         TextButton(
                           onPressed: () {
                             // Navigate to history
                           },
-                          child: const Text(
+                          child: Text(
                             'ดูทั้งหมด',
-                            style: TextStyle(
-                              color: AppColors.primary,
+                            style: GoogleFonts.kanit(
+                              color: AppColors.candleGold,
                               fontSize: 14.0,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -275,7 +268,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-        ],
       ),
     );
   }

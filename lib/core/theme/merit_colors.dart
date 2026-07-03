@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 
-/// Merit feature palette — "Soft Celestial" light theme.
+import 'app_colors.dart';
+
+/// Merit feature palette — "Sacred Astrology" silk + candlelight.
 ///
 /// Constant NAMES are kept stable so the merit screens keep compiling; only the
-/// VALUES are flipped from the old dark scheme to a warm gold + peach accent on
-/// a soft pastel base. Merit-making (donation) reads as gentle warmth here.
+/// VALUES are tuned to the temple palette: muted candle gold accents on warm
+/// ivory / rice-paper cards, framed by a warm gold hairline. Merit-making
+/// (ฝากทำบุญ) reads as quiet, premium and trustworthy — never bright/gambling
+/// gold, never hard-sell.
 class MeritColors {
-  // Primary accent — warm celestial gold + peach.
-  static const Color accent = Color(0xFFF2C879); // soft gold star
-  static const Color accentDark = Color(0xFFE6A15C); // deeper amber/peach
+  // Primary accent — candle gold → muted gold (calm, gilt, not neon).
+  static const Color accent = AppColors.candleGold; // candle gold
+  static const Color accentDark = AppColors.deepGoldBrown; // deep gold-brown
 
   static const List<Color> accentGradient = [
-    Color(0xFFF2C879), // gold
-    Color(0xFFFFB0A0), // peach
+    AppColors.candleGold, // candle gold
+    AppColors.mutedGold, // muted gold
   ];
 
-  // Surfaces — clean white/cream cards on the pastel canvas.
-  static const Color cardBackground = Color(0xFFFFFFFF); // white card
-  static const Color inputBackground = Color(0xFFF3ECFB); // soft lavender wash
-  static const Color inputBorder = Color(0xFFEDE6F7); // gentle divider tone
+  // Surfaces — warm ivory / rice-paper cards on the indigo canvas.
+  static const Color cardBackground = AppColors.ivorySilk; // ivory card
+  static const Color inputBackground = AppColors.ricePaper; // rice-paper wash
+  static const Color inputBorder = AppColors.warmCardBorder; // warm gold hairline
 
-  // Text — deep plum-ink on light surfaces.
-  static const Color textPrimary = Color(0xFF2F2A40);
-  static Color textSecondary = const Color(0xFF2F2A40).withValues(alpha: 0.75);
-  static Color textHint = const Color(0xFF8A82A0);
+  // Text — dark ink on warm ivory surfaces.
+  static const Color textPrimary = AppColors.ink;
+  static Color textSecondary = AppColors.ink.withValues(alpha: 0.75);
+  static Color textHint = AppColors.softInk;
 
-  // Price — warm amber for emphasis.
-  static const Color price = Color(0xFFE6A15C);
+  // Price — deep gold-brown for emphasis (legible, gilt, not flashy).
+  static const Color price = AppColors.deepGoldBrown;
 
-  // Divider
-  static Color divider = const Color(0xFFEDE6F7);
+  // Divider — warm gold hairline.
+  static Color divider = AppColors.warmCardBorder;
 }

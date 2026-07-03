@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/gradient_button.dart';
 
@@ -50,81 +51,56 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'ภาษา',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'เลือกภาษา',
-                        style: TextStyle(
-                          color: AppColors.lightText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SacredHeader(
+              title: 'ภาษา',
+              overline: 'LANGUAGE',
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'เลือกภาษา',
+                      style: SacredText.kanit(
+                        color: AppColors.onBackdrop,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'เลือกภาษาที่คุณต้องการใช้ในแอปพลิเคชัน',
-                        style: TextStyle(
-                          color: AppColors.lightText.withValues(alpha: 0.7),
-                          fontSize: 14,
-                        ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'เลือกภาษาที่คุณต้องการใช้ในแอปพลิเคชัน',
+                      style: SacredText.kanit(
+                        color: AppColors.onBackdropMuted,
+                        fontSize: 14,
                       ),
-                      const SizedBox(height: 24),
-                      ..._supportedLanguages.map((language) => _buildLanguageItem(language)),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 24),
+                    ..._supportedLanguages.map((language) => _buildLanguageItem(language)),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: GradientButton(
-                  text: 'บันทึกการตั้งค่า',
-                  onPressed: _saveLanguage,
-                  gradient: const LinearGradient(
-                    colors: AppColors.primaryGradient,
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  width: double.infinity,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: GradientButton(
+                text: 'บันทึกการตั้งค่า',
+                onPressed: _saveLanguage,
+                gradient: const LinearGradient(
+                  colors: AppColors.goldGradient,
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
+                width: double.infinity,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -133,23 +109,17 @@ class _LanguageScreenState extends State<LanguageScreen> {
   Widget _buildLanguageItem(Map<String, dynamic> language) {
     final isSelected = language['code'] == _selectedLanguage;
     
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedLanguage = language['code'];
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        radius: 16,
+        highlight: isSelected,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.transparent,
-            width: 1,
-          ),
-        ),
+        onTap: () {
+          setState(() {
+            _selectedLanguage = language['code'];
+          });
+        },
         child: Row(
           children: [
             Container(
@@ -171,17 +141,17 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 children: [
                   Text(
                     language['native_name'],
-                    style: const TextStyle(
-                      color: AppColors.lightText,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     language['name'],
-                    style: TextStyle(
-                      color: AppColors.lightText.withValues(alpha: 0.7),
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
                       fontSize: 14,
                     ),
                   ),
@@ -192,7 +162,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               const SvgIcon(
                 AppIcons.check,
                 size: 20,
-                color: AppColors.primary,
+                color: AppColors.deepGoldBrown,
               ),
           ],
         ),
@@ -207,7 +177,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('บันทึกการตั้งค่าภาษาเรียบร้อยแล้ว'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
       ),
     );
     

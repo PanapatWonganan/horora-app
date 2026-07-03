@@ -1,47 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/theme.dart';
+import '../../core/theme/sacred_ui.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'ช่วยเหลือและสนับสนุน',
-          style: TextStyle(
-            color: AppColors.lightText,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(
-          color: AppColors.lightText,
-        ),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.lightBackground,
-              AppColors.cream,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SacredHeader(
+              title: 'ช่วยเหลือและสนับสนุน',
+              overline: 'SUPPORT',
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 _buildSectionTitle('คำถามที่พบบ่อย'),
                 const SizedBox(height: 16),
                 _buildFAQItem(
@@ -89,56 +70,54 @@ class HelpSupportScreen extends StatelessWidget {
                 _buildSectionTitle('ติดตามเรา'),
                 const SizedBox(height: 16),
                 _buildSocialMediaLinks(),
-              ],
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.lightText,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+    return SacredSectionTitle(title);
   }
 
   Widget _buildFAQItem(BuildContext context, String question, String answer) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.darkSurface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ExpansionTile(
-        title: Text(
-          question,
-          style: const TextStyle(
-            color: AppColors.lightText,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        iconColor: AppColors.primary,
-        collapsedIconColor: AppColors.lightText.withValues(alpha: 0.7),
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Text(
-              answer,
-              style: TextStyle(
-                color: AppColors.lightText.withValues(alpha: 0.7),
-                fontSize: 14,
-                height: 1.5,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        radius: 16,
+        padding: EdgeInsets.zero,
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            shape: const Border(),
+            collapsedShape: const Border(),
+            title: Text(
+              question,
+              style: SacredText.kanit(
+                color: AppColors.deepText,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
+            iconColor: AppColors.deepGoldBrown,
+            collapsedIconColor: AppColors.mutedText,
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            children: [
+              Text(
+                answer,
+                style: SacredText.kanit(
+                  color: AppColors.mutedText,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -149,28 +128,24 @@ class HelpSupportScreen extends StatelessWidget {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SacredCard(
+        onTap: onTap,
+        radius: 16,
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.darkSurface,
-          borderRadius: BorderRadius.circular(12),
-        ),
         child: Row(
           children: [
             Container(
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.candleGold.withValues(alpha: 0.16),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: AppColors.primary,
+                color: AppColors.deepGoldBrown,
                 size: 20,
               ),
             ),
@@ -181,17 +156,17 @@ class HelpSupportScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: AppColors.lightText,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: AppColors.lightText.withValues(alpha: 0.7),
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
                       fontSize: 14,
                     ),
                   ),
@@ -200,7 +175,7 @@ class HelpSupportScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.lightText.withValues(alpha: 0.5),
+              color: AppColors.mutedText.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -210,30 +185,34 @@ class HelpSupportScreen extends StatelessWidget {
   }
 
   Widget _buildSocialMediaLinks() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildSocialMediaButton(
-          icon: Icons.facebook,
-          color: const Color(0xFF1877F2),
-          onTap: () => _launchURL('https://facebook.com'),
-        ),
-        _buildSocialMediaButton(
-          icon: Icons.camera_alt_outlined,
-          color: const Color(0xFFE1306C),
-          onTap: () => _launchURL('https://instagram.com'),
-        ),
-        _buildSocialMediaButton(
-          icon: Icons.chat_bubble_outline,
-          color: const Color(0xFF00B900),
-          onTap: () => _launchURL('https://line.me'),
-        ),
-        _buildSocialMediaButton(
-          icon: Icons.language,
-          color: AppColors.primary,
-          onTap: () => _launchURL('https://astrologyapp.com'),
-        ),
-      ],
+    return SacredCard(
+      radius: 18,
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildSocialMediaButton(
+            icon: Icons.facebook,
+            color: const Color(0xFF1877F2),
+            onTap: () => _launchURL('https://facebook.com'),
+          ),
+          _buildSocialMediaButton(
+            icon: Icons.camera_alt_outlined,
+            color: const Color(0xFFE1306C),
+            onTap: () => _launchURL('https://instagram.com'),
+          ),
+          _buildSocialMediaButton(
+            icon: Icons.chat_bubble_outline,
+            color: const Color(0xFF00B900),
+            onTap: () => _launchURL('https://line.me'),
+          ),
+          _buildSocialMediaButton(
+            icon: Icons.language,
+            color: AppColors.deepGoldBrown,
+            onTap: () => _launchURL('https://astrologyapp.com'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -246,16 +225,17 @@ class HelpSupportScreen extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(30),
       child: Container(
-        width: 60,
-        height: 60,
+        width: 56,
+        height: 56,
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: color.withValues(alpha: 0.12),
           shape: BoxShape.circle,
+          border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
         ),
         child: Icon(
           icon,
           color: color,
-          size: 30,
+          size: 28,
         ),
       ),
     );
@@ -299,7 +279,7 @@ class HelpSupportScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('กำลังเชื่อมต่อกับเจ้าหน้าที่...'),
-        backgroundColor: Colors.green,
+        backgroundColor: AppColors.success,
       ),
     );
   }

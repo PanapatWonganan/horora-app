@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_icons.dart';
 
@@ -20,36 +21,12 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
   bool _isCustomTopic = false;
 
   final List<Map<String, dynamic>> _predefinedTopics = [
-    {
-      'title': 'ดวงความรัก',
-      'svgIcon': AppIcons.love,
-      'color': Colors.pink,
-    },
-    {
-      'title': 'ดวงการงาน',
-      'svgIcon': AppIcons.career,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'ดวงการเงิน',
-      'svgIcon': AppIcons.finance,
-      'color': Colors.green,
-    },
-    {
-      'title': 'ดวงสุขภาพ',
-      'svgIcon': AppIcons.health,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'ดวงครอบครัว',
-      'svgIcon': AppIcons.family,
-      'color': Colors.purple,
-    },
-    {
-      'title': 'ดวงการศึกษา',
-      'svgIcon': AppIcons.education,
-      'color': Colors.teal,
-    },
+    {'title': 'ดวงความรัก', 'svgIcon': AppIcons.love},
+    {'title': 'ดวงการงาน', 'svgIcon': AppIcons.career},
+    {'title': 'ดวงการเงิน', 'svgIcon': AppIcons.finance},
+    {'title': 'ดวงสุขภาพ', 'svgIcon': AppIcons.health},
+    {'title': 'ดวงครอบครัว', 'svgIcon': AppIcons.family},
+    {'title': 'ดวงการศึกษา', 'svgIcon': AppIcons.education},
   ];
 
   @override
@@ -83,28 +60,34 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: AppColors.lightSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: AppColors.warmCardBorder.withValues(alpha: 0.7),
+          width: 1,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'เลือกหัวข้อที่ต้องการสนทนา',
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
+                color: AppColors.deepText,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: 6),
+            Text(
               'เลือกหัวข้อที่คุณต้องการปรึกษากับนักพยากรณ์',
-              style: TextStyle(
+              style: GoogleFonts.kanit(
                 fontSize: 14,
-                color: Colors.grey,
+                color: AppColors.mutedText,
               ),
             ),
             const SizedBox(height: 16),
@@ -128,14 +111,14 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? topic['color'].withValues(alpha: 0.2)
-                          : Colors.grey.withValues(alpha: 0.1),
+                          ? AppColors.candleGold.withValues(alpha: 0.16)
+                          : AppColors.ricePaper,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
-                            ? topic['color']
-                            : Colors.transparent,
-                        width: 2,
+                            ? AppColors.candleGold
+                            : AppColors.warmCardBorder.withValues(alpha: 0.7),
+                        width: isSelected ? 1.6 : 1,
                       ),
                     ),
                     child: Column(
@@ -144,13 +127,20 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                         SvgIcon(
                           topic['svgIcon'],
                           size: 28,
+                          color: isSelected
+                              ? AppColors.deepGoldBrown
+                              : AppColors.primary,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           topic['title'],
-                          style: TextStyle(
-                            color: isSelected ? topic['color'] : Colors.white,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          style: GoogleFonts.kanit(
+                            color: isSelected
+                                ? AppColors.deepGoldBrown
+                                : AppColors.deepText,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w400,
                           ),
                         ),
                       ],
@@ -167,28 +157,34 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: _isCustomTopic
-                      ? AppColors.primary.withValues(alpha: 0.2)
-                      : Colors.grey.withValues(alpha: 0.1),
+                      ? AppColors.candleGold.withValues(alpha: 0.16)
+                      : AppColors.ricePaper,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _isCustomTopic
-                        ? AppColors.primary
-                        : Colors.transparent,
-                    width: 2,
+                        ? AppColors.candleGold
+                        : AppColors.warmCardBorder.withValues(alpha: 0.7),
+                    width: _isCustomTopic ? 1.6 : 1,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.add,
-                      color: _isCustomTopic ? AppColors.primary : Colors.grey,
+                      color: _isCustomTopic
+                          ? AppColors.deepGoldBrown
+                          : AppColors.mutedText,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'หัวข้ออื่นๆ',
-                      style: TextStyle(
-                        color: _isCustomTopic ? AppColors.primary : Colors.white,
-                        fontWeight: _isCustomTopic ? FontWeight.bold : FontWeight.normal,
+                      style: GoogleFonts.kanit(
+                        color: _isCustomTopic
+                            ? AppColors.deepGoldBrown
+                            : AppColors.deepText,
+                        fontWeight: _isCustomTopic
+                            ? FontWeight.w700
+                            : FontWeight.w400,
                       ),
                     ),
                   ],
@@ -199,45 +195,64 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _customTopicController,
+                cursorColor: AppColors.deepGoldBrown,
                 decoration: InputDecoration(
                   hintText: 'ระบุหัวข้อที่ต้องการสนทนา',
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
+                  hintStyle: GoogleFonts.kanit(
+                    color: AppColors.softInk.withValues(alpha: 0.7),
                   ),
+                  filled: true,
+                  fillColor: AppColors.ricePaper,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.warmCardBorder,
+                      width: 1,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: AppColors.warmCardBorder.withValues(alpha: 0.8),
+                      width: 1,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(
-                      color: AppColors.primary,
-                      width: 2,
+                      color: AppColors.candleGold,
+                      width: 1.4,
                     ),
                   ),
                 ),
-                style: const TextStyle(color: Colors.white),
+                style: GoogleFonts.kanit(color: AppColors.deepText),
               ),
             ],
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: (_isCustomTopic && _customTopicController.text.trim().isNotEmpty) || 
+                onPressed: (_isCustomTopic && _customTopicController.text.trim().isNotEmpty) ||
                           (!_isCustomTopic && _selectedTopic != null)
                     ? _confirmSelection
                     : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: AppColors.candleGold,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor:
+                      AppColors.disabled.withValues(alpha: 0.6),
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'เริ่มการสนทนา',
-                  style: TextStyle(
+                  style: GoogleFonts.kanit(
+                    color: Colors.white,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

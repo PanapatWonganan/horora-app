@@ -22,7 +22,7 @@ void main() {
         name: 'มินทร์',
         birthDate: birthDate,
         birthTime: const BirthTime(hour: 8, minute: 5),
-        primaryInterest: PrimaryInterest.finance,
+        interests: {PrimaryInterest.finance},
         spiritualStyle: SpiritualStyle.merit,
         meritFrequency: MeritFrequency.monthly,
         wantsNotifications: true,
@@ -77,7 +77,7 @@ void main() {
     test('removes onboarding data but keeps completed flag', () async {
       const onboarding = OnboardingData(
         name: 'ฝน',
-        primaryInterest: PrimaryInterest.love,
+        interests: {PrimaryInterest.love},
       );
       await service.saveOnboarding(onboarding);
       await service.markOnboardingCompleted();

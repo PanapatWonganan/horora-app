@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../models/affiliate_models.dart';
 import '../services/affiliate_service.dart';
 import 'affiliate_share_screen.dart';
@@ -36,46 +37,72 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ระบบตัวแทน'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AffiliateShareScreen()),
-            ),
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _dashboard == null
-              ? _buildError()
-              : RefreshIndicator(
-                  onRefresh: _loadDashboard,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildBalanceCard(),
-                        const SizedBox(height: 16),
-                        _buildStatsGrid(),
-                        const SizedBox(height: 16),
-                        _buildTierCard(),
-                        const SizedBox(height: 16),
-                        _buildQuickActions(),
-                        const SizedBox(height: 24),
-                        _buildRecentCommissions(),
-                      ],
+    return SacredScaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            SacredHeader(
+              title: 'ระบบตัวแทน',
+              overline: 'AFFILIATE',
+              trailing: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AffiliateShareScreen()),
+                ),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(13),
+                    border: Border.all(
+                      color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                      width: 1,
                     ),
                   ),
+                  child: const Icon(
+                    Icons.share,
+                    size: 18,
+                    color: AppColors.onBackdrop,
+                  ),
                 ),
+              ),
+            ),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent),
+                    )
+                  : _dashboard == null
+                      ? _buildError()
+                      : RefreshIndicator(
+                          onRefresh: _loadDashboard,
+                          color: AppColors.deepGoldBrown,
+                          backgroundColor: AppColors.ivorySilk,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildBalanceCard(),
+                                const SizedBox(height: 16),
+                                _buildStatsGrid(),
+                                const SizedBox(height: 16),
+                                _buildTierCard(),
+                                const SizedBox(height: 16),
+                                _buildQuickActions(),
+                                const SizedBox(height: 24),
+                                _buildRecentCommissions(),
+                              ],
+                            ),
+                          ),
+                        ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -84,12 +111,26 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: Colors.grey),
+          const Icon(Icons.error_outline,
+              size: 48, color: AppColors.onBackdropMuted),
           const SizedBox(height: 16),
-          const Text('ไม่สามารถโหลดข้อมูลได้'),
+          Text(
+            'ไม่สามารถโหลดข้อมูลได้',
+            style: SacredText.kanit(
+              color: AppColors.onBackdrop,
+              fontSize: 15,
+            ),
+          ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _loadDashboard,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.deepGoldBrown,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: const Text('ลองใหม่'),
           ),
         ],
@@ -104,33 +145,46 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
+          colors: [AppColors.softPlum, AppColors.nightPlum],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.candleGold.withValues(alpha: 0.4),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.templeIndigo.withValues(alpha: 0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'ยอดคงเหลือ',
-            style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.7), fontSize: 14),
+            style: SacredText.kanit(
+                color: AppColors.onBackdropMuted, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Text(
             '฿${stats.availableBalance.toStringAsFixed(0)}',
-            style: const TextStyle(
-              color: AppColors.deepText,
+            style: SacredText.display(
+              color: AppColors.candleGold,
               fontSize: 36,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 4),
           if (stats.pendingCommission > 0)
             Text(
               'รอดำเนินการ ฿${stats.pendingCommission.toStringAsFixed(0)}',
-              style: TextStyle(color: AppColors.deepText.withValues(alpha: 0.6), fontSize: 13),
+              style: SacredText.kanit(
+                  color: AppColors.onBackdropMuted, fontSize: 13),
             ),
           const SizedBox(height: 16),
           Row(
@@ -152,8 +206,9 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                   icon: const Icon(Icons.account_balance_wallet, size: 18),
                   label: const Text('ถอนเงิน'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.deepText,
-                    side: BorderSide(color: AppColors.deepText.withValues(alpha: 0.35)),
+                    foregroundColor: AppColors.onBackdrop,
+                    side: BorderSide(
+                        color: AppColors.candleGold.withValues(alpha: 0.55)),
                   ),
                 ),
               ),
@@ -167,8 +222,9 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                   icon: const Icon(Icons.share, size: 18),
                   label: const Text('แชร์ลิงก์'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.deepText,
-                    side: BorderSide(color: AppColors.deepText.withValues(alpha: 0.35)),
+                    foregroundColor: AppColors.onBackdrop,
+                    side: BorderSide(
+                        color: AppColors.candleGold.withValues(alpha: 0.55)),
                   ),
                 ),
               ),
@@ -193,25 +249,25 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
   }
 
   Widget _buildStatItem(String label, String value, IconData icon) {
-    return Container(
+    return SacredCard(
+      radius: 14,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-      ),
       child: Column(
         children: [
-          Icon(icon, color: AppColors.primary, size: 24),
+          Icon(icon, color: AppColors.deepGoldBrown, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: SacredText.kanit(
+              color: AppColors.deepText,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: SacredText.kanit(fontSize: 11, color: AppColors.mutedText),
             textAlign: TextAlign.center,
           ),
         ],
@@ -223,19 +279,15 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
     final stats = _dashboard!.stats;
     final tierColor = _getTierColor(stats.tier);
 
-    return Container(
+    return SacredCard(
+      radius: 16,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: tierColor.withValues(alpha: 0.3)),
-      ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: tierColor.withValues(alpha: 0.1),
+              color: tierColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(Icons.workspace_premium, color: tierColor, size: 32),
@@ -247,21 +299,24 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
               children: [
                 Text(
                   'ระดับ ${_getTierLabel(stats.tier)}',
-                  style: TextStyle(
+                  style: SacredText.kanit(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: tierColor,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'ออเดอร์เดือนนี้: ${stats.monthlyOrders} รายการ',
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  style: SacredText.kanit(
+                      fontSize: 13, color: AppColors.mutedText),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _getNextTierMessage(stats.tier, stats.monthlyOrders),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  style: SacredText.kanit(
+                      fontSize: 12,
+                      color: AppColors.mutedText.withValues(alpha: 0.8)),
                 ),
               ],
             ),
@@ -275,11 +330,10 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'เมนู',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: SacredSectionTitle('เมนู'),
         ),
-        const SizedBox(height: 12),
         _buildActionItem(
           icon: Icons.history,
           title: 'ประวัติคอมมิชชั่น',
@@ -324,14 +378,53 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(icon, color: AppColors.primary),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: const Icon(Icons.chevron_right),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SacredCard(
         onTap: onTap,
+        radius: 14,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.candleGold.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: AppColors.deepGoldBrown, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.mutedText.withValues(alpha: 0.7),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -341,11 +434,10 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'คอมมิชชั่นล่าสุด',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: SacredSectionTitle('คอมมิชชั่นล่าสุด'),
         ),
-        const SizedBox(height: 12),
         if (commissions.isEmpty)
           Container(
             padding: const EdgeInsets.all(24),
@@ -353,7 +445,8 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
             child: Text(
               'ยังไม่มีคอมมิชชั่น\nเริ่มแชร์ลิงก์เพื่อรับค่าแนะนำ!',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[500]),
+              style: SacredText.kanit(
+                  color: AppColors.onBackdropMuted, fontSize: 14),
             ),
           )
         else
@@ -370,37 +463,63 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
       _ => AppColors.warning,
     };
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: statusColor.withValues(alpha: 0.1),
-          child: Icon(Icons.receipt, color: statusColor, size: 20),
-        ),
-        title: Text(
-          commission.orderLocationName,
-          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-        ),
-        subtitle: Text(
-          '${commission.rateFormatted} of ${commission.orderAmountFormatted} - ${commission.statusLabel}',
-          style: const TextStyle(fontSize: 12),
-        ),
-        trailing: Text(
-          commission.commissionFormatted,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: statusColor,
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: SacredCard(
+        radius: 14,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: statusColor.withValues(alpha: 0.12),
+              child: Icon(Icons.receipt, color: statusColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    commission.orderLocationName,
+                    style: SacredText.kanit(
+                      color: AppColors.deepText,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${commission.rateFormatted} of ${commission.orderAmountFormatted} - ${commission.statusLabel}',
+                    style: SacredText.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              commission.commissionFormatted,
+              style: SacredText.kanit(
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
+                color: statusColor,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
+  // Tier accents — kept distinct/metallic but toned toward the temple palette
+  // so the gold tier sits beside the app's candle gold without clashing.
   Color _getTierColor(String tier) => switch (tier) {
-    'platinum' => const Color(0xFF607D8B),
-    'gold' => const Color(0xFFFFB300),
-    'silver' => const Color(0xFF9E9E9E),
-    _ => const Color(0xFFCD7F32),
+    'platinum' => const Color(0xFF6E7A8A), // muted slate
+    'gold' => AppColors.candleGold, // candle gold (matches app accent)
+    'silver' => const Color(0xFF9A938A), // warm grey
+    _ => AppColors.deepGoldBrown, // bronze → deep gold-brown
   };
 
   String _getTierLabel(String tier) => switch (tier) {

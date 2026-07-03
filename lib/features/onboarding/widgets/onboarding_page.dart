@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/theme.dart';
+import '../../../core/theme/sacred_ui.dart';
 
 class OnboardingPageData {
   final String title;
@@ -30,8 +31,7 @@ class OnboardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    return Container(
-      color: data.backgroundColor,
+    return SacredBackground(
       child: SafeArea(
         child: Column(
           children: [
@@ -50,18 +50,18 @@ class OnboardingPage extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'ASTROLOGY',
-            style: TextStyle(
-              color: AppColors.lightText,
+            style: SacredText.display(
               fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+              color: AppColors.onBackdrop,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 3,
             ),
           ),
         ],
@@ -75,12 +75,16 @@ class OnboardingPage extends StatelessWidget {
       height: size.width * 0.8,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.primary.withValues(alpha: 0.1),
+        color: AppColors.accent.withValues(alpha: 0.08),
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.25),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.2),
-            blurRadius: 20,
-            spreadRadius: 5,
+            color: AppColors.accent.withValues(alpha: 0.18),
+            blurRadius: 30,
+            spreadRadius: 4,
           ),
         ],
       ),
@@ -88,7 +92,7 @@ class OnboardingPage extends StatelessWidget {
         child: Icon(
           data.icon,
           size: size.width * 0.4,
-          color: AppColors.primary,
+          color: AppColors.accent,
         ),
       ),
     );
@@ -101,18 +105,20 @@ class OnboardingPage extends StatelessWidget {
         children: [
           Text(
             data.title,
-            style: const TextStyle(
-              color: AppColors.lightText,
+            textAlign: TextAlign.center,
+            style: SacredText.kanit(
+              color: AppColors.onBackdrop,
               fontSize: 28,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             data.description,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AppColors.lightText.withValues(alpha: 0.8),
+            style: SacredText.kanit(
+              color: AppColors.onBackdropMuted,
               fontSize: 16,
               height: 1.5,
             ),
