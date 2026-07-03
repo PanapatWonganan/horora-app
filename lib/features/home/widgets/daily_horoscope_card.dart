@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/models/horoscope_model.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/utils/app_icons.dart';
 import '../../shared/widgets/loading_indicator.dart';
@@ -40,22 +41,51 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
   }
   
   Future<void> _loadUserZodiacSign() async {
-    final user = _authService.currentUser;
-    if (user != null) {
-      // ใช้ข้อมูล thai_animal จาก Laravel user ก่อน
-      if (user.thaiAnimal != null) {
-        setState(() {
-          _userZodiacSign = user.thaiAnimal!;
-          _userZodiacSignThai = 'ปี${user.thaiAnimal}';
-        });
-      } else if (user.birthDate != null) {
-        // ถ้าไม่มี thai_animal ให้คำนวณจากวันเกิด
-        setState(() {
-          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
-          _userZodiacSign = thaiZodiac.animalName;
-          _userZodiacSignThai = thaiZodiac.thaiName;
-        });
+    try {
+      final user = _authService.currentUser;
+      if (user != null) {
+        // (a) บัญชีที่ login แล้ว: ใช้ thai_animal จาก Laravel user ก่อน
+        if (user.thaiAnimal != null) {
+          if (mounted) {
+            setState(() {
+              _userZodiacSign = user.thaiAnimal!;
+              _userZodiacSignThai = 'ปี${user.thaiAnimal}';
+            });
+          }
+          return;
+        }
+        // (b) ถ้าไม่มี thai_animal ให้คำนวณจากวันเกิดของบัญชี
+        if (user.birthDate != null) {
+          final thaiZodiac =
+              ThaiZodiacService.getThaiZodiacFromDate(user.birthDate!);
+          if (mounted) {
+            setState(() {
+              _userZodiacSign = thaiZodiac.animalName;
+              _userZodiacSignThai = thaiZodiac.thaiName;
+            });
+          }
+          return;
+        }
       }
+
+      // (c) ไม่มีบัญชี login (หรือบัญชีไม่มีข้อมูลวันเกิด) — fallback ไปใช้
+      // birthDate จาก guest onboarding
+      final guestBirthDate =
+          (await GuestSessionService.instance.loadOnboarding())?.birthDate;
+      if (guestBirthDate != null) {
+        final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(guestBirthDate);
+        if (mounted) {
+          setState(() {
+            _userZodiacSign = thaiZodiac.animalName;
+            _userZodiacSignThai = thaiZodiac.thaiName;
+          });
+        }
+      }
+      // (d) ไม่มีข้อมูลใดๆ — ปล่อย _userZodiacSign/_userZodiacSignThai เป็น
+      // null ไว้ (UI จะ fallback เป็นค่า default เดิม เช่น 'มะเมีย' placeholder)
+    } catch (e) {
+      // ผิดพลาดระหว่างโหลด — ปล่อยว่างไว้อย่างปลอดภัย ไม่ให้ crash การ์ด
+      debugPrint('DailyHoroscopeCard._loadUserZodiacSign error: $e');
     }
   }
   

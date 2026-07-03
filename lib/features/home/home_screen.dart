@@ -9,6 +9,7 @@ import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/guest_session_service.dart';
 import '../../core/utils/app_icons.dart';
 import '../merit/models/merit_models.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -79,18 +80,34 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _loadUserName() async {
-    final user = _authService.currentUser;
-    if (user != null) {
-      if (user.name.isNotEmpty) {
-        setState(() {
-          _userName = user.name;
-        });
-      } else if (user.email.isNotEmpty) {
-        // ถ้าไม่มีชื่อ ใช้อีเมลแทน
-        setState(() {
-          _userName = user.email.split('@')[0]; // ใช้ส่วนแรกของอีเมลก่อน @
-        });
+    try {
+      final user = _authService.currentUser;
+      if (user != null) {
+        // (a) บัญชีที่ login แล้ว: ใช้ชื่อก่อน
+        if (user.name.isNotEmpty) {
+          if (mounted) setState(() => _userName = user.name);
+          return;
+        }
+        // (b) ถ้าไม่มีชื่อ ใช้อีเมลแทน (พฤติกรรมเดิม)
+        if (user.email.isNotEmpty) {
+          if (mounted) {
+            setState(() => _userName = user.email.split('@')[0]);
+          }
+          return;
+        }
       }
+
+      // (c) ไม่มีบัญชี login — fallback ไปใช้ชื่อจาก guest onboarding
+      final guestData = await GuestSessionService.instance.loadOnboarding();
+      final guestName = guestData?.name;
+      if (guestName != null && guestName.isNotEmpty) {
+        if (mounted) setState(() => _userName = guestName);
+      }
+      // (d) ไม่มีข้อมูลใดๆ — ปล่อย _userName ว่างไว้ (การ์ดทักทายจะ
+      // fallback เป็น "สวัสดีค่ะ" อยู่แล้ว)
+    } catch (e) {
+      // ผิดพลาดระหว่างโหลด (account หรือ guest) — ปล่อยว่างไว้อย่างปลอดภัย
+      debugPrint('HomeScreen._loadUserName error: $e');
     }
   }
 

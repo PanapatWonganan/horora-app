@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/laravel_auth_service.dart';
 import '../../../core/services/thai_zodiac_service.dart';
 import '../../../core/api/api_client.dart';
@@ -64,9 +65,18 @@ class ChatRepository {
       }
 
       // ถ้าไม่มีข้อมูลใน currentUser ให้ลองดึงจาก API
-      final profile = await _authService.getUserProfile();
-
-      debugPrint("ChatRepository: profile fetched (keys: ${profile?.keys.join(', ')})"); // PII removed
+      // (guest ที่ไม่มี token จะให้ exception ตรงนี้ — ดักไว้เฉพาะจุดนี้
+      // เพื่อให้ยังตกไปลอง guest fallback ต่อด้านล่างได้ แทนที่จะกระโดด
+      // ไป catch นอกสุดแล้ว return null ทันที)
+      Map<String, dynamic>? profile;
+      try {
+        profile = await _authService.getUserProfile();
+        debugPrint(
+            "ChatRepository: profile fetched (keys: ${profile?.keys.join(', ')})"); // PII removed
+      } catch (e) {
+        debugPrint('ChatRepository: getUserProfile failed (likely guest/no-auth): $e');
+        profile = null;
+      }
 
       if (profile != null) {
         // ลองหา thai_animal ในโปรไฟล์ก่อน
@@ -84,6 +94,18 @@ class ChatRepository {
               "ChatRepository: calculated Thai zodiac from profile birth_date: ${thaiZodiac.animalName}");
           return thaiZodiac.animalName;
         }
+      }
+
+      // ไม่มีบัญชี login หรือบัญชีไม่มีข้อมูลวันเกิด — fallback ไปใช้
+      // birthDate จาก guest onboarding (ข้อมูล guest ต้องไม่ overwrite
+      // ข้อมูลบัญชีจริง — โค้ดด้านบนคืนค่าไปแล้วถ้ามีข้อมูลบัญชี)
+      final guestBirthDate =
+          (await GuestSessionService.instance.loadOnboarding())?.birthDate;
+      if (guestBirthDate != null) {
+        final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(guestBirthDate);
+        debugPrint(
+            "ChatRepository: calculated Thai zodiac from guest birth_date: ${thaiZodiac.animalName}");
+        return thaiZodiac.animalName;
       }
 
       debugPrint("ChatRepository: no Thai zodiac animal found");
