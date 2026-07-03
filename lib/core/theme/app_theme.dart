@@ -136,6 +136,13 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.dialog),
         ),
+        // Pin the dialog title style so future AlertDialogs don't silently
+        // inherit whatever headlineSmall happens to be.
+        titleTextStyle: GoogleFonts.kanit(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: AppColors.deepText,
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.lightSurface,
@@ -366,6 +373,13 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.dialog),
+        ),
+        // Pin the dialog title style so future AlertDialogs don't silently
+        // inherit whatever headlineSmall happens to be.
+        titleTextStyle: GoogleFonts.kanit(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: AppColors.darkText,
         ),
       ),
       snackBarTheme: SnackBarThemeData(
