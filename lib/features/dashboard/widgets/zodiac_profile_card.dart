@@ -94,6 +94,7 @@ class ZodiacProfileCard extends StatelessWidget {
                   onPressed: () {
                     // Navigate to edit profile
                   },
+                  tooltip: 'แก้ไขข้อมูลดวง',
                 ),
               ],
             ),

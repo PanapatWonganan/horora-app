@@ -195,21 +195,25 @@ class HelpSupportScreen extends StatelessWidget {
             icon: Icons.facebook,
             color: const Color(0xFF1877F2),
             onTap: () => _launchURL('https://facebook.com'),
+            label: 'เปิด Facebook',
           ),
           _buildSocialMediaButton(
             icon: Icons.camera_alt_outlined,
             color: const Color(0xFFE1306C),
             onTap: () => _launchURL('https://instagram.com'),
+            label: 'เปิด Instagram',
           ),
           _buildSocialMediaButton(
             icon: Icons.chat_bubble_outline,
             color: const Color(0xFF00B900),
             onTap: () => _launchURL('https://line.me'),
+            label: 'เปิด LINE',
           ),
           _buildSocialMediaButton(
             icon: Icons.language,
             color: AppColors.deepGoldBrown,
             onTap: () => _launchURL('https://astrologyapp.com'),
+            label: 'เปิดเว็บไซต์',
           ),
         ],
       ),
@@ -220,22 +224,27 @@ class HelpSupportScreen extends StatelessWidget {
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
+    required String label,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.12),
-          shape: BoxShape.circle,
-          border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
-        ),
-        child: Icon(
-          icon,
-          color: color,
-          size: 28,
+    return Semantics(
+      button: true,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+            border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 28,
+          ),
         ),
       ),
     );

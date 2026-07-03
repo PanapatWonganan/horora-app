@@ -105,38 +105,43 @@ class _ChatInputState extends State<ChatInput> {
           AnimatedOpacity(
             opacity: _hasText && !widget.isTyping ? 1.0 : 0.5,
             duration: const Duration(milliseconds: 200),
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(24),
-              child: InkWell(
-                onTap: _hasText && !widget.isTyping ? _handleSend : null,
+            child: Semantics(
+              button: true,
+              label: 'ส่งข้อความ',
+              child: Material(
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(24),
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        AppColors.candleGold,
-                        AppColors.deepGoldBrown,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.deepGoldBrown.withValues(alpha: 0.35),
-                        blurRadius: 12,
-                        offset: const Offset(0, 5),
+                child: InkWell(
+                  onTap: _hasText && !widget.isTyping ? _handleSend : null,
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.candleGold,
+                          AppColors.deepGoldBrown,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: SvgIcon(
-                      AppIcons.send,
-                      size: 22,
-                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              AppColors.deepGoldBrown.withValues(alpha: 0.35),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: SvgIcon(
+                        AppIcons.send,
+                        size: 22,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),

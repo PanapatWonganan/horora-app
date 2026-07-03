@@ -101,12 +101,37 @@ class ChatMessageItem extends StatelessWidget {
                       ],
                     ),
                     if (!isTyping)
-                      GestureDetector(
-                        onTap: () => _showReportDialog(context),
-                        child: Icon(
-                          Icons.flag_outlined,
-                          size: 16,
-                          color: AppColors.mutedText.withValues(alpha: 0.7),
+                      Semantics(
+                        button: true,
+                        label: 'รายงานข้อความนี้',
+                        child: SizedBox(
+                          // Layout footprint stays exactly the icon's 16x16
+                          // so the header row's height / spaceBetween
+                          // layout is untouched; OverflowBox expands only
+                          // the *tappable* region to the 44px minimum, with
+                          // the extra hit area overlapping into the
+                          // bubble's own padding rather than pushing
+                          // anything below it downward.
+                          width: 16,
+                          height: 16,
+                          child: OverflowBox(
+                            minWidth: 44,
+                            minHeight: 44,
+                            maxWidth: 44,
+                            maxHeight: 44,
+                            child: GestureDetector(
+                              onTap: () => _showReportDialog(context),
+                              behavior: HitTestBehavior.opaque,
+                              child: Center(
+                                child: Icon(
+                                  Icons.flag_outlined,
+                                  size: 16,
+                                  color:
+                                      AppColors.mutedText.withValues(alpha: 0.7),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                   ],

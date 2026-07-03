@@ -45,27 +45,48 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
             SacredHeader(
               title: 'ระบบตัวแทน',
               overline: 'AFFILIATE',
-              trailing: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AffiliateShareScreen()),
-                ),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
+              trailing: Semantics(
+                button: true,
+                label: 'แชร์ลิงก์แนะนำเพื่อน',
+                child: SizedBox(
+                  // Visual chip stays 40x40 (matches SacredHeader's back
+                  // chip rhythm); OverflowBox grows only the tappable
+                  // region to the 44px minimum, so the header Row's layout
+                  // is unaffected.
                   width: 40,
                   height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.onBackdrop.withValues(alpha: 0.06),
-                    borderRadius: BorderRadius.circular(13),
-                    border: Border.all(
-                      color: AppColors.onBackdrop.withValues(alpha: 0.12),
-                      width: 1,
+                  child: OverflowBox(
+                    minWidth: 44,
+                    minHeight: 44,
+                    maxWidth: 44,
+                    maxHeight: 44,
+                    child: GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const AffiliateShareScreen()),
+                      ),
+                      behavior: HitTestBehavior.opaque,
+                      child: Center(
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                            borderRadius: BorderRadius.circular(13),
+                            border: Border.all(
+                              color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.share,
+                            size: 18,
+                            color: AppColors.onBackdrop,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Icon(
-                    Icons.share,
-                    size: 18,
-                    color: AppColors.onBackdrop,
                   ),
                 ),
               ),

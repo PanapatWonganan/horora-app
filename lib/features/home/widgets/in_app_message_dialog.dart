@@ -126,6 +126,7 @@ class InAppMessageDialog extends StatelessWidget {
                             onDismiss?.call();
                             Navigator.of(context).pop();
                           },
+                          tooltip: 'ปิด',
                           icon: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(

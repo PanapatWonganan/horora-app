@@ -237,6 +237,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             onPressed: _navigateBackSafely,
             icon: const SvgIcon(AppIcons.arrowBack,
                 size: 20, color: AppColors.onBackdrop),
+            tooltip: 'ย้อนกลับ',
           ),
           Expanded(
             child: Column(

@@ -163,6 +163,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
           icon: const SvgIcon(AppIcons.arrowBack,
               size: 20, color: AppColors.onBackdrop),
           onPressed: () => Navigator.pop(context),
+          tooltip: 'ย้อนกลับ',
         ),
         Text(
           'ดวงประจำวัน',
@@ -184,6 +185,7 @@ class _HoroscopeDetailScreenState extends State<HoroscopeDetailScreen> {
               icon: const SvgIcon(AppIcons.share,
                   size: 20, color: AppColors.candleGold),
               onPressed: _shareHoroscope,
+              tooltip: 'แชร์ดวง',
             ),
           ],
         ),

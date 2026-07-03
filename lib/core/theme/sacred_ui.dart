@@ -347,24 +347,46 @@ class _BackChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
+    // Layout footprint stays exactly 40x40 (unchanged rhythm / sibling
+    // spacing in SacredHeader's Row); the tappable region is expanded to the
+    // 44x44 accessibility minimum via OverflowBox, which lets the
+    // GestureDetector claim a larger hit area without the parent Row
+    // reserving any extra space for it.
+    return Semantics(
+      button: true,
+      label: 'ย้อนกลับ',
+      child: SizedBox(
         width: 40,
         height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.onBackdrop.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(
-            color: AppColors.onBackdrop.withValues(alpha: 0.12),
-            width: 1,
+        child: OverflowBox(
+          minWidth: 44,
+          minHeight: 44,
+          maxWidth: 44,
+          maxHeight: 44,
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              alignment: Alignment.center,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(
+                    color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 17,
+                  color: AppColors.onBackdrop,
+                ),
+              ),
+            ),
           ),
-        ),
-        child: const Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: 17,
-          color: AppColors.onBackdrop,
         ),
       ),
     );
@@ -671,25 +693,37 @@ class SacredTextAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = color ?? AppColors.deepGoldBrown;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: SacredText.kanit(
-              color: c,
-              fontSize: 13.5,
-              fontWeight: FontWeight.w600,
-            ),
+    // The label row itself is only text-height (~19px). Pad the tappable
+    // region vertically to reach the 44px hit-height minimum — this nudges
+    // surrounding spacing by a few px at most (no absolute repositioning),
+    // which keeps the visual rhythm effectively unchanged while giving the
+    // control a real accessible hit area instead of relying on overflow.
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: SacredText.kanit(
+                  color: c,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (trailingSvg != null) ...[
+                const SizedBox(width: 4),
+                SvgIcon(trailingSvg!, size: 15, color: c),
+              ],
+            ],
           ),
-          if (trailingSvg != null) ...[
-            const SizedBox(width: 4),
-            SvgIcon(trailingSvg!, size: 15, color: c),
-          ],
-        ],
+        ),
       ),
     );
   }

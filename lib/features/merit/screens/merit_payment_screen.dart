@@ -319,6 +319,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
           IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
+            tooltip: 'ย้อนกลับ',
           ),
           Expanded(
             child: Column(
@@ -566,17 +567,36 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                 ),
               ),
               Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: () => setState(() => _slipImage = null),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
-                      shape: BoxShape.circle,
+                // Anchored flush to the Stack's own edges (0, 0) rather
+                // than the old (8, 8) inset so the full 44x44 hit area
+                // stays inside the Stack's clip bounds (default
+                // Clip.hardEdge would otherwise trim a negative-offset
+                // box). The visible 28px chip is centered inside this
+                // region via alignment, so it sits ~6px further from the
+                // corner than before — a small, deliberate trade-off to
+                // avoid clipping the accessible hit area.
+                top: 0,
+                right: 0,
+                child: Semantics(
+                  button: true,
+                  label: 'ลบรูปหลักฐานการโอน',
+                  child: GestureDetector(
+                    onTap: () => setState(() => _slipImage = null),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppColors.error,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close,
+                            color: Colors.white, size: 20),
+                      ),
                     ),
-                    child: const Icon(Icons.close, color: Colors.white, size: 20),
                   ),
                 ),
               ),

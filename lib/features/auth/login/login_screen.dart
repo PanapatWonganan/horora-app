@@ -177,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _togglePasswordVisibility,
+              tooltip: _obscurePassword ? 'แสดงรหัสผ่าน' : 'ซ่อนรหัสผ่าน',
             ),
           ),
           const SizedBox(height: 24),
@@ -248,6 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white,
               ),
               onPressed: _loginWithGoogle,
+              semanticLabel: 'เข้าสู่ระบบด้วย Google',
             ),
             const SizedBox(width: 16),
             SocialLoginButton(
@@ -257,6 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white,
               ),
               onPressed: _loginWithFacebook,
+              semanticLabel: 'เข้าสู่ระบบด้วย Facebook',
             ),
             const SizedBox(width: 16),
             SocialLoginButton(
@@ -266,6 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: Colors.white,
               ),
               onPressed: _loginWithApple,
+              semanticLabel: 'เข้าสู่ระบบด้วย Apple',
             ),
           ],
         ),

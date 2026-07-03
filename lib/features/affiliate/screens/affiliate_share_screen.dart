@@ -225,6 +225,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                               onPressed: _copyLink,
                               icon: const Icon(Icons.copy,
                                   size: 20, color: AppColors.deepGoldBrown),
+                              tooltip: 'คัดลอกลิงก์',
                             ),
                           ],
                         ),

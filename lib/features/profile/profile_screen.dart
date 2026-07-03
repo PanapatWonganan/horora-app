@@ -233,27 +233,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.settings);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Container(
+          Semantics(
+            button: true,
+            label: 'ตั้งค่า',
+            child: SizedBox(
+              // Visual chip stays 42x42; OverflowBox grows only the
+              // tappable region to the 44px minimum, so the header Row's
+              // spaceBetween layout is unaffected.
               width: 42,
               height: 42,
-              decoration: BoxDecoration(
-                color: AppColors.onBackdrop.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(13),
-                border: Border.all(
-                  color: AppColors.onBackdrop.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
-              child: const Center(
-                child: SvgIcon(
-                  AppIcons.settings,
-                  size: 22,
-                  color: AppColors.onBackdrop,
+              child: OverflowBox(
+                minWidth: 44,
+                minHeight: 44,
+                maxWidth: 44,
+                maxHeight: 44,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.settings);
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Center(
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppColors.onBackdrop.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          color: AppColors.onBackdrop.withValues(alpha: 0.12),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Center(
+                        child: SvgIcon(
+                          AppIcons.settings,
+                          size: 22,
+                          color: AppColors.onBackdrop,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -455,6 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               size: 20,
               color: AppColors.deepGoldBrown,
             ),
+            tooltip: 'แก้ไขโปรไฟล์',
             onPressed: () async {
               final result =
                   await AppRouter.navigateTo(context, AppRoutes.editProfile);

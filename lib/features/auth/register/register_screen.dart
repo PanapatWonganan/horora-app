@@ -312,6 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _togglePasswordVisibility,
+              tooltip: _obscurePassword ? 'แสดงรหัสผ่าน' : 'ซ่อนรหัสผ่าน',
             ),
           ),
           const SizedBox(height: 16),
@@ -338,6 +339,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: AppColors.lightText.withValues(alpha: 0.7),
               ),
               onPressed: _toggleConfirmPasswordVisibility,
+              tooltip:
+                  _obscureConfirmPassword ? 'แสดงรหัสผ่าน' : 'ซ่อนรหัสผ่าน',
             ),
           ),
           const SizedBox(height: 16),
@@ -562,6 +565,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white,
               ),
               onPressed: _registerWithGoogle,
+              semanticLabel: 'สมัครสมาชิกด้วย Google',
             ),
             const SizedBox(width: 16),
             SocialLoginButton(
@@ -571,6 +575,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white,
               ),
               onPressed: _registerWithFacebook,
+              semanticLabel: 'สมัครสมาชิกด้วย Facebook',
             ),
             const SizedBox(width: 16),
             SocialLoginButton(
@@ -580,6 +585,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 color: Colors.white,
               ),
               onPressed: _registerWithApple,
+              semanticLabel: 'สมัครสมาชิกด้วย Apple',
             ),
           ],
         ),

@@ -1080,6 +1080,7 @@ class _ProofViewerState extends State<_ProofViewer> {
               onPressed: () => Navigator.pop(context),
               icon: const Icon(Icons.close_rounded,
                   color: Colors.white, size: 28),
+              tooltip: 'ปิด',
             ),
           ),
           // Caption + counter.

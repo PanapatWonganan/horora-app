@@ -113,6 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       // Navigate to notifications
                       Navigator.pushNamed(context, AppRoutes.notifications);
                     },
+                    tooltip: 'การแจ้งเตือน',
                   ),
                   IconButton(
                     icon: const Icon(Icons.person_outline),
@@ -120,6 +121,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       // Navigate to profile
                       Navigator.pushNamed(context, AppRoutes.profile);
                     },
+                    tooltip: 'โปรไฟล์ของฉัน',
                   ),
                 ],
               ),

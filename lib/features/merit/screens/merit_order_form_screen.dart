@@ -174,6 +174,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
           IconButton(
             onPressed: () => Navigator.pop(context),
             icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
+            tooltip: 'ย้อนกลับ',
           ),
           Expanded(
             child: Column(
