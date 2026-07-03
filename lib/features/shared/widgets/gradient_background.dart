@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import '../../../core/theme/theme.dart';
 
@@ -45,19 +47,24 @@ class GradientBackground extends StatelessWidget {
 }
 
 class _StarsPainter extends CustomPainter {
+  // Fixed seed so the stars are deterministic (no per-frame churn / jitter
+  // on every repaint). Matches the pattern used by _GrainPainter in
+  // lib/core/theme/celestial_effects.dart.
+  static const int _seed = 1340217;
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.white.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
 
-    final random = DateTime.now().millisecondsSinceEpoch;
+    final rng = math.Random(_seed);
     const starCount = 100;
 
     for (var i = 0; i < starCount; i++) {
-      final x = ((random * (i + 1)) % size.width.toInt()).toDouble();
-      final y = ((random * (i + 2)) % size.height.toInt()).toDouble();
-      final radius = ((random * (i + 3)) % 3) + 1.0;
+      final x = rng.nextDouble() * size.width;
+      final y = rng.nextDouble() * size.height;
+      final radius = rng.nextDouble() * 3 + 1.0;
 
       canvas.drawCircle(Offset(x, y), radius, paint);
     }
