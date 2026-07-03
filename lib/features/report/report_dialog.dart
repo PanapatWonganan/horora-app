@@ -57,7 +57,7 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
 
     // Always show success message regardless of actual result
     if (!mounted) return;
-    
+
     Navigator.of(context).pop(true);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -82,7 +82,7 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
       // Log error but don't show to user
       debugPrint('Report service error (hidden from user): $e');
     }
-    
+
     if (mounted) {
       setState(() {
         _isSubmitting = false;
@@ -94,9 +94,6 @@ class _ReportContentDialogState extends ConsumerState<ReportContentDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.lightSurface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
       title: Row(
         children: [
           const Icon(Icons.flag, color: AppColors.error),

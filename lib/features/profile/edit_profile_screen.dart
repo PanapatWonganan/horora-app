@@ -5,7 +5,6 @@ import '../../core/theme/theme.dart';
 import '../../core/theme/sacred_ui.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/thai_zodiac_service.dart';
-import '../shared/widgets/gradient_button.dart';
 import '../auth/widgets/auth_text_field.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -19,13 +18,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _birthDateController = TextEditingController();
-  
+
   DateTime? _selectedDate;
   ThaiZodiac? _thaiZodiac; // ปีนักษัตรไทย
   bool _isLoading = true;
   bool _isSaving = false;
   final _authService = AuthService.instance;
-  
+
   // User data
   Map<String, dynamic> _userData = {};
 
@@ -46,11 +45,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       // Get current user from auth
       final currentUser = _authService.currentUser;
-      
+
       if (currentUser != null) {
         // อัปเดตข้อมูลเบื้องต้นจาก auth
         _userData['email'] = currentUser.email;
@@ -62,22 +61,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         // ดึงวันเกิดและคำนวณปีนักษัตร
         if (currentUser.birthDate != null) {
-          _userData['birth_date'] = currentUser.birthDate!.toIso8601String().split('T')[0];
+          _userData['birth_date'] =
+              currentUser.birthDate!.toIso8601String().split('T')[0];
 
           // คำนวณปีนักษัตรจากวันเกิด
-          final thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(currentUser.birthDate!);
+          final thaiZodiac =
+              ThaiZodiacService.getThaiZodiacFromDate(currentUser.birthDate!);
           _userData['thai_animal'] = thaiZodiac.animalName;
           _userData['thai_year_name'] = thaiZodiac.thaiName;
         } else if (currentUser.thaiAnimal != null) {
           _userData['thai_animal'] = currentUser.thaiAnimal;
-          _userData['thai_year_name'] = currentUser.thaiYearName ?? 'ปี${currentUser.thaiAnimal}';
+          _userData['thai_year_name'] =
+              currentUser.thaiYearName ?? 'ปี${currentUser.thaiAnimal}';
         }
       }
-      
+
       // พยายามดึงข้อมูลจากฐานข้อมูล
       try {
         final profile = await _authService.getUserProfile();
-        
+
         if (profile != null) {
           // อัปเดตข้อมูลจากฐานข้อมูล
           _userData = {
@@ -88,20 +90,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } catch (e) {
         debugPrint('Error fetching profile from database: $e');
       }
-      
+
       // ตั้งค่าข้อมูลใน controllers
       _nameController.text = _userData['full_name'] ?? '';
-      
-      if (_userData['birth_date'] != null && _userData['birth_date'].isNotEmpty) {
+
+      if (_userData['birth_date'] != null &&
+          _userData['birth_date'].isNotEmpty) {
         try {
           _selectedDate = DateTime.parse(_userData['birth_date']);
-          _birthDateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+          _birthDateController.text =
+              DateFormat('dd/MM/yyyy').format(_selectedDate!);
           _thaiZodiac = ThaiZodiacService.getThaiZodiacFromDate(_selectedDate!);
         } catch (e) {
           debugPrint('Error parsing birth date: $e');
         }
       }
-      
     } catch (e) {
       debugPrint('Error in _loadUserProfile: $e');
     } finally {
@@ -112,7 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     }
   }
-  
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -127,13 +130,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               onPrimary: Colors.white,
               surface: AppColors.lightSurface,
               onSurface: AppColors.deepText,
-            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.lightSurface),
+            ),
+            dialogTheme:
+                const DialogThemeData(backgroundColor: AppColors.lightSurface),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -144,19 +149,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
-  
+
   Future<void> _saveProfile() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isSaving = true;
       });
-      
+
       try {
         // สร้างข้อมูลที่จะอัปเดต
         final updatedData = {
           'full_name': _nameController.text.trim(),
         };
-        
+
         // เพิ่มวันเกิดถ้ามีการเลือก
         if (_selectedDate != null) {
           updatedData['birth_date'] = _selectedDate!.toIso8601String();
@@ -165,10 +170,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             updatedData['thai_year_name'] = _thaiZodiac!.thaiName;
           }
         }
-        
+
         // อัปเดตข้อมูลในฐานข้อมูล
         await _authService.updateUserProfile(updatedData);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -176,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               backgroundColor: AppColors.success,
             ),
           );
-          
+
           // ส่งค่า true กลับไปยังหน้าโปรไฟล์เพื่อให้รู้ว่ามีการอัปเดตข้อมูล
           Navigator.of(context).pop(true);
         }
@@ -241,7 +246,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-  
+
   Widget _buildProfileImage() {
     return Center(
       child: Column(
@@ -261,21 +266,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: AppColors.candleGold.withValues(alpha: 0.18),
-                child: _userData['profile_image_url'] != null && _userData['profile_image_url'].isNotEmpty
-                  ? Image.network(
-                      _userData['profile_image_url'],
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
+                child: _userData['profile_image_url'] != null &&
+                        _userData['profile_image_url'].isNotEmpty
+                    ? Image.network(
+                        _userData['profile_image_url'],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: AppColors.deepGoldBrown,
+                        ),
+                      )
+                    : const Icon(
                         Icons.person,
                         size: 50,
                         color: AppColors.deepGoldBrown,
                       ),
-                    )
-                  : const Icon(
-                      Icons.person,
-                      size: 50,
-                      color: AppColors.deepGoldBrown,
-                    ),
               ),
             ),
           ),
@@ -291,7 +298,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-  
+
   Widget _buildEditForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,18 +386,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ],
     );
   }
-  
+
   Widget _buildSaveButton() {
-    return GradientButton(
-      text: 'บันทึกข้อมูล',
-      onPressed: _saveProfile,
-      gradient: const LinearGradient(
-        colors: AppColors.goldGradient,
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ),
-      width: double.infinity,
+    return SacredPrimaryButton(
+      label: 'บันทึกข้อมูล',
+      onTap: _saveProfile,
+      filled: true,
       isLoading: _isSaving,
     );
   }
-} 
+}

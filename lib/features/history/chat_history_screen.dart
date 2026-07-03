@@ -3,7 +3,6 @@ import '../../core/api/api_client.dart';
 import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/sacred_ui.dart';
-import '../shared/widgets/gradient_button.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -45,7 +44,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     try {
       final apiClient = ApiClient();
       final response = await apiClient.get('/chat/history');
-      final List<dynamic> data = response is List ? response : (response?['data'] ?? []);
+      final List<dynamic> data =
+          response is List ? response : (response?['data'] ?? []);
 
       setState(() {
         _chatHistory = data.map((e) => Map<String, dynamic>.from(e)).toList();
@@ -118,14 +118,10 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            GradientButton(
-              text: 'ลองใหม่อีกครั้ง',
-              onPressed: _loadChatHistory,
-              gradient: const LinearGradient(
-                colors: AppColors.goldGradient,
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+            SacredPrimaryButton(
+              label: 'ลองใหม่อีกครั้ง',
+              onTap: _loadChatHistory,
+              filled: true,
             ),
           ],
         ),
@@ -186,7 +182,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   }
 
   Widget _buildHistoryItem(Map<String, dynamic> item) {
-    final date = DateTime.parse(item['date'] ?? DateTime.now().toIso8601String());
+    final date =
+        DateTime.parse(item['date'] ?? DateTime.now().toIso8601String());
     final formattedDate = '${date.day}/${date.month}/${date.year}';
     final astrologer = item['astrologer'] ?? 'ไม่ระบุ';
     final topic = item['topic'] ?? 'ไม่ระบุหัวข้อ';
@@ -222,7 +219,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             ),
             const SizedBox(height: 8.0),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
               decoration: BoxDecoration(
                 color: AppColors.candleGold.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(8.0),

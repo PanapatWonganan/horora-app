@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/app_icons.dart';
-import '../shared/widgets/gradient_button.dart';
 
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({Key? key}) : super(key: key);
@@ -14,7 +13,7 @@ class LanguageScreen extends StatefulWidget {
 class _LanguageScreenState extends State<LanguageScreen> {
   // ภาษาที่เลือกในปัจจุบัน
   String _selectedLanguage = 'th'; // ค่าเริ่มต้นเป็นภาษาไทย
-  
+
   // รายการภาษาที่รองรับ
   final List<Map<String, dynamic>> _supportedLanguages = [
     {
@@ -82,22 +81,18 @@ class _LanguageScreenState extends State<LanguageScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    ..._supportedLanguages.map((language) => _buildLanguageItem(language)),
+                    ..._supportedLanguages
+                        .map((language) => _buildLanguageItem(language)),
                   ],
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(20),
-              child: GradientButton(
-                text: 'บันทึกการตั้งค่า',
-                onPressed: _saveLanguage,
-                gradient: const LinearGradient(
-                  colors: AppColors.goldGradient,
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                width: double.infinity,
+              child: SacredPrimaryButton(
+                label: 'บันทึกการตั้งค่า',
+                onTap: _saveLanguage,
+                filled: true,
               ),
             ),
           ],
@@ -108,7 +103,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
   Widget _buildLanguageItem(Map<String, dynamic> language) {
     final isSelected = language['code'] == _selectedLanguage;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: SacredCard(
@@ -173,14 +168,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
   void _saveLanguage() {
     // ในแอปจริง ควรบันทึกการตั้งค่าภาษาลงใน SharedPreferences หรือฐานข้อมูล
     // และอัปเดตภาษาของแอปพลิเคชัน
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('บันทึกการตั้งค่าภาษาเรียบร้อยแล้ว'),
         backgroundColor: AppColors.success,
       ),
     );
-    
+
     Navigator.of(context).pop();
   }
-} 
+}

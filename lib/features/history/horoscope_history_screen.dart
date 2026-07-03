@@ -6,7 +6,6 @@ import '../../core/services/auth_guard.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/zodiac_utils.dart';
-import '../shared/widgets/gradient_button.dart';
 
 class HoroscopeHistoryScreen extends StatefulWidget {
   const HoroscopeHistoryScreen({Key? key}) : super(key: key);
@@ -46,10 +45,12 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
     try {
       final apiClient = ApiClient();
       final response = await apiClient.get('/horoscope/history');
-      final List<dynamic> data = response is List ? response : (response?['data'] ?? []);
+      final List<dynamic> data =
+          response is List ? response : (response?['data'] ?? []);
 
       setState(() {
-        _horoscopeHistory = data.map((e) => Map<String, dynamic>.from(e)).toList();
+        _horoscopeHistory =
+            data.map((e) => Map<String, dynamic>.from(e)).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -128,14 +129,10 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            GradientButton(
-              text: 'ลองใหม่อีกครั้ง',
-              onPressed: _loadHoroscopeHistory,
-              gradient: const LinearGradient(
-                colors: AppColors.goldGradient,
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+            SacredPrimaryButton(
+              label: 'ลองใหม่อีกครั้ง',
+              onTap: _loadHoroscopeHistory,
+              filled: true,
             ),
           ],
         ),
@@ -175,17 +172,13 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            GradientButton(
-              text: 'ดูดวงจากราศี',
-              onPressed: () {
+            SacredPrimaryButton(
+              label: 'ดูดวงจากราศี',
+              onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushNamed('/horoscope');
               },
-              gradient: const LinearGradient(
-                colors: AppColors.goldGradient,
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+              filled: true,
             ),
           ],
         ),
@@ -213,7 +206,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
     final formattedDate = DateFormat('dd/MM/yyyy').format(date);
     final zodiacSign = item['zodiac_sign'];
     final prediction = item['prediction'];
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: SacredCard(
@@ -314,7 +307,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
       ],
     );
   }
-  
+
   // ฟังก์ชันสำหรับแปลงชื่อราศีภาษาอังกฤษเป็นภาษาไทย
   String _getThaiZodiacName(String englishName) {
     switch (englishName.toLowerCase()) {
@@ -346,4 +339,4 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
         return 'ไม่ทราบราศี';
     }
   }
-} 
+}

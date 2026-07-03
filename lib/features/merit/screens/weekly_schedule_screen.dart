@@ -69,11 +69,11 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   ///
   /// These overlines sit directly on the dark celestial backdrop, so they use a
   /// light muted-lilac tone for legibility.
-  Widget _overline(String text, {Color? color}) {
+  Widget _overline(String text, {Color? color, double size = 11.5}) {
     return Text(
       text.toUpperCase(),
       style: _displayStyle(
-        fontSize: 11.5,
+        fontSize: size,
         color: color ?? AppColors.onBackdropMuted,
         fontWeight: FontWeight.w600,
         letterSpacing: 2.6,
@@ -242,7 +242,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _overline('Merit · ทำบุญออนไลน์'),
+                _overline('Merit · ทำบุญออนไลน์', size: 12),
                 const SizedBox(height: 2),
                 Text(
                   'ฝากดวงใจไหว้ให้',
@@ -1028,7 +1028,10 @@ class _ProofSample {
       temple: 'ท้าวเวสสุวรรณ สำเพ็ง',
       date: '29 พ.ค. 2569',
       caption: 'ปิดทอง ถวายพวงมาลัยเรียบร้อย 🌺',
-      gradient: [Color(0xFF8FA98F), Color(0xFF8C86A8)], // bodhi-green → plum-grey
+      gradient: [
+        Color(0xFF8FA98F),
+        Color(0xFF8C86A8)
+      ], // bodhi-green → plum-grey
     ),
   ];
 }

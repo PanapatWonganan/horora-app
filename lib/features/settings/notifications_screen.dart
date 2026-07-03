@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/sacred_ui.dart';
-import '../shared/widgets/gradient_button.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({Key? key}) : super(key: key);
@@ -18,7 +17,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _chatNotificationsEnabled = true;
   bool _promotionsEnabled = false;
   bool _appUpdatesEnabled = true;
-  
+
   // เวลาที่จะรับการแจ้งเตือนดวงประจำวัน
   TimeOfDay _dailyHoroscopeTime = const TimeOfDay(hour: 8, minute: 0);
 
@@ -39,80 +38,80 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                _buildSectionTitle('การแจ้งเตือนดวงชะตา'),
-                const SizedBox(height: 16),
-                _buildNotificationSwitch(
-                  'ดวงประจำวัน',
-                  'รับการแจ้งเตือนดวงประจำวันของคุณทุกเช้า',
-                  _dailyHoroscopeEnabled,
-                  (value) {
-                    setState(() {
-                      _dailyHoroscopeEnabled = value;
-                    });
-                  },
-                ),
-                if (_dailyHoroscopeEnabled) _buildTimeSelector(),
-                _buildNotificationSwitch(
-                  'ดวงประจำสัปดาห์',
-                  'รับการแจ้งเตือนดวงประจำสัปดาห์ทุกวันจันทร์',
-                  _weeklyHoroscopeEnabled,
-                  (value) {
-                    setState(() {
-                      _weeklyHoroscopeEnabled = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-                _buildSectionTitle('การแจ้งเตือนไพ่ทาโรต์'),
-                const SizedBox(height: 16),
-                _buildNotificationSwitch(
-                  'เตือนให้อ่านไพ่',
-                  'รับการแจ้งเตือนให้อ่านไพ่ทาโรต์ประจำวัน',
-                  _tarotReminderEnabled,
-                  (value) {
-                    setState(() {
-                      _tarotReminderEnabled = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-                _buildSectionTitle('การแจ้งเตือนการสนทนา'),
-                const SizedBox(height: 16),
-                _buildNotificationSwitch(
-                  'ข้อความใหม่',
-                  'รับการแจ้งเตือนเมื่อมีข้อความใหม่จากนักพยากรณ์',
-                  _chatNotificationsEnabled,
-                  (value) {
-                    setState(() {
-                      _chatNotificationsEnabled = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-                _buildSectionTitle('การแจ้งเตือนอื่นๆ'),
-                const SizedBox(height: 16),
-                _buildNotificationSwitch(
-                  'ข่าวสารและสิ่งดีๆ',
-                  'รับการแจ้งเตือนข่าวสารและสิ่งดีๆ ที่คัดสรรมาเพื่อคุณ',
-                  _promotionsEnabled,
-                  (value) {
-                    setState(() {
-                      _promotionsEnabled = value;
-                    });
-                  },
-                ),
-                _buildNotificationSwitch(
-                  'อัปเดตแอปพลิเคชัน',
-                  'รับการแจ้งเตือนเมื่อมีการอัปเดตแอปพลิเคชัน',
-                  _appUpdatesEnabled,
-                  (value) {
-                    setState(() {
-                      _appUpdatesEnabled = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 32),
-                _buildSaveButton(),
+                    _buildSectionTitle('การแจ้งเตือนดวงชะตา'),
+                    const SizedBox(height: 16),
+                    _buildNotificationSwitch(
+                      'ดวงประจำวัน',
+                      'รับการแจ้งเตือนดวงประจำวันของคุณทุกเช้า',
+                      _dailyHoroscopeEnabled,
+                      (value) {
+                        setState(() {
+                          _dailyHoroscopeEnabled = value;
+                        });
+                      },
+                    ),
+                    if (_dailyHoroscopeEnabled) _buildTimeSelector(),
+                    _buildNotificationSwitch(
+                      'ดวงประจำสัปดาห์',
+                      'รับการแจ้งเตือนดวงประจำสัปดาห์ทุกวันจันทร์',
+                      _weeklyHoroscopeEnabled,
+                      (value) {
+                        setState(() {
+                          _weeklyHoroscopeEnabled = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    _buildSectionTitle('การแจ้งเตือนไพ่ทาโรต์'),
+                    const SizedBox(height: 16),
+                    _buildNotificationSwitch(
+                      'เตือนให้อ่านไพ่',
+                      'รับการแจ้งเตือนให้อ่านไพ่ทาโรต์ประจำวัน',
+                      _tarotReminderEnabled,
+                      (value) {
+                        setState(() {
+                          _tarotReminderEnabled = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    _buildSectionTitle('การแจ้งเตือนการสนทนา'),
+                    const SizedBox(height: 16),
+                    _buildNotificationSwitch(
+                      'ข้อความใหม่',
+                      'รับการแจ้งเตือนเมื่อมีข้อความใหม่จากนักพยากรณ์',
+                      _chatNotificationsEnabled,
+                      (value) {
+                        setState(() {
+                          _chatNotificationsEnabled = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    _buildSectionTitle('การแจ้งเตือนอื่นๆ'),
+                    const SizedBox(height: 16),
+                    _buildNotificationSwitch(
+                      'ข่าวสารและสิ่งดีๆ',
+                      'รับการแจ้งเตือนข่าวสารและสิ่งดีๆ ที่คัดสรรมาเพื่อคุณ',
+                      _promotionsEnabled,
+                      (value) {
+                        setState(() {
+                          _promotionsEnabled = value;
+                        });
+                      },
+                    ),
+                    _buildNotificationSwitch(
+                      'อัปเดตแอปพลิเคชัน',
+                      'รับการแจ้งเตือนเมื่อมีการอัปเดตแอปพลิเคชัน',
+                      _appUpdatesEnabled,
+                      (value) {
+                        setState(() {
+                          _appUpdatesEnabled = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                    _buildSaveButton(),
                   ],
                 ),
               ),
@@ -212,7 +211,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             InkWell(
               onTap: _selectTime,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.candleGold.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(8),
@@ -245,13 +245,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onPrimary: Colors.white,
               surface: AppColors.lightSurface,
               onSurface: AppColors.deepText,
-            ), dialogTheme: const DialogThemeData(backgroundColor: AppColors.lightSurface),
+            ),
+            dialogTheme:
+                const DialogThemeData(backgroundColor: AppColors.lightSurface),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (picked != null && picked != _dailyHoroscopeTime) {
       setState(() {
         _dailyHoroscopeTime = picked;
@@ -266,29 +268,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildSaveButton() {
-    return GradientButton(
-      text: 'บันทึกการตั้งค่า',
-      onPressed: _saveSettings,
-      gradient: const LinearGradient(
-        colors: AppColors.goldGradient,
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ),
-      width: double.infinity,
+    return SacredPrimaryButton(
+      label: 'บันทึกการตั้งค่า',
+      onTap: _saveSettings,
+      filled: true,
     );
   }
 
   void _saveSettings() {
     // ในแอปจริง ควรบันทึกการตั้งค่าลงใน SharedPreferences หรือฐานข้อมูล
     // และอาจต้องลงทะเบียนหรือยกเลิกการลงทะเบียนกับ Firebase Cloud Messaging
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('บันทึกการตั้งค่าการแจ้งเตือนเรียบร้อยแล้ว'),
         backgroundColor: AppColors.success,
       ),
     );
-    
+
     Navigator.of(context).pop();
   }
-} 
+}
