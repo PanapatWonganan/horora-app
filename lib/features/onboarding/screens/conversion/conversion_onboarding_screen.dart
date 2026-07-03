@@ -40,6 +40,13 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   int _page = 0;
   OnboardingData _data = const OnboardingData();
 
+  /// Resolved lazily the first time the paywall page builds (see
+  /// [_paywall]). Defaults to [PaywallVariant.control] until resolved so the
+  /// very first frame renders control (matches [kPaywallSoftGateWeight]
+  /// being 0.0 by default).
+  PaywallVariant _paywallVariant = PaywallVariant.control;
+  bool _paywallShownTracked = false;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +93,43 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   void _goToLogin() =>
       Navigator.pushReplacementNamed(context, AppRoutes.login);
 
+  // ---- Paywall experiment (see ab_test_service.dart) -----------------------
+  //
+  // 5 funnel events fire from the paywall page: paywall_shown,
+  // paywall_plan_selected, paywall_start_trial_tapped, paywall_skipped,
+  // paywall_closed. All of them route through ABTestService.trackPaywallEvent
+  // so every event is tagged with the resolved PaywallVariant.
+
+  /// Resolves the persisted paywall variant (once) and fires paywall_shown.
+  /// Called when the PageView lands on the paywall (index 10).
+  void _onPaywallShown() {
+    if (_paywallShownTracked) return;
+    _paywallShownTracked = true;
+    _abTest.getPaywallVariant().then((variant) {
+      if (mounted) setState(() => _paywallVariant = variant);
+    });
+    _abTest.trackPaywallEvent('paywall_shown');
+  }
+
+  void _onPaywallPlanSelected(String plan) {
+    _abTest.trackPaywallEvent('paywall_plan_selected', detail: plan);
+  }
+
+  void _onPaywallStartTrialTapped() {
+    _abTest.trackPaywallEvent('paywall_start_trial_tapped');
+    _finishAsGuest();
+  }
+
+  void _onPaywallSkipped() {
+    _abTest.trackPaywallEvent('paywall_skipped');
+    _finishAsGuest();
+  }
+
+  void _onPaywallClosed() {
+    _abTest.trackPaywallEvent('paywall_closed');
+    _finishAsGuest();
+  }
+
   // ---- Build ---------------------------------------------------------------
 
   @override
@@ -103,6 +147,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
               setState(() => _page = i);
               _abTest.trackFunnelStep('cv_page_$i');
               if (i == 6) _runAnalyzing(); // screen 7 = analyzing
+              if (i == 10) _onPaywallShown(); // screen 11 = paywall
             },
             children: [
               _welcome(), // 1
@@ -1036,7 +1081,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
           child: Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
-              onTap: _finishAsGuest,
+              onTap: _onPaywallClosed,
               child: Text('✕',
                   style: CvType.body(14, color: CvColors.creamA(0.65))),
             ),
@@ -1070,25 +1115,31 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                       ),
                     )),
                 const SizedBox(height: 20),
-                const IntrinsicHeight(
+                IntrinsicHeight(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Expanded(
-                        child: _PlanCard(
-                          title: 'รายปี',
-                          price: '฿599',
-                          per: '฿50/เดือน',
-                          badge: 'ประหยัด 50%',
-                          highlighted: true,
+                        child: GestureDetector(
+                          onTap: () => _onPaywallPlanSelected('yearly'),
+                          child: const _PlanCard(
+                            title: 'รายปี',
+                            price: '฿599',
+                            per: '฿50/เดือน',
+                            badge: 'ประหยัด 50%',
+                            highlighted: true,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 11),
+                      const SizedBox(width: 11),
                       Expanded(
-                        child: _PlanCard(
-                          title: 'รายเดือน',
-                          price: '฿99',
-                          per: 'ต่อเดือน',
+                        child: GestureDetector(
+                          onTap: () => _onPaywallPlanSelected('monthly'),
+                          child: const _PlanCard(
+                            title: 'รายเดือน',
+                            price: '฿99',
+                            per: 'ต่อเดือน',
+                          ),
                         ),
                       ),
                     ],
@@ -1112,11 +1163,22 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
             children: [
               // Placeholder: both trial + skip enter Home as guest for now.
               CvGoldButton(
-                  label: 'เริ่มทดลองฟรี 7 วัน', onPressed: _finishAsGuest),
+                  label: 'เริ่มทดลองฟรี 7 วัน',
+                  onPressed: _onPaywallStartTrialTapped),
               const SizedBox(height: 9),
               Text('จากนั้น ฿599/ปี · ยกเลิกได้ทุกเมื่อ',
                   style: CvType.body(12, color: CvColors.creamA(0.65))),
-              CvTextLink(label: 'ข้ามไปก่อน', onPressed: _finishAsGuest),
+              // Dormant softGate delta: only rendered when the paywall
+              // experiment assigns PaywallVariant.softGate (never true today
+              // — kPaywallSoftGateWeight is 0.0). Control's skip link below
+              // is unchanged either way.
+              if (_paywallVariant == PaywallVariant.softGate) ...[
+                const SizedBox(height: 4),
+                Text('ทดลองดูดวงฟรีวันนี้',
+                    style: CvType.body(12,
+                        weight: FontWeight.w500, color: CvColors.goldSoft)),
+              ],
+              CvTextLink(label: 'ข้ามไปก่อน', onPressed: _onPaywallSkipped),
             ],
           ),
         ),
