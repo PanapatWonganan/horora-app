@@ -181,13 +181,13 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.2),
+                    color: MeritColors.accent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     // Outlined temple — matches the calm line-icon language.
                     Icons.temple_buddhist_outlined,
-                    color: AppColors.primary,
+                    color: MeritColors.accentDark,
                     size: 24,
                   ),
                 ),

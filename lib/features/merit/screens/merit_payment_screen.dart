@@ -416,7 +416,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                     fontWeight: FontWeight.w700,
                   )
                 : GoogleFonts.kanit(
-                    color: isHighlight ? AppColors.primary : AppColors.deepText,
+                    color: isHighlight ? MeritColors.accentDark : AppColors.deepText,
                     fontSize: 14,
                     fontWeight: isBold ? FontWeight.w700 : FontWeight.w400,
                   ),
