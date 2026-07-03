@@ -18,7 +18,8 @@ import '../shared/widgets/loading_indicator.dart';
 class TarotCardDetailsScreen extends StatefulWidget {
   final int readingId;
 
-  const TarotCardDetailsScreen({Key? key, required this.readingId}) : super(key: key);
+  const TarotCardDetailsScreen({Key? key, required this.readingId})
+      : super(key: key);
 
   @override
   State<TarotCardDetailsScreen> createState() => _TarotCardDetailsScreenState();
@@ -45,7 +46,8 @@ class _TarotCardDetailsScreenState extends State<TarotCardDetailsScreen> {
     });
 
     try {
-      final reading = await _tarotRepository.getTarotReadingById(widget.readingId);
+      final reading =
+          await _tarotRepository.getTarotReadingById(widget.readingId);
       setState(() {
         _reading = reading;
         _isSaved = reading.isSaved;
@@ -83,7 +85,9 @@ class _TarotCardDetailsScreenState extends State<TarotCardDetailsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ไม่สามารถ${_isSaved ? 'ยกเลิกการบันทึก' : 'บันทึก'}การอ่านไพ่ได้: ${e.toString()}')),
+          SnackBar(
+              content: Text(
+                  'ไม่สามารถ${_isSaved ? 'ยกเลิกการบันทึก' : 'บันทึก'}การอ่านไพ่ได้: ${e.toString()}')),
         );
       }
     }
@@ -115,7 +119,8 @@ class _TarotCardDetailsScreenState extends State<TarotCardDetailsScreen> {
     }
 
     final cardsText = _reading!.cards
-        .map((card) => '${card.position}: ${card.card.nameTh}${card.isReversed ? ' (กลับหัว)' : ''}')
+        .map((card) =>
+            '${card.position}: ${card.card.nameTh}${card.isReversed ? ' (กลับหัว)' : ''}')
         .join('\n');
 
     final shareText = '''
@@ -196,49 +201,51 @@ ${_reading!.interpretation}
             const Positioned.fill(child: GrainOverlay(opacity: 0.03)),
             SafeArea(
               child: _isLoading
-            ? const Center(child: LoadingIndicator())
-            : _errorMessage != null
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: AppColors.error,
-                          size: 48,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _errorMessage!,
-                          style: GoogleFonts.kanit(color: AppColors.onBackdrop),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: _loadReading,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                  ? const Center(child: LoadingIndicator())
+                  : _errorMessage != null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: AppColors.error,
+                                size: 48,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                _errorMessage!,
+                                style: GoogleFonts.kanit(
+                                    color: AppColors.onBackdrop),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton(
+                                onPressed: _loadReading,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Text(
+                                  'ลองใหม่',
+                                  style: GoogleFonts.kanit(),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            'ลองใหม่',
-                            style: GoogleFonts.kanit(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : _reading == null
-                    ? Center(
-                        child: Text(
-                          'ไม่พบข้อมูลการอ่านไพ่',
-                          style: GoogleFonts.kanit(color: AppColors.onBackdrop),
-                        ),
-                      )
-                    : _buildReadingDetails(),
+                        )
+                      : _reading == null
+                          ? Center(
+                              child: Text(
+                                'ไม่พบข้อมูลการอ่านไพ่',
+                                style: GoogleFonts.kanit(
+                                    color: AppColors.onBackdrop),
+                              ),
+                            )
+                          : _buildReadingDetails(),
             ),
           ],
         ),
@@ -458,47 +465,46 @@ ${_reading!.interpretation}
                 ),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Transform.rotate(
-                angle: cardPosition.isReversed ? 3.14159 : 0, // 180 degrees if reversed
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SvgIcon(
-                      AppIcons.sparkle,
-                      color: AppColors.primary,
-                      size: 40,
-                    ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        cardPosition.card.name.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.fraunces(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.2,
-                          color: AppColors.primary.withValues(alpha: 0.8),
-                        ),
+              // Card names stay upright even for reversed cards — the
+              // "(กลับหัว)" label below the card carries that state.
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SvgIcon(
+                    AppIcons.sparkle,
+                    color: AppColors.primary,
+                    size: 40,
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      cardPosition.card.name.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.fraunces(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.2,
+                        color: AppColors.primary.withValues(alpha: 0.8),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        cardPosition.card.nameTh,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.kanit(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.deepText,
-                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      cardPosition.card.nameTh,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.kanit(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.deepText,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -600,5 +606,4 @@ ${_reading!.interpretation}
       ],
     );
   }
-
 }

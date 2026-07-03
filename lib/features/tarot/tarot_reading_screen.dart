@@ -337,7 +337,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   // The lone "hero" case: a single-card spread gets a bigger, grander, more
   // cinematic treatment than the multi-card spreads. Purely a visual branch —
   // no draw/select/interpret/save logic depends on it.
-  bool get _isSingleHero => _spreadType == 'single' || _selectedCards.length == 1;
+  bool get _isSingleHero =>
+      _spreadType == 'single' || _selectedCards.length == 1;
 
   int _getCardCountForSpreadType() {
     switch (_spreadType) {
@@ -674,7 +675,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SacredSectionTitle('เลือกรูปแบบการอ่านไพ่', overline: 'THE SPREAD'),
+        const SacredSectionTitle('เลือกรูปแบบการอ่านไพ่',
+            overline: 'THE SPREAD'),
         const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -1103,9 +1105,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
         // Idle invitation pulse on un-revealed backs (subtle breathing scale).
         // The lone hero back breathes a touch more to draw the tap.
-        final idlePulse = !isRevealed
-            ? 1.0 + sin(t) * (isHero ? 0.022 : 0.012)
-            : 1.0;
+        final idlePulse =
+            !isRevealed ? 1.0 + sin(t) * (isHero ? 0.022 : 0.012) : 1.0;
 
         // Press-scale on tap-down, before the flip starts.
         final pressScale = (hasSlot && _isPressed[index]) ? 0.95 : 1.0;
@@ -1231,15 +1232,15 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                           // so the lone card always feels luminous.
                           if (isHero)
                             BoxShadow(
-                              color: AppColors.accent.withValues(
-                                  alpha: 0.22 + flip * 0.18),
+                              color: AppColors.accent
+                                  .withValues(alpha: 0.22 + flip * 0.18),
                               blurRadius: 30 + flip * 18,
                               spreadRadius: 2 + flip * 4,
                             ),
                           // Reveal glow halo (intensifies as the front lands).
                           BoxShadow(
-                            color: AppColors.accent
-                                .withValues(alpha: (isHero ? 0.7 : 0.55) * glow),
+                            color: AppColors.accent.withValues(
+                                alpha: (isHero ? 0.7 : 0.55) * glow),
                             blurRadius: (isHero ? 42 : 26) * glow,
                             spreadRadius: (isHero ? 8 : 4) * glow,
                           ),
@@ -1287,18 +1288,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     );
   }
 
-  // The revealed card face (image + Thai label). Keeps the reversed-card
-  // Transform.rotate(pi) so upside-down cards read correctly.
+  // The revealed card face (image + Thai label). Only the artwork rotates
+  // for reversed cards — the label strip stays upright so the card name
+  // and "(กลับหัว)" remain readable.
   Widget _buildCardFront(int index, {bool isHero = false}) {
     final isReversed = _isCardReversed[index];
-    return Transform.rotate(
-      angle: isReversed ? pi : 0,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(isHero ? 18 : 14),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(isHero ? 18 : 14),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Transform.rotate(
+              angle: isReversed ? pi : 0,
               child: Image.asset(
                 _selectedCards[index].imagePath,
                 fit: BoxFit.contain,
@@ -1314,51 +1316,51 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                 },
               ),
             ),
-            Container(
-              width: double.infinity,
-              color: AppColors.surfaceMuted,
-              padding: EdgeInsets.symmetric(
-                  vertical: isHero ? 12 : 8, horizontal: isHero ? 10 : 6),
-              child: Column(
-                children: [
-                  // English editorial overline (display font).
-                  Text(
-                    _cardOverline(_selectedCards[index]),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.fraunces(
-                      fontSize: isHero ? 12 : 9,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: isHero ? 2.0 : 1.4,
-                      color: AppColors.primary.withValues(alpha: 0.8),
-                    ),
+          ),
+          Container(
+            width: double.infinity,
+            color: AppColors.surfaceMuted,
+            padding: EdgeInsets.symmetric(
+                vertical: isHero ? 12 : 8, horizontal: isHero ? 10 : 6),
+            child: Column(
+              children: [
+                // English editorial overline (display font).
+                Text(
+                  _cardOverline(_selectedCards[index]),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.fraunces(
+                    fontSize: isHero ? 12 : 9,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: isHero ? 2.0 : 1.4,
+                    color: AppColors.primary.withValues(alpha: 0.8),
                   ),
-                  SizedBox(height: isHero ? 4 : 2),
+                ),
+                SizedBox(height: isHero ? 4 : 2),
+                Text(
+                  _selectedCards[index].nameTh,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.kanit(
+                    fontSize: isHero ? 20 : 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.deepText,
+                  ),
+                ),
+                if (isReversed)
                   Text(
-                    _selectedCards[index].nameTh,
-                    textAlign: TextAlign.center,
+                    '(กลับหัว)',
                     style: GoogleFonts.kanit(
-                      fontSize: isHero ? 20 : 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.deepText,
+                      fontSize: isHero ? 14 : 12,
+                      // Readable ink-gold on the ivory card (candle gold
+                      // body text on ivory reads too low-contrast).
+                      color: AppColors.deepGoldBrown,
                     ),
                   ),
-                  if (isReversed)
-                    Text(
-                      '(กลับหัว)',
-                      style: GoogleFonts.kanit(
-                        fontSize: isHero ? 14 : 12,
-                        // Readable ink-gold on the ivory card (candle gold
-                        // body text on ivory reads too low-contrast).
-                        color: AppColors.deepGoldBrown,
-                      ),
-                    ),
-                ],
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
