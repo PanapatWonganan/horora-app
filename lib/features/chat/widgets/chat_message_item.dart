@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/simple_markdown.dart';
 import '../../report/report_dialog.dart';
 
 class ChatMessageItem extends StatelessWidget {
@@ -105,14 +106,27 @@ class ChatMessageItem extends StatelessWidget {
               ],
               isTyping
                   ? _buildTypingIndicator()
-                  : Text(
-                      message,
-                      style: GoogleFonts.kanit(
-                        color: bubbleTextColor,
-                        fontSize: 14,
-                        height: 1.45,
-                      ),
-                    ),
+                  // AI replies may carry light Markdown (**bold**, headings);
+                  // user messages are shown verbatim.
+                  : isUser
+                      ? Text(
+                          message,
+                          style: GoogleFonts.kanit(
+                            color: bubbleTextColor,
+                            fontSize: 14,
+                            height: 1.45,
+                          ),
+                        )
+                      : Text.rich(
+                          SimpleMarkdown.parse(
+                            message,
+                            base: GoogleFonts.kanit(
+                              color: bubbleTextColor,
+                              fontSize: 14,
+                              height: 1.45,
+                            ),
+                          ),
+                        ),
             ],
           ),
         ),

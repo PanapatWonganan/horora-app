@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/models/tarot_card_model.dart';
+import '../../core/utils/simple_markdown.dart';
 import '../../core/repositories/tarot_repository.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/laravel_auth_service.dart';
@@ -1615,12 +1616,14 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                             ),
                           ),
                         const SizedBox(height: 12),
-                        Text(
-                          _interpretation ?? '',
-                          style: GoogleFonts.kanit(
-                            fontSize: 16,
-                            color: AppColors.deepText,
-                            height: 1.7,
+                        Text.rich(
+                          SimpleMarkdown.parse(
+                            _interpretation ?? '',
+                            base: GoogleFonts.kanit(
+                              fontSize: 16,
+                              color: AppColors.deepText,
+                              height: 1.7,
+                            ),
                           ),
                         ),
                       ],

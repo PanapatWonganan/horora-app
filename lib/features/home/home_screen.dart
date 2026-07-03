@@ -33,7 +33,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  String _userName = "คุณ"; // จะถูกอัพเดทจาก user repository
+  String _userName = ""; // จะถูกอัพเดทจาก user repository (ว่าง = โหมด guest)
   final DateTime _today = DateTime.now();
   final _authService = AuthService.instance;
 
@@ -316,7 +316,9 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   Flexible(
                     child: Text(
-                      'สวัสดีค่ะ คุณ$_userName',
+                      _userName.isEmpty
+                          ? 'สวัสดีค่ะ'
+                          : 'สวัสดีค่ะ คุณ$_userName',
                       style: GoogleFonts.kanit(
                         color: AppColors.onBackdrop,
                         fontSize: 30,
@@ -740,7 +742,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'วัน$dayName เป็นวันที่เหมาะกับการตั้งจิต'
+                  '$dayName เป็นวันที่เหมาะกับการตั้งจิต'
                   'เรื่อง${schedule.belief}',
                   style: GoogleFonts.kanit(
                     color: AppColors.mutedText,
