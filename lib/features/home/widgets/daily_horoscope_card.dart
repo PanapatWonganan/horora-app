@@ -343,7 +343,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                             style: GoogleFonts.fraunces(
                               color: AppColors.deepGoldBrown
                                   .withValues(alpha: 0.8),
-                              fontSize: 10.5,
+                              fontSize: 11,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 2.4,
                             ),
@@ -433,12 +433,24 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
                   _readingHeading('พลังงานวันนี้'),
                   const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildRatingItem('ความรัก', horoscope.loveRating),
-                      _buildRatingItem('การงาน', horoscope.careerRating),
-                      _buildRatingItem('สุขภาพ', horoscope.healthRating),
-                      _buildLuckyItem('เลขนำโชค', horoscope.luckyNumber),
+                      Expanded(
+                        child: _buildRatingItem(
+                            'ความรัก', horoscope.loveRating),
+                      ),
+                      Expanded(
+                        child: _buildRatingItem(
+                            'การงาน', horoscope.careerRating),
+                      ),
+                      Expanded(
+                        child: _buildRatingItem(
+                            'สุขภาพ', horoscope.healthRating),
+                      ),
+                      Expanded(
+                        child: _buildLuckyItem(
+                            'เลขนำโชค', horoscope.luckyNumber),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 18),
@@ -530,6 +542,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
 
   Widget _buildRatingItem(String label, int rating) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label,
@@ -537,17 +550,25 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
             color: AppColors.mutedText,
             fontSize: 12,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
-        Row(
-          children: List.generate(
-            5,
-            (index) => Icon(
-              index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-              color: index < rating
-                  ? AppColors.candleGold
-                  : AppColors.deepText.withValues(alpha: 0.35),
-              size: 15,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(
+              5,
+              (index) => Icon(
+                index < rating
+                    ? Icons.star_rounded
+                    : Icons.star_outline_rounded,
+                color: index < rating
+                    ? AppColors.candleGold
+                    : AppColors.deepText.withValues(alpha: 0.35),
+                size: 15,
+              ),
             ),
           ),
         ),
@@ -557,6 +578,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
 
   Widget _buildLuckyItem(String label, String value) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           label,
@@ -564,15 +586,21 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
             color: AppColors.mutedText,
             fontSize: 12,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.fraunces(
-            color: AppColors.deepGoldBrown,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: GoogleFonts.fraunces(
+              color: AppColors.deepGoldBrown,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
+            maxLines: 1,
           ),
         ),
       ],

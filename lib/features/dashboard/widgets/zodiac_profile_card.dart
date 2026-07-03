@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/app_icons.dart';
 
 class ZodiacProfileCard extends StatelessWidget {
   final String zodiacSign;
@@ -51,10 +52,12 @@ class ZodiacProfileCard extends StatelessWidget {
                     color: AppColors.zodiacFire.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    _getZodiacIcon(),
-                    color: AppColors.zodiacFire,
-                    size: 32.0,
+                  child: Center(
+                    child: SvgIcon(
+                      AppIcons.getWesternZodiacIcon(_zodiacEnglishName()),
+                      size: 32.0,
+                      color: AppColors.zodiacFire,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16.0),
@@ -161,34 +164,36 @@ class ZodiacProfileCard extends StatelessWidget {
     );
   }
 
-  IconData _getZodiacIcon() {
+  /// Maps the Thai zodiac display name (e.g. "ราศีเมษ") to the English key
+  /// used by [AppIcons.getWesternZodiacIcon] for the branded SVG set.
+  String _zodiacEnglishName() {
     switch (zodiacSign) {
       case 'ราศีเมษ':
-        return Icons.filter_vintage;
+        return 'aries';
       case 'ราศีพฤษภ':
-        return Icons.spa;
+        return 'taurus';
       case 'ราศีเมถุน':
-        return Icons.people;
+        return 'gemini';
       case 'ราศีกรกฎ':
-        return Icons.water;
+        return 'cancer';
       case 'ราศีสิงห์':
-        return Icons.pets;
+        return 'leo';
       case 'ราศีกันย์':
-        return Icons.eco;
+        return 'virgo';
       case 'ราศีตุลย์':
-        return Icons.balance;
+        return 'libra';
       case 'ราศีพิจิก':
-        return Icons.bug_report;
+        return 'scorpio';
       case 'ราศีธนู':
-        return Icons.adjust;
+        return 'sagittarius';
       case 'ราศีมังกร':
-        return Icons.terrain;
+        return 'capricorn';
       case 'ราศีกุมภ์':
-        return Icons.waves;
+        return 'aquarius';
       case 'ราศีมีน':
-        return Icons.water_drop;
+        return 'pisces';
       default:
-        return Icons.star;
+        return 'aries';
     }
   }
-} 
+}

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
@@ -252,33 +254,7 @@ class ChatMessageItem extends StatelessWidget {
   }
 
   Widget _buildTypingIndicator() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildDot(1),
-        _buildDot(2),
-        _buildDot(3),
-      ],
-    );
-  }
-
-  Widget _buildDot(int index) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2),
-      child: AnimatedBuilder(
-        animation: const AlwaysStoppedAnimation(0),
-        builder: (context, child) {
-          return Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.6),
-              shape: BoxShape.circle,
-            ),
-          );
-        },
-      ),
-    );
+    return const _TypingDots();
   }
 
   void _showReportDialog(BuildContext context) async {
@@ -289,4 +265,76 @@ class ChatMessageItem extends StatelessWidget {
       contentSnapshot: message.length > 200 ? message.substring(0, 200) : message,
     );
   }
-} 
+}
+
+/// Three dots that pulse in a staggered sequence while the astrologer "types".
+/// Each dot fades + scales up on its own offset within a shared ~1s loop.
+class _TypingDots extends StatefulWidget {
+  const _TypingDots();
+
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildDot(0.0),
+        _buildDot(0.2),
+        _buildDot(0.4),
+      ],
+    );
+  }
+
+  Widget _buildDot(double delay) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          // Staggered pulse: each dot runs the same 0->1->0 curve but offset
+          // by `delay` within the shared 1s loop.
+          final t = (_controller.value + delay) % 1.0;
+          final pulse = (math.sin(t * 2 * math.pi) + 1) / 2; // 0..1
+          final opacity = 0.35 + (pulse * 0.65);
+          final scale = 0.7 + (pulse * 0.3);
+          return Opacity(
+            opacity: opacity,
+            child: Transform.scale(
+              scale: scale,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.9),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

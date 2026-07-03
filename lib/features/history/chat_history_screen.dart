@@ -3,6 +3,7 @@ import '../../core/api/api_client.dart';
 import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/sacred_ui.dart';
+import '../shared/widgets/gradient_button.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class ChatHistoryScreen extends StatefulWidget {
 class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   List<Map<String, dynamic>> _chatHistory = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   Future<void> _loadChatHistory() async {
     setState(() {
       _isLoading = true;
+      _hasError = false;
     });
 
     try {
@@ -51,6 +54,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     } catch (e) {
       setState(() {
         _isLoading = false;
+        _hasError = true;
       });
     }
   }
@@ -70,9 +74,58 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.accent),
                     )
-                  : _chatHistory.isEmpty
-                      ? _buildEmptyState()
-                      : _buildHistoryList(),
+                  : _hasError
+                      ? _buildErrorState()
+                      : _chatHistory.isEmpty
+                          ? _buildEmptyState()
+                          : _buildHistoryList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: AppColors.error,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'โหลดข้อมูลไม่สำเร็จ',
+              style: SacredText.kanit(
+                color: AppColors.onBackdrop,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'ลองอีกครั้งเพื่อดูประวัติการสนทนาของคุณ',
+              style: SacredText.kanit(
+                color: AppColors.onBackdropMuted,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            GradientButton(
+              text: 'ลองใหม่อีกครั้ง',
+              onPressed: _loadChatHistory,
+              gradient: const LinearGradient(
+                colors: AppColors.goldGradient,
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
           ],
         ),

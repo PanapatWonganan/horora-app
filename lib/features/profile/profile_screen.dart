@@ -28,10 +28,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _hasError = false;
   String _errorMessage = '';
 
-  // User data with default values
+  // ค่าเริ่มต้นที่เป็นกลาง — ใช้จนกว่าจะโหลดข้อมูลจริงจาก auth/ฐานข้อมูลสำเร็จ
   Map<String, dynamic> _userData = {
     'full_name': 'ผู้ใช้งาน',
-    'email': 'user@example.com',
+    'email': '',
     'birth_date': null,
     'thai_animal': null,
     'thai_year_name': null,
@@ -73,19 +73,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      // ข้อมูลตัวอย่างสำหรับการแสดงผล (ใช้เมื่อไม่สามารถโหลดข้อมูลจริงได้)
-      final sampleUserData = {
-        'full_name': 'สมชาย ใจดี',
-        'email': 'somchai@example.com',
-        'birth_date': '1990-05-15',
-        'thai_animal': 'มะเมีย',
-        'thai_year_name': 'ปีมะเมีย',
-        'thai_element': 'ทอง',
-        'thai_element_full': 'ธาตุทอง',
-        'is_premium': true,
-        'profile_image_url': '',
-      };
-
       // Get current user from auth
       final currentUser = _authService.currentUser;
 
@@ -153,50 +140,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               }
             }
           });
-        } else {
-          // ถ้าไม่มีข้อมูลในฐานข้อมูล แต่มีข้อมูลจาก auth แล้ว ไม่ต้องทำอะไร
-          // ถ้าไม่มีข้อมูลทั้งสองที่ ให้ใช้ข้อมูลตัวอย่าง
-          if (_userData['full_name'] == 'ผู้ใช้งาน' &&
-              _userData['email'] == 'user@example.com') {
-            setState(() {
-              _userData = sampleUserData;
-            });
-          }
         }
+        // ถ้าไม่มีข้อมูลในฐานข้อมูล แต่มีข้อมูลจาก auth แล้ว ให้ใช้ข้อมูลจาก auth ต่อไป
+        // (ไม่มีข้อมูลตัวอย่างมาแทนที่แล้ว — เหลือเป็นค่าเริ่มต้นที่เป็นกลาง)
       } catch (e) {
         debugPrint('Error fetching profile from database: $e');
-        // ถ้าดึงข้อมูลจากฐานข้อมูลไม่ได้ แต่มีข้อมูลจาก auth แล้ว ไม่ต้องทำอะไร
-        // ถ้าไม่มีข้อมูลทั้งสองที่ ให้ใช้ข้อมูลตัวอย่าง
-        if (_userData['full_name'] == 'ผู้ใช้งาน' &&
-            _userData['email'] == 'user@example.com') {
-          setState(() {
-            _userData = sampleUserData;
-          });
-        }
+        // ถ้าดึงข้อมูลจากฐานข้อมูลไม่ได้ ให้ใช้ข้อมูลจาก auth ที่มีอยู่แล้วต่อไป
       }
 
       // Check subscription status
       await _checkSubscriptionStatus();
     } catch (e) {
       debugPrint('Error in _loadUserProfile: $e');
-
-      // ใช้ข้อมูลตัวอย่างแทนเมื่อเกิดข้อผิดพลาด
-      setState(() {
-        _userData = {
-          'full_name': 'สมชาย ใจดี',
-          'email': 'somchai@example.com',
-          'birth_date': '1990-05-15',
-          'thai_animal': 'มะเมีย',
-          'thai_year_name': 'ปีมะเมีย',
-          'thai_element': 'ทอง',
-          'thai_element_full': 'ธาตุทอง',
-          'is_premium': true,
-          'profile_image_url': '',
-        };
-
-        // ไม่แสดงข้อความผิดพลาด แต่ใช้ข้อมูลตัวอย่างแทน
-        _hasError = false;
-      });
     } finally {
       if (mounted) {
         setState(() {
@@ -208,25 +163,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _checkSubscriptionStatus() async {
     try {
-      // ถ้าข้อมูลผู้ใช้มีการกำหนดสถานะพรีเมียมไว้แล้ว ให้ใช้ค่านั้น
-      if (_userData.containsKey('is_premium')) {
-        return; // ใช้ค่าที่มีอยู่แล้ว
+      // ถ้าข้อมูลผู้ใช้ (จาก auth หรือฐานข้อมูล) มีการกำหนดสถานะพรีเมียมไว้แล้ว
+      // ให้เคารพค่านั้น — ไม่บังคับเป็น true
+      if (_userData['is_premium'] is bool) {
+        return;
       }
 
-      // This would typically call a method to check subscription status
-      // For now, we'll just simulate it
-      // In a real app, you would call something like:
+      // TODO: เชื่อมต่อ endpoint ตรวจสอบสถานะสมาชิกจริงเมื่อพร้อมใช้งาน
       // final subscription = await _authService.getUserSubscription();
       // _userData['is_premium'] = subscription != null && subscription['is_active'] == true;
 
-      // For demonstration, set to true to show premium UI
-      _userData['is_premium'] = true;
+      // ไม่มีข้อมูลสถานะสมาชิก — ค่าเริ่มต้นคือไม่ใช่พรีเมียม
+      _userData['is_premium'] = false;
     } catch (e) {
       debugPrint('Error checking subscription status: $e');
       // Default to non-premium if there's an error
-      if (!_userData.containsKey('is_premium')) {
-        _userData['is_premium'] = false;
-      }
+      _userData['is_premium'] = false;
     }
   }
 
