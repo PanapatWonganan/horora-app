@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/merit_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
 import '../widgets/merit_ui.dart';
 import 'weekly_schedule_screen.dart';
 
@@ -38,9 +38,7 @@ class _MeritScreenState extends State<MeritScreen> {
     // transition into the merit hero never flashes a bright screen.
     return const Scaffold(
       body: SilkCandleBackdrop(
-        child: Center(
-          child: CircularProgressIndicator(color: MeritColors.accent),
-        ),
+        child: SacredLoader.large(),
       ),
     );
   }

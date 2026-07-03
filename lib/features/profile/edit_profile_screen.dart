@@ -211,11 +211,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       showSpecks: false,
       body: SafeArea(
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.accent,
-                ),
-              )
+            ? const SacredLoader.large()
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

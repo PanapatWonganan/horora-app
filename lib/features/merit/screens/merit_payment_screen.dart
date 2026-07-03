@@ -286,19 +286,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               _buildHeader(),
               Expanded(
                 child: _isCreatingOrder
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const CircularProgressIndicator(color: MeritColors.accent),
-                            const SizedBox(height: 16),
-                            Text(
-                              'กำลังสร้างคำสั่งบุญ…',
-                              style: GoogleFonts.kanit(color: AppColors.onBackdrop),
-                            ),
-                          ],
-                        ),
-                      )
+                    ? const SacredLoader.large(label: 'กำลังสร้างคำสั่งบุญ…')
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(20),
                         child: Column(

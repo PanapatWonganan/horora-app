@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/services/auth_service.dart';
 import '../../core/services/guest_session_service.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../welcome/welcome_screen.dart';
 import '../home/home_screen.dart';
 
@@ -54,9 +55,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: SacredLoader.large(),
       );
     }
 

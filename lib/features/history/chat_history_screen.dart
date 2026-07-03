@@ -71,9 +71,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             ),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.accent),
-                    )
+                  ? const SacredLoader.large()
                   : _hasError
                       ? _buildErrorState()
                       : _chatHistory.isEmpty

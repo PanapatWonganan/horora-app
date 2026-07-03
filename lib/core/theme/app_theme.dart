@@ -138,13 +138,17 @@ class AppTheme {
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.deepText,
+        backgroundColor: AppColors.lightSurface,
         contentTextStyle: GoogleFonts.kanit(
           fontSize: 14,
-          color: Colors.white,
+          color: AppColors.deepText,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(
+            color: AppColors.candleGold.withValues(alpha: 0.35),
+            width: 1,
+          ),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -371,7 +375,11 @@ class AppTheme {
           color: AppColors.darkText,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(
+            color: AppColors.candleGold.withValues(alpha: 0.35),
+            width: 1,
+          ),
         ),
         behavior: SnackBarBehavior.floating,
       ),

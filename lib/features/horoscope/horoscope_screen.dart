@@ -331,11 +331,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       body: SafeArea(
         bottom: false,
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-                ),
-              )
+            ? const SacredLoader.large()
             : Column(
                 children: [
                   StaggeredReveal(index: 0, child: _buildHeader()),
@@ -363,14 +359,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
       overline: 'HOROSCOPE',
       title: 'ดวงชะตา',
       trailing: _isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-              ),
-            )
+          ? const SacredLoader(size: 20)
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -431,11 +420,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildDailyTab() {
     if (_isHoroscopeLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-        ),
-      );
+      return const SacredLoader.large();
     }
 
     return SingleChildScrollView(
@@ -456,11 +441,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildWeeklyTab() {
     if (_isHoroscopeLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-        ),
-      );
+      return const SacredLoader.large();
     }
 
     final weeklyData = _weeklyHoroscope;
@@ -600,11 +581,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildMonthlyTab() {
     if (_isHoroscopeLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-        ),
-      );
+      return const SacredLoader.large();
     }
 
     final monthlyData = _monthlyHoroscope;
@@ -721,11 +698,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
   Widget _buildYearlyTab() {
     if (_isHoroscopeLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
-        ),
-      );
+      return const SacredLoader.large();
     }
 
     final yearlyData = _yearlyHoroscope;

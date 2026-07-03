@@ -361,11 +361,9 @@ class MeritOrderStatusScreen extends StatelessWidget {
     // of complex scroll control. Tapping a thumb opens the fullscreen viewer.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.deepText,
         content: Text(
           'แตะภาพในแกลเลอรีด้านบนเพื่อดูหลักฐานแบบเต็มจอ',
-          style: GoogleFonts.kanit(color: Colors.white),
+          style: GoogleFonts.kanit(color: AppColors.deepText),
         ),
       ),
     );

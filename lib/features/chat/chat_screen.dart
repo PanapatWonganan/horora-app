@@ -155,11 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Consumer<ChatViewModel>(
                 builder: (context, viewModel, _) {
                   if (viewModel.state == ChatViewState.loading) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.candleGold,
-                      ),
-                    );
+                    return const SacredLoader.large();
                   }
 
                   if (viewModel.state == ChatViewState.error) {

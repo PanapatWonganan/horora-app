@@ -72,9 +72,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
             ),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.accent),
-                    )
+                  ? const SacredLoader.large()
                   : _dashboard == null
                       ? _buildError()
                       : RefreshIndicator(

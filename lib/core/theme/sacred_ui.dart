@@ -719,6 +719,86 @@ InputDecoration sacredInputDecoration({
   );
 }
 
+/// The app's single on-brand loading spinner — a candle-gold ring with a
+/// small sparkle glyph riding its track, plus an optional muted Kanit label
+/// underneath. Replaces bare `CircularProgressIndicator` everywhere a screen
+/// needs to say "loading" so the whole app speaks one loading language.
+///
+/// Cheap by design: no blur, no grain, just a coloured
+/// [CircularProgressIndicator] and a static sparkle icon — safe to drop into
+/// lists, cards, or full-screen centers alike.
+///
+/// Use [size] for the ring diameter (defaults to the compact inline size of
+/// 28); pass a larger value (e.g. 44-56) for a full-screen center loader.
+/// Pass [label] for a short Thai status line under the ring (e.g.
+/// "กำลังโหลด...").
+class SacredLoader extends StatelessWidget {
+  /// Compact inline size — spinners inside cards, list rows, small areas.
+  static const double sizeInline = 28;
+
+  /// Full-screen / hero center size — the whole-page loading state.
+  static const double sizeLarge = 48;
+
+  final double size;
+  final String? label;
+  final Color color;
+
+  const SacredLoader({
+    super.key,
+    this.size = sizeInline,
+    this.label,
+    this.color = AppColors.candleGold,
+  });
+
+  /// Convenience constructor for the full-screen center loading state.
+  const SacredLoader.large({super.key, this.label, this.color = AppColors.candleGold})
+      : size = sizeLarge;
+
+  @override
+  Widget build(BuildContext context) {
+    final ring = SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            strokeWidth: size >= sizeLarge ? 3.4 : 2.6,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            backgroundColor: color.withValues(alpha: 0.15),
+          ),
+          SvgPicture.asset(
+            AppIcons.sparkleFilled,
+            width: size * 0.32,
+            height: size * 0.32,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+          ),
+        ],
+      ),
+    );
+
+    if (label == null) return Center(child: ring);
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ring,
+          const SizedBox(height: 14),
+          Text(
+            label!,
+            textAlign: TextAlign.center,
+            style: SacredText.kanit(
+              color: AppColors.onBackdropMuted,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Gentle press-scale + soft splash wrapper. Scales the child down slightly
 /// while tapped. Identical micro-interaction to Home's `_PressScale`.
 class SacredPressable extends StatefulWidget {

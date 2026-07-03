@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// A widget that displays a loading indicator with an optional message.
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/sacred_ui.dart';
+
+/// A loading indicator with an optional message.
+///
+/// Thin wrapper around [SacredLoader] so every existing call site (tarot
+/// history/details, horoscope detail/home card) picks up the app's single
+/// on-brand candle-gold loading language for free. [color] is honored for
+/// callers that pass a specific tint; otherwise it defaults to the shared
+/// candle-gold.
 class LoadingIndicator extends StatelessWidget {
   final String? message;
   final Color? color;
@@ -13,29 +22,9 @@ class LoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              color ?? Theme.of(context).primaryColor,
-            ),
-          ),
-          if (message != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: Text(
-                message!,
-                style: TextStyle(
-                  color: color ?? Theme.of(context).textTheme.bodyLarge?.color,
-                  fontSize: 16.0,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-        ],
-      ),
+    return SacredLoader(
+      label: message,
+      color: color ?? AppColors.candleGold,
     );
   }
-} 
+}

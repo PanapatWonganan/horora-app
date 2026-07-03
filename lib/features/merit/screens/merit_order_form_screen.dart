@@ -138,9 +138,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
               _buildHeader(),
               Expanded(
                 child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: MeritColors.accent),
-                      )
+                    ? const SacredLoader.large()
                     : SingleChildScrollView(
                         padding: const EdgeInsets.all(20),
                         child: Form(

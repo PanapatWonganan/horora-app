@@ -83,8 +83,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
             ),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.accent))
+                  ? const SacredLoader.large()
                   : _referralLink == null
                       ? Center(
                           child: Text(

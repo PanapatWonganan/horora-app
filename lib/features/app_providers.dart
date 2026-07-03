@@ -6,6 +6,7 @@ import '../core/services/auth_service.dart';
 import '../config/constants.dart';
 import '../core/api/api_client.dart';
 import '../core/repositories/horoscope_repository.dart';
+import '../core/theme/sacred_ui.dart';
 import '../features/chat/repositories/chat_repository.dart';
 
 class AppProviders extends StatelessWidget {
@@ -57,9 +58,7 @@ class AppProviders extends StatelessWidget {
         // แสดง loading screen ระหว่างรอ SharedPreferences
         return const MaterialApp(
           home: Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: SacredLoader.large(),
           ),
         );
       },

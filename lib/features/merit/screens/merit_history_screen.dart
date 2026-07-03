@@ -52,9 +52,7 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
               _buildHeader(),
               Expanded(
                 child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: MeritColors.accent),
-                      )
+                    ? const SacredLoader.large()
                     : _orders.isEmpty
                         ? _buildEmptyState()
                         : _buildOrderList(),

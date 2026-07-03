@@ -52,11 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return SacredScaffold(
       body: SafeArea(
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.accent,
-                ),
-              )
+            ? const SacredLoader.large()
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

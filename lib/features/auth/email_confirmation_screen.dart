@@ -76,9 +76,9 @@ class _EmailConfirmationScreenState extends State<EmailConfirmationScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_isVerifying) ...[
-                    const CircularProgressIndicator(
+                    const SacredLoader(
+                      size: 40,
                       color: AppColors.deepGoldBrown,
-                      strokeWidth: 3,
                     ),
                     const SizedBox(height: 24),
                     Text(

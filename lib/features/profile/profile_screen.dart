@@ -181,11 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bottomNavigationBar: const AppBottomNavigation(currentIndex: 4),
       body: SafeArea(
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.accent,
-                ),
-              )
+            ? const SacredLoader.large()
             : RefreshIndicator(
                 onRefresh: _loadUserProfile,
                 color: AppColors.deepGoldBrown,

@@ -87,24 +87,7 @@ class _HoroscopeHistoryScreenState extends State<HoroscopeHistoryScreen> {
   }
 
   Widget _buildLoadingView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            color: AppColors.accent,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'กำลังโหลดประวัติการดูดวง...',
-            style: SacredText.kanit(
-              color: AppColors.onBackdrop,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
+    return const SacredLoader.large(label: 'กำลังโหลดประวัติการดูดวง...');
   }
 
   Widget _buildErrorView() {
