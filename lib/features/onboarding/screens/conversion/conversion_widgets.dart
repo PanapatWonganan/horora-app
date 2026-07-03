@@ -58,7 +58,7 @@ class CvSelectRow extends StatelessWidget {
                     if (subtitle != null) ...[
                       const SizedBox(height: 2),
                       Text(subtitle!,
-                          style: CvType.body(12, color: CvColors.creamA(0.5))),
+                          style: CvType.body(12, color: CvColors.creamA(0.65))),
                     ],
                   ],
                 ),
@@ -261,11 +261,11 @@ class CvCheckRow extends StatelessWidget {
                           : FontWeight.w500,
                       color: done
                           ? CvColors.creamA(subtitle != null ? 1 : 0.85)
-                          : CvColors.creamA(0.55))),
+                          : CvColors.creamA(0.65))),
               if (subtitle != null) ...[
                 const SizedBox(height: 3),
                 Text(subtitle!,
-                    style: CvType.body(12, color: CvColors.creamA(0.55))),
+                    style: CvType.body(12, color: CvColors.creamA(0.65))),
               ],
             ],
           ),

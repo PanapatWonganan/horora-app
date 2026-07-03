@@ -1,64 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 /// Design tokens for the high-conversion onboarding flow.
 ///
-/// These mirror the imported "Onboarding Flow" Claude Design exactly — a deep
-/// indigo→plum radial canvas, a candle-gold CTA ramp, and warm ivory cards.
-/// Kept local to the onboarding feature so the funnel can stay 1:1 with the
-/// design without disturbing the rest of the app's [AppColors].
+/// Re-skinned onto the app's "Sacred Astrology" system ([AppColors]): a deep
+/// temple indigo/plum radial canvas, a candle-gold CTA ramp, and warm ivory
+/// cards. Member NAMES are kept stable so call sites in `conversion_widgets`
+/// / `conversion_onboarding_screen` don't churn — every value below is a thin
+/// alias of an [AppColors] token, no independent hexes.
 class CvColors {
   CvColors._();
 
-  // Indigo / plum canvas (radial, top-down)
-  static const Color bgTop = Color(0xFF3B2B51);
-  static const Color bgMid = Color(0xFF281D3C);
-  static const Color bgBottom = Color(0xFF1C1430);
-  static const Color bgFooter = Color(0xFF1F1733); // CTA scrim base
+  // Indigo / plum canvas (radial, top-down) — Sacred backdrop ramp.
+  static const Color bgTop = AppColors.softPlum;
+  static const Color bgMid = AppColors.nightPlum;
+  static const Color bgBottom = AppColors.templeIndigo;
+  static const Color bgFooter = AppColors.templeIndigo; // CTA scrim base
 
   // Candle-gold CTA ramp
-  static const Color goldLight = Color(0xFFF2D486);
-  static const Color goldMid = Color(0xFFD2A043);
-  static const Color goldDeep = Color(0xFFC2902F);
-  static const Color goldInk = Color(0xFF5B4318); // text on gold
+  static const Color goldLight = AppColors.candleGold;
+  static const Color goldMid = AppColors.mutedGold;
+  static const Color goldDeep = AppColors.deepGoldBrown;
+  static const Color goldInk = AppColors.ink; // text on gold
 
   // Gold accents
-  static const Color gold = Color(0xFFCDA64E);
-  static const Color goldSoft = Color(0xFFE0B85A);
+  static const Color gold = AppColors.mutedGold;
+  static const Color goldSoft = AppColors.candleGold;
 
   // Ivory cards
-  static const Color ivory = Color(0xFFF4EAD7);
-  static const Color ivoryInk = Color(0xFF3A2C1C);
-  static const Color ivoryInkSoft = Color(0xFF6B552F);
-  static const Color ivoryDivider = Color(0xFFE3D3B3);
+  static const Color ivory = AppColors.ivorySilk;
+  static const Color ivoryInk = AppColors.ink;
+  static const Color ivoryInkSoft = AppColors.softInk;
+  static const Color ivoryDivider = AppColors.warmCardBorder;
 
   // Text on indigo
-  static const Color cream = Color(0xFFF4EDDE);
-  static const Color creamStatus = Color(0xFFEFE7D8);
+  static const Color cream = AppColors.onBackdrop;
+  static const Color creamStatus = AppColors.onBackdrop;
 
   // Sage (verified checks)
-  static const Color sage = Color(0xFFA3BD6B);
+  static const Color sage = AppColors.bodhiGreen;
 
   // Caption / label slate
-  static const Color noteInk = Color(0xFF352A4C);
+  static const Color noteInk = AppColors.softPlum;
 
   static Color creamA(double a) => cream.withValues(alpha: a);
   static Color goldA(double a) => gold.withValues(alpha: a);
   static Color whiteA(double a) => Colors.white.withValues(alpha: a);
 }
 
-/// Typography roles from the design: Trirong (display serif),
-/// IBM Plex Sans Thai (body), Cormorant Garamond (eyebrows).
+/// Typography roles, aligned with the app's Sacred UI kit: Kanit (display +
+/// body — Thai/English), Fraunces (eyebrow/overline), matching
+/// `SacredText.kanit` / `SacredOverline` in `sacred_ui.dart`.
 class CvType {
   CvType._();
 
   static TextStyle display(
     double size, {
-    FontWeight weight = FontWeight.w700,
+    FontWeight weight = FontWeight.w600,
     Color color = CvColors.cream,
     double height = 1.3,
   }) =>
-      GoogleFonts.trirong(
+      GoogleFonts.kanit(
           fontSize: size, fontWeight: weight, color: color, height: height);
 
   static TextStyle body(
@@ -67,12 +71,12 @@ class CvType {
     Color color = CvColors.cream,
     double height = 1.55,
   }) =>
-      GoogleFonts.ibmPlexSansThai(
+      GoogleFonts.kanit(
           fontSize: size, fontWeight: weight, color: color, height: height);
 
-  static TextStyle eyebrow({Color color = CvColors.gold, double size = 11}) =>
-      GoogleFonts.cormorantGaramond(
-        fontSize: size,
+  static TextStyle eyebrow({Color color = CvColors.gold, double size = 12}) =>
+      GoogleFonts.fraunces(
+        fontSize: size < 12 ? 12 : size,
         fontWeight: FontWeight.w600,
         color: color,
         letterSpacing: 3,
@@ -162,13 +166,13 @@ class CvTextLink extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        foregroundColor: color ?? CvColors.creamA(0.55),
+        foregroundColor: color ?? CvColors.creamA(0.65),
         padding: const EdgeInsets.symmetric(vertical: 13),
         minimumSize: const Size(double.infinity, 0),
       ),
       child: Text(label,
           style: CvType.body(14,
-              weight: FontWeight.w500, color: color ?? CvColors.creamA(0.55))),
+              weight: FontWeight.w500, color: color ?? CvColors.creamA(0.65))),
     );
   }
 }
@@ -195,31 +199,6 @@ class CvProgressBar extends StatelessWidget {
           ),
         );
       }),
-    );
-  }
-}
-
-/// Faux iOS status bar to match the design's phone mockups.
-class CvStatusBar extends StatelessWidget {
-  final Widget? trailing;
-  const CvStatusBar({super.key, this.trailing});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text('9:41',
-              style: CvType.body(13,
-                  weight: FontWeight.w600, color: CvColors.creamStatus)),
-          trailing ??
-              Text('●●●  ▮',
-                  style: CvType.body(11, color: CvColors.creamA(0.85))
-                      .copyWith(letterSpacing: 2)),
-        ],
-      ),
     );
   }
 }

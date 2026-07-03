@@ -183,7 +183,6 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   Widget _welcome() {
     return Column(
       children: [
-        const CvStatusBar(),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(26, 30, 26, 26),
@@ -225,7 +224,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                     TextSpan(
                       text: 'มีบัญชีอยู่แล้ว? ',
                       style:
-                          CvType.body(14, color: CvColors.creamA(0.55)),
+                          CvType.body(14, color: CvColors.creamA(0.65)),
                       children: [
                         TextSpan(
                           text: 'เข้าสู่ระบบ',
@@ -447,7 +446,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                 Expanded(
                   child: Text(
                     'ข้อมูลของคุณถูกเก็บเป็นความลับ ใช้เพื่อ personalize เท่านั้น',
-                    style: CvType.body(12, color: CvColors.creamA(0.5)),
+                    style: CvType.body(12, color: CvColors.creamA(0.65)),
                   ),
                 ),
               ],
@@ -498,7 +497,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                       : 'แตะเพื่อเลือกวันเกิด',
                   style: CvType.body(19,
                       weight: FontWeight.w600,
-                      color: hasDate ? CvColors.cream : CvColors.creamA(0.4)),
+                      color: hasDate ? CvColors.cream : CvColors.creamA(0.65)),
                 ),
               ),
             ),
@@ -656,7 +655,6 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
     final pct = (_analyzeProgress * 100).clamp(0, 100).round();
     return Column(
       children: [
-        const CvStatusBar(),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 30),
@@ -704,8 +702,6 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CvStatusBar(),
-            const SizedBox(height: 6),
             Text('YOUR GUIDANCE', style: CvType.eyebrow(size: 11)),
             const SizedBox(height: 6),
             Text.rich(TextSpan(
@@ -831,7 +827,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('เหมาะกับเป้าหมายของคุณ',
-                    style: CvType.body(11, color: CvColors.creamA(0.55))),
+                    style: CvType.body(12, color: CvColors.creamA(0.65))),
                 Text(temple,
                     style: CvType.body(15,
                         weight: FontWeight.w700, color: CvColors.cream)),
@@ -850,7 +846,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   // ========================================================================
   Widget _trust() {
     return _pageWithCta(
-      header: const CvStatusBar(),
+      header: const SizedBox.shrink(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
         child: Column(
@@ -904,7 +900,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
           const SizedBox(height: 8),
           Text('— คุณมนัสนันท์, กรุงเทพฯ',
               style: CvType.body(12,
-                  color: CvColors.ivoryInk.withValues(alpha: 0.55))),
+                  color: CvColors.ivoryInk.withValues(alpha: 0.65))),
         ],
       ),
     );
@@ -916,7 +912,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   Widget _notifications() {
     return _pageWithCta(
       scrim: false,
-      header: const CvStatusBar(),
+      header: const SizedBox.shrink(),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(24, 30, 24, 8),
         child: Column(
@@ -1035,11 +1031,15 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   Widget _paywall() {
     return Column(
       children: [
-        CvStatusBar(
-          trailing: GestureDetector(
-            onTap: _finishAsGuest,
-            child: Text('✕',
-                style: CvType.body(14, color: CvColors.creamA(0.55))),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 4),
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: _finishAsGuest,
+              child: Text('✕',
+                  style: CvType.body(14, color: CvColors.creamA(0.65))),
+            ),
           ),
         ),
         Expanded(
@@ -1115,7 +1115,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                   label: 'เริ่มทดลองฟรี 7 วัน', onPressed: _finishAsGuest),
               const SizedBox(height: 9),
               Text('จากนั้น ฿599/ปี · ยกเลิกได้ทุกเมื่อ',
-                  style: CvType.body(11, color: CvColors.creamA(0.45))),
+                  style: CvType.body(12, color: CvColors.creamA(0.65))),
               CvTextLink(label: 'ข้ามไปก่อน', onPressed: _finishAsGuest),
             ],
           ),
@@ -1219,8 +1219,8 @@ class _Pill extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(text,
-          style: CvType.body(11,
-              weight: FontWeight.w500, color: CvColors.creamA(0.5))),
+          style: CvType.body(12,
+              weight: FontWeight.w500, color: CvColors.creamA(0.65))),
     );
   }
 }
@@ -1238,7 +1238,7 @@ class _IvoryChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(text,
-          style: CvType.body(11,
+          style: CvType.body(12,
               weight: FontWeight.w500, color: CvColors.ivoryInkSoft)),
     );
   }
@@ -1290,8 +1290,8 @@ class _PlanCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(price, style: CvType.display(19)),
           Text(per,
-              style: CvType.body(11,
-                  color: CvColors.creamA(highlighted ? 0.55 : 0.45))),
+              style: CvType.body(12,
+                  color: CvColors.creamA(highlighted ? 0.65 : 0.65))),
         ],
       ),
     );
@@ -1315,7 +1315,7 @@ class _PlanCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(badge!,
-                    style: CvType.body(9,
+                    style: CvType.body(12,
                             weight: FontWeight.w700,
                             color: const Color(0xFF3A2C0E))
                         .copyWith(letterSpacing: 1)),
