@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/routes/routes.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/celestial_effects.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/app_icons.dart';
-import '../shared/widgets/gradient_button.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/tarot_spread_card.dart';
 
@@ -142,8 +142,11 @@ class _TarotScreenState extends State<TarotScreen> {
               width: 1.5,
             ),
             boxShadow: [
+              // This coin floats directly on the dark celestial backdrop, so
+              // a plum shadow barely reads — use a low-alpha candle-gold glow
+              // instead.
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.18),
+                color: AppColors.candleGold.withValues(alpha: 0.16),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -161,49 +164,9 @@ class _TarotScreenState extends State<TarotScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title, {String? overline}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 4,
-          height: overline != null ? 30 : 20,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.accent, AppColors.secondary],
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (overline != null)
-              Text(
-                overline,
-                style: GoogleFonts.fraunces(
-                  color: AppColors.onBackdropMuted,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 2.5,
-                ),
-              ),
-            Text(
-              title,
-              style: GoogleFonts.kanit(
-                color: AppColors.onBackdrop,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Section titles now use the shared SacredSectionTitle (see sacred_ui.dart)
+  // instead of a hand-rolled copy, so tarot reads identically to
+  // Horoscope/Chat.
 
   Widget _buildIntroduction() {
     return Container(
@@ -264,21 +227,13 @@ class _TarotScreenState extends State<TarotScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          GradientButton(
-            text: 'เริ่มการอ่านไพ่',
-            onPressed: () {
+          SacredPrimaryButton(
+            label: 'เริ่มการอ่านไพ่',
+            onTap: () {
               Navigator.pushNamed(context, AppRoutes.tarotReading);
             },
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            icon: const SvgIcon(
-              AppIcons.arrowForward,
-              size: 20,
-              color: Colors.white,
-            ),
+            trailingSvg: AppIcons.arrowForward,
+            filled: true,
           ),
         ],
       ),
@@ -289,7 +244,7 @@ class _TarotScreenState extends State<TarotScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('รูปแบบการอ่านไพ่', overline: 'CHOOSE A SPREAD'),
+        const SacredSectionTitle('รูปแบบการอ่านไพ่', overline: 'CHOOSE A SPREAD'),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -369,7 +324,7 @@ class _TarotScreenState extends State<TarotScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('การอ่านไพ่ที่บันทึกไว้', overline: 'YOUR ARCHIVE'),
+        const SacredSectionTitle('การอ่านไพ่ที่บันทึกไว้', overline: 'YOUR ARCHIVE'),
         const SizedBox(height: 16),
         // TODO: Implement saved readings list when data is available
         Container(
@@ -427,46 +382,13 @@ class _TarotScreenState extends State<TarotScreen> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.tarotReading);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.nightPlum,
-                    foregroundColor: AppColors.onBackdrop,
-                    shadowColor: AppColors.primary.withValues(alpha: 0.18),
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: AppColors.candleGold.withValues(alpha: 0.42),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SvgIcon(
-                        AppIcons.divination,
-                        size: 20,
-                        color: AppColors.candleGold,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'เริ่มการอ่านไพ่ใหม่',
-                        style: GoogleFonts.kanit(
-                          color: AppColors.onBackdrop,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              SacredPrimaryButton(
+                label: 'เริ่มการอ่านไพ่ใหม่',
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.tarotReading);
+                },
+                trailingSvg: AppIcons.divination,
+                filled: true,
               ),
             ],
           ),

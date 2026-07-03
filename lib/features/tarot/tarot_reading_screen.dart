@@ -16,9 +16,9 @@ import 'dart:ui' show ImageFilter;
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/celestial_effects.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/app_icons.dart';
 import '../../core/services/thai_zodiac_service.dart';
-import '../shared/widgets/gradient_button.dart';
 import 'widgets/reveal_burst.dart';
 import 'widgets/riffle_shuffle.dart';
 
@@ -133,6 +133,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
         curve: Curves.easeInOut,
       ),
     );
+    // HAPTICS: side effects live in a controller listener, not in a builder —
+    // this fires exactly once per animation tick regardless of how many
+    // widgets rebuild off _shuffleAnimation.
+    _shuffleAnimation.addListener(_handleRiffleHapticTick);
 
     // เพิ่ม animation สำหรับการโหลด
     _loadingAnimationController = AnimationController(
@@ -237,6 +241,29 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           _userThaiZodiac = thaiZodiac.thaiName;
         });
       }
+    }
+  }
+
+  // HAPTICS: light tactile ticks at each of the three interleave peaks, then a
+  // stronger one at the final flare. Lives on the controller's listener (not a
+  // builder callback) so it fires once per animation tick as a pure side
+  // effect, re-armed each time the shuffle restarts from 0.
+  void _handleRiffleHapticTick() {
+    final v = _shuffleAnimation.value;
+    if (v < 0.04) {
+      _riffleHapticStage = 0;
+    } else if (_riffleHapticStage < 1 && v >= 0.18) {
+      _riffleHapticStage = 1;
+      HapticFeedback.lightImpact();
+    } else if (_riffleHapticStage < 2 && v >= 0.45) {
+      _riffleHapticStage = 2;
+      HapticFeedback.lightImpact();
+    } else if (_riffleHapticStage < 3 && v >= 0.72) {
+      _riffleHapticStage = 3;
+      HapticFeedback.lightImpact();
+    } else if (_riffleHapticStage < 4 && v >= 0.86) {
+      _riffleHapticStage = 4;
+      HapticFeedback.mediumImpact();
     }
   }
 
@@ -536,6 +563,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   @override
   void dispose() {
     _questionController.dispose();
+    _shuffleAnimation.removeListener(_handleRiffleHapticTick);
     _shuffleAnimationController.dispose();
     _loadingAnimationController.dispose();
     _revealBurstController.dispose();
@@ -637,55 +665,15 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     );
   }
 
-  Widget _buildSectionTitle(String title, {String? overline}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 4,
-          height: overline != null ? 30 : 20,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.accent, AppColors.secondary],
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (overline != null)
-              Text(
-                overline,
-                style: GoogleFonts.fraunces(
-                  color: AppColors.candleGold.withValues(alpha: 0.82),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 2.5,
-                ),
-              ),
-            Text(
-              title,
-              style: GoogleFonts.kanit(
-                color: AppColors.onBackdrop,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Section titles now use the shared SacredSectionTitle (see sacred_ui.dart)
+  // instead of a hand-rolled copy, so tarot reads identically to
+  // Horoscope/Chat.
 
   Widget _buildSpreadTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('เลือกรูปแบบการอ่านไพ่', overline: 'THE SPREAD'),
+        const SacredSectionTitle('เลือกรูปแบบการอ่านไพ่', overline: 'THE SPREAD'),
         const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -812,31 +800,13 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ',
+        const SacredSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ',
             overline: 'YOUR QUESTION'),
         const SizedBox(height: 12),
         TextField(
           controller: _questionController,
-          decoration: InputDecoration(
-            hintText: 'พิมพ์คำถามของคุณที่นี่...',
-            hintStyle: GoogleFonts.kanit(color: AppColors.mutedText),
-            filled: true,
-            fillColor: AppColors.lightSurface,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.divider, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide:
-                  const BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: sacredInputDecoration(
+            hint: 'พิมพ์คำถามของคุณที่นี่...',
           ),
           style: GoogleFonts.kanit(color: AppColors.deepText),
           maxLines: 3,
@@ -911,21 +881,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   }
 
   Widget _buildStartButton() {
-    return Center(
-      child: GradientButton(
-        text: 'เริ่มการอ่านไพ่',
-        onPressed: _shuffleCards,
-        gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        icon: const Icon(
-          Icons.auto_awesome,
-          color: Colors.white,
-          size: 20,
-        ),
-      ),
+    return SacredPrimaryButton(
+      label: 'เริ่มการอ่านไพ่',
+      onTap: _shuffleCards,
+      trailingSvg: AppIcons.sparkleFilled,
+      filled: true,
     );
   }
 
@@ -952,24 +912,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
             child: AnimatedBuilder(
               animation: _shuffleAnimation,
               builder: (context, child) {
+                // Pure presentation — haptic side effects live on the
+                // controller's listener (_handleRiffleHapticTick), not here.
                 final v = _shuffleAnimation.value;
-                // Light tactile ticks at each of the three interleave peaks,
-                // then a stronger one at the final flare. Re-armed at the start.
-                if (v < 0.04) {
-                  _riffleHapticStage = 0;
-                } else if (_riffleHapticStage < 1 && v >= 0.18) {
-                  _riffleHapticStage = 1;
-                  HapticFeedback.lightImpact();
-                } else if (_riffleHapticStage < 2 && v >= 0.45) {
-                  _riffleHapticStage = 2;
-                  HapticFeedback.lightImpact();
-                } else if (_riffleHapticStage < 3 && v >= 0.72) {
-                  _riffleHapticStage = 3;
-                  HapticFeedback.lightImpact();
-                } else if (_riffleHapticStage < 4 && v >= 0.86) {
-                  _riffleHapticStage = 4;
-                  HapticFeedback.mediumImpact();
-                }
                 return Center(child: RiffleShuffle(progress: v));
               },
             ),
@@ -981,9 +926,18 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 3,
-              // The shuffle area sits over a dark celestial glow patch, so use
-              // a warm gold that reads against it (not the light-theme lavender).
-              color: AppColors.accent,
+              // The shuffle area sits over a dark celestial glow patch that
+              // blooms to a bright gold flare at the climax — plain candle
+              // gold washes out right at that peak, so use ivory (with a
+              // faint dark shadow for grounding) which stays legible across
+              // the whole ritual, flare included.
+              color: AppColors.onBackdrop,
+              shadows: [
+                Shadow(
+                  color: AppColors.templeIndigo.withValues(alpha: 0.55),
+                  blurRadius: 6,
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 6),
@@ -1033,21 +987,11 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
   }
 
   Widget _buildSelectCardsButton() {
-    return Center(
-      child: GradientButton(
-        text: 'เลือกไพ่',
-        onPressed: _selectCards,
-        gradient: const LinearGradient(
-          colors: AppColors.primaryGradient,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        icon: const Icon(
-          Icons.touch_app,
-          color: Colors.white,
-          size: 20,
-        ),
-      ),
+    return SacredPrimaryButton(
+      label: 'เลือกไพ่',
+      onTap: _selectCards,
+      trailingSvg: AppIcons.sparkleFilled,
+      filled: true,
     );
   }
 
@@ -1055,7 +999,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('ไพ่ของคุณ', overline: 'YOUR CARDS'),
+        const SacredSectionTitle('ไพ่ของคุณ', overline: 'YOUR CARDS'),
         SizedBox(height: _isSingleHero ? 40 : 16),
         Center(
           child: Padding(
@@ -1271,9 +1215,14 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                         ),
                         borderRadius: BorderRadius.circular(frameRadius),
                         boxShadow: [
+                          // This frame floats directly on the dark celestial
+                          // backdrop (not an ivory card), so a plum drop
+                          // shadow is nearly invisible here — use a low-alpha
+                          // candle-gold glow instead so the card visibly
+                          // lifts off the backdrop.
                           BoxShadow(
-                            color: AppColors.primary
-                                .withValues(alpha: isHero ? 0.26 : 0.18),
+                            color: AppColors.candleGold
+                                .withValues(alpha: isHero ? 0.20 : 0.14),
                             blurRadius: isHero ? 22 : 14,
                             offset: const Offset(0, 6),
                           ),
@@ -1399,7 +1348,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                       '(กลับหัว)',
                       style: GoogleFonts.kanit(
                         fontSize: isHero ? 14 : 12,
-                        color: AppColors.secondary,
+                        // Readable ink-gold on the ivory card (candle gold
+                        // body text on ivory reads too low-contrast).
+                        color: AppColors.deepGoldBrown,
                       ),
                     ),
                 ],
@@ -1411,8 +1362,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     );
   }
 
-  // The un-revealed card back (mystical lavender + star/sparkle accents),
-  // with a subtle travelling sheen inviting a tap.
+  // The un-revealed card back (muted temple plum/indigo + star/sparkle
+  // accents + a candle-gold hairline), with a subtle travelling sheen
+  // inviting a tap.
   Widget _buildCardBack(int index) {
     // Slow ambient shimmer band travelling across the back to feel interactive.
     final shimmerT = (_ambientController.value + index * 0.13) % 1.0;
@@ -1420,17 +1372,19 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
       child: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(14)),
-          // Deeper, more mystical card back gradient.
-          gradient: LinearGradient(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(14)),
+          // Sacred palette's muted plum→indigo (matches the shuffle back).
+          gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF6C5BD0), // deep lavender
-              Color(0xFF8B6FE0),
-              Color(0xFFB8A6F0),
-            ],
+            colors: AppColors.mysticalGradient,
+          ),
+          // Thin gold hairline so the back keeps definition against the
+          // deep indigo backdrop now that it's no longer a bright lavender.
+          border: Border.all(
+            color: AppColors.candleGold.withValues(alpha: 0.55),
+            width: 1,
           ),
         ),
         child: ClipRRect(
@@ -1578,7 +1532,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำทำนาย', overline: 'THE READING'),
+        const SacredSectionTitle('คำทำนาย', overline: 'THE READING'),
         const SizedBox(height: 16),
         // The cards "speaking": a gentle fade + a one-time shimmer sweep over a
         // glassmorphic panel as the interpretation appears.
@@ -1593,24 +1547,23 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  // Translucent white glass over the celestial backdrop.
-                  gradient: LinearGradient(
+                  // Warm ivory→rice-paper card (Sacred palette) over the
+                  // celestial backdrop, replacing the cold translucent-white
+                  // glass so the reading matches Horoscope/Chat.
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.78),
-                      Colors.white.withValues(alpha: 0.55),
-                    ],
+                    colors: [AppColors.ivorySilk, AppColors.ricePaper],
                   ),
                   borderRadius: BorderRadius.circular(22),
-                  // Gold hairline border.
+                  // Warm gold hairline border.
                   border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.45),
+                    color: AppColors.warmCardBorder.withValues(alpha: 0.8),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.12),
+                      color: AppColors.templeIndigo.withValues(alpha: 0.16),
                       blurRadius: 24,
                       offset: const Offset(0, 10),
                     ),
@@ -1711,21 +1664,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
           ),
         ),
         const SizedBox(height: 24),
-        Center(
-          child: GradientButton(
-            text: 'อ่านไพ่อีกครั้ง',
-            onPressed: _shuffleCards,
-            gradient: const LinearGradient(
-              colors: AppColors.primaryGradient,
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            icon: const Icon(
-              Icons.refresh,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
+        SacredPrimaryButton(
+          label: 'อ่านไพ่อีกครั้ง',
+          onTap: _shuffleCards,
+          trailingSvg: AppIcons.sparkleFilled,
         ),
       ],
     );
@@ -1750,10 +1692,13 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                        // Gold/plum sweep (Sacred palette) instead of the flat
+                        // primary/secondary ring, so this reads as candlelight
+                        // rather than a generic loading spinner.
                         gradient: SweepGradient(
                           colors: [
-                            AppColors.primary.withValues(alpha: 0.2),
-                            AppColors.secondary.withValues(alpha: 0.2),
+                            AppColors.candleGold.withValues(alpha: 0.22),
+                            AppColors.softPlum.withValues(alpha: 0.22),
                           ],
                           stops: const [0.0, 1.0],
                         ),
@@ -1772,11 +1717,17 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                       width: 100,
                       height: 160,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        // Warm ivory card (Sacred palette) instead of flat
+                        // white, matching the tarot card face + hero cards.
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [AppColors.ivorySilk, AppColors.ricePaper],
+                        ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
+                            color: AppColors.candleGold.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -1786,7 +1737,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                         borderRadius: BorderRadius.circular(12),
                         child: Stack(
                           children: [
-                            // เอฟเฟกต์แสง
+                            // เอฟเฟกต์แสง — gold/plum pulse instead of the
+                            // flat primary/secondary wash.
                             Positioned.fill(
                               child: AnimatedBuilder(
                                 animation: _pulseAnimation,
@@ -1797,10 +1749,10 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.primary
-                                              .withValues(alpha: 0.3),
-                                          AppColors.secondary
-                                              .withValues(alpha: 0.3),
+                                          AppColors.candleGold
+                                              .withValues(alpha: 0.18),
+                                          AppColors.softPlum
+                                              .withValues(alpha: 0.18),
                                         ],
                                       ),
                                     ),

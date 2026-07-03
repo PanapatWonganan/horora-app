@@ -11,6 +11,7 @@ import '../../core/repositories/tarot_repository.dart';
 import '../../core/services/auth_guard.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/celestial_effects.dart';
+import '../../core/theme/sacred_ui.dart';
 import '../../core/utils/app_icons.dart';
 import '../shared/widgets/loading_indicator.dart';
 
@@ -280,8 +281,10 @@ ${_reading!.interpretation}
           _buildCards(),
           const SizedBox(height: 24),
           _buildInterpretation(),
-          const SizedBox(height: 24),
-          if (_reading!.cards.length > 1) _buildZodiacInfluence(),
+          // NOTE: a "zodiac influence" section used to render here but it was
+          // always placeholder copy ("...จะแสดงที่นี่") since no real backend
+          // data ever populates it — removed per design audit until there is
+          // real content to show (req 9).
         ],
       ),
     );
@@ -362,55 +365,15 @@ ${_reading!.interpretation}
     );
   }
 
-  Widget _buildSectionTitle(String title, {String? overline}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 4,
-          height: overline != null ? 28 : 18,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.accent, AppColors.secondary],
-            ),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (overline != null)
-              Text(
-                overline,
-                style: GoogleFonts.fraunces(
-                  color: AppColors.primary.withValues(alpha: 0.75),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 2.5,
-                ),
-              ),
-            Text(
-              title,
-              style: GoogleFonts.kanit(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.deepText,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Section titles now use the shared SacredSectionTitle (see sacred_ui.dart)
+  // instead of a hand-rolled copy, so tarot reads identically to
+  // Horoscope/Chat.
 
   Widget _buildQuestion() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ',
+        const SacredSectionTitle('คำถามหรือประเด็นที่ต้องการคำตอบ',
             overline: 'YOUR QUESTION'),
         const SizedBox(height: 10),
         Container(
@@ -438,7 +401,7 @@ ${_reading!.interpretation}
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('ไพ่ที่ได้', overline: 'THE CARDS'),
+        const SacredSectionTitle('ไพ่ที่ได้', overline: 'THE CARDS'),
         const SizedBox(height: 16),
         SizedBox(
           height: 220,
@@ -554,7 +517,9 @@ ${_reading!.interpretation}
               '(กลับหัว)',
               style: GoogleFonts.kanit(
                 fontSize: 12,
-                color: AppColors.secondary,
+                // Readable ink-gold on the ivory card (candle gold body text
+                // on ivory reads too low-contrast).
+                color: AppColors.deepGoldBrown,
               ),
             ),
         ],
@@ -566,7 +531,7 @@ ${_reading!.interpretation}
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('คำทำนาย', overline: 'THE READING'),
+        const SacredSectionTitle('คำทำนาย', overline: 'THE READING'),
         const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(22),
@@ -576,22 +541,22 @@ ${_reading!.interpretation}
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                // Warm ivory→rice-paper card (Sacred palette) over the
+                // celestial backdrop, replacing the cold translucent-white
+                // glass so this matches Horoscope/Chat.
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.78),
-                    Colors.white.withValues(alpha: 0.55),
-                  ],
+                  colors: [AppColors.ivorySilk, AppColors.ricePaper],
                 ),
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: AppColors.accent.withValues(alpha: 0.45),
+                  color: AppColors.warmCardBorder.withValues(alpha: 0.8),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: AppColors.templeIndigo.withValues(alpha: 0.16),
                     blurRadius: 22,
                     offset: const Offset(0, 10),
                   ),
@@ -636,79 +601,4 @@ ${_reading!.interpretation}
     );
   }
 
-  Widget _buildZodiacInfluence() {
-    // ตรวจสอบว่ามีข้อมูลอิทธิพลของราศีหรือไม่
-    final Map<String, dynamic> interpretationData = {};
-    try {
-      // ลองแปลงข้อความตีความเป็น JSON
-      if (_reading!.interpretation.contains('zodiac_influence')) {
-        interpretationData['zodiac_influence'] = 'อิทธิพลของราศีต่อการตีความไพ่นี้จะแสดงที่นี่';
-      }
-    } catch (e) {
-      // ไม่สามารถแปลงเป็น JSON ได้ ไม่เป็นไร
-    }
-
-    if (!interpretationData.containsKey('zodiac_influence')) {
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('อิทธิพลของราศี'),
-        const SizedBox(height: 10),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.surfaceMuted,
-                AppColors.cream.withValues(alpha: 0.6),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.accent.withValues(alpha: 0.35),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const SvgIcon(
-                    AppIcons.sparkle,
-                    color: AppColors.accent,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'ราศีของคุณ',
-                    style: GoogleFonts.kanit(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                interpretationData['zodiac_influence'] as String,
-                style: GoogleFonts.kanit(
-                  fontSize: 14,
-                  color: AppColors.deepText,
-                  height: 1.55,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-} 
+}

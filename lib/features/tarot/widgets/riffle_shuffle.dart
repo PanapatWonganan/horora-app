@@ -145,8 +145,13 @@ class RiffleShuffle extends StatelessWidget {
           ...List.generate(cardCount, (i) => _buildCard(i)),
 
           // ---- GRAIN over the whole ritual for atmosphere. ----
-          Positioned.fill(
-            child: GrainOverlay(opacity: 0.05 + energy * 0.03),
+          // PERF: fixed opacity (not derived from `energy`/`progress`) so
+          // _GrainPainter.shouldRepaint stays false across the ~2.8s shuffle —
+          // otherwise this repaints ~2600 circles every animation frame for
+          // the whole ritual. Visual behaviour is effectively identical (the
+          // energy-driven swing was a few thousandths of opacity).
+          const Positioned.fill(
+            child: GrainOverlay(opacity: 0.065),
           ),
         ],
       ),
@@ -298,9 +303,10 @@ class RiffleShuffle extends StatelessWidget {
   }
 }
 
-/// A celestial card back — mystical lavender gradient, thin gold border, and a
-/// sparkle signet — matching the un-revealed deck's look at riffle scale. A
-/// [glint] term lifts the gold edge + sheen as the ritual's energy builds.
+/// A celestial card back — muted temple plum/indigo gradient (Sacred palette),
+/// thin gold border, and a sparkle signet — matching the un-revealed deck's
+/// look at riffle scale. A [glint] term lifts the gold edge + sheen as the
+/// ritual's energy builds.
 class _CardBack extends StatelessWidget {
   const _CardBack({
     required this.width,
@@ -322,11 +328,7 @@ class _CardBack extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF6C5BD0), // deep lavender
-            Color(0xFF8B6FE0),
-            Color(0xFFB8A6F0),
-          ],
+          colors: AppColors.mysticalGradient,
         ),
         border: Border.all(
           color: AppColors.accent.withValues(alpha: (0.85 + glint * 0.15).clamp(0.0, 1.0)),
