@@ -20,6 +20,35 @@ import 'widgets/in_app_message_dialog.dart';
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 
+/// Pure precedence logic for the Home greeting name — extracted out of
+/// [_HomeScreenState._loadUserName] so it can be unit-tested without
+/// standing up AuthService/GuestSessionService. Behavior-preserving:
+///
+///   (a) logged-in account name, if non-empty
+///   (b) else the account email's local-part (before '@'), if non-empty
+///   (c) else the guest onboarding name, if non-empty
+///   (d) else '' (Home falls back to the plain "สวัสดีค่ะ" greeting)
+///
+/// [accountName]/[accountEmail] should be null when there is no logged-in
+/// user; [guestName] should be null when there is no saved guest onboarding
+/// record. Never throws.
+String resolveHomeDisplayName({
+  String? accountName,
+  String? accountEmail,
+  String? guestName,
+}) {
+  if (accountName != null && accountName.isNotEmpty) {
+    return accountName;
+  }
+  if (accountEmail != null && accountEmail.isNotEmpty) {
+    return accountEmail.split('@')[0];
+  }
+  if (guestName != null && guestName.isNotEmpty) {
+    return guestName;
+  }
+  return '';
+}
+
 // Static variable เก็บสถานะว่าเคยออกจาก home ไปหรือยัง
 class HomeScreenState {
   static bool hasLeftHome = false;
@@ -82,29 +111,24 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _loadUserName() async {
     try {
       final user = _authService.currentUser;
-      if (user != null) {
-        // (a) บัญชีที่ login แล้ว: ใช้ชื่อก่อน
-        if (user.name.isNotEmpty) {
-          if (mounted) setState(() => _userName = user.name);
-          return;
-        }
-        // (b) ถ้าไม่มีชื่อ ใช้อีเมลแทน (พฤติกรรมเดิม)
-        if (user.email.isNotEmpty) {
-          if (mounted) {
-            setState(() => _userName = user.email.split('@')[0]);
-          }
-          return;
-        }
-      }
+      // guest onboarding fallback ถูกอ่านเสมอเมื่อบัญชีจริงไม่มีทั้งชื่อและ
+      // อีเมล (รวมถึงกรณีไม่มีบัญชี login เลย) — resolveHomeDisplayName
+      // เข้ารหัสลำดับความสำคัญ (a)-(d) ไว้เป็น pure function ที่ทดสอบแยกได้
+      final hasAccountNameOrEmail =
+          (user?.name.isNotEmpty ?? false) || (user?.email.isNotEmpty ?? false);
+      final guestData = hasAccountNameOrEmail
+          ? null
+          : await GuestSessionService.instance.loadOnboarding();
 
-      // (c) ไม่มีบัญชี login — fallback ไปใช้ชื่อจาก guest onboarding
-      final guestData = await GuestSessionService.instance.loadOnboarding();
-      final guestName = guestData?.name;
-      if (guestName != null && guestName.isNotEmpty) {
-        if (mounted) setState(() => _userName = guestName);
-      }
-      // (d) ไม่มีข้อมูลใดๆ — ปล่อย _userName ว่างไว้ (การ์ดทักทายจะ
-      // fallback เป็น "สวัสดีค่ะ" อยู่แล้ว)
+      final name = resolveHomeDisplayName(
+        accountName: user?.name,
+        accountEmail: user?.email,
+        guestName: guestData?.name,
+      );
+
+      if (mounted && name.isNotEmpty) setState(() => _userName = name);
+      // ถ้า name ว่าง — ปล่อย _userName ว่างไว้ (การ์ดทักทายจะ fallback เป็น
+      // "สวัสดีค่ะ" อยู่แล้ว)
     } catch (e) {
       // ผิดพลาดระหว่างโหลด (account หรือ guest) — ปล่อยว่างไว้อย่างปลอดภัย
       debugPrint('HomeScreen._loadUserName error: $e');

@@ -21,6 +21,14 @@ void main() {
       expect(ThaiZodiacService.getThaiZodiac(2012).animalName, 'มะโรง'); // Dragon
     });
 
+    // Known-year spot check matching the brief's example: 1991 -> มะแม
+    // (Year of Goat). animalIndex = (1991 - 1984 + 4) % 12 = 11, which is
+    // 'มะแม' in the service's _zodiacAnimals ordering.
+    test('1991 is ปีมะแม (Year of Goat)', () {
+      expect(ThaiZodiacService.getThaiZodiac(1991).animalName, 'มะแม');
+      expect(ThaiZodiacService.getThaiZodiac(1991).englishName, 'Year of Goat');
+    });
+
     test('element follows a 10-year (5-element) cycle', () {
       // elementIndex = year % 10 ; 0,1->ทอง 2,3->น้ำ 4,5->ไม้ 6,7->ไฟ 8,9->ดิน
       expect(ThaiZodiacService.getThaiZodiac(2020).element, 'ทอง'); // 2020 % 10 = 0
