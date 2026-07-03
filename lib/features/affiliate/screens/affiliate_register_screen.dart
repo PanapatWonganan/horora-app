@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../services/affiliate_service.dart';
 import 'affiliate_dashboard_screen.dart';
@@ -80,7 +81,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                padding: AppSpacing.pagePadding.copyWith(top: 8, bottom: 32),
                 child: Form(
                   key: _formKey,
                   child: Column(

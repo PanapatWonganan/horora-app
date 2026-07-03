@@ -298,9 +298,8 @@ class _ChatScreenState extends State<ChatScreen> {
         );
         return AlertDialog(
           backgroundColor: AppColors.lightSurface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          // Shape intentionally omitted so this inherits dialogTheme's
+          // AppRadius.dialog (24) instead of a hardcoded mismatched radius.
           title: Text(
             'วิธีใช้งานการสนทนากับนักพยากรณ์',
             style: GoogleFonts.kanit(
@@ -363,9 +362,8 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.lightSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        // Shape intentionally omitted so this inherits dialogTheme's
+        // AppRadius.dialog (24) instead of a hardcoded mismatched radius.
         title: Row(
           children: [
             const Icon(Icons.flag, color: AppColors.error),

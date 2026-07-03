@@ -340,7 +340,7 @@ class _TarotHistoryScreenState extends State<TarotHistoryScreen> {
             Text(
               '(กลับหัว)',
               style: SacredText.kanit(
-                fontSize: 10.0,
+                fontSize: 12.0,
                 color: AppColors.error,
               ),
             ),

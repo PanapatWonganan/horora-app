@@ -546,7 +546,7 @@ class _DailyHoroscopeCardState extends State<DailyHoroscopeCard> {
               index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
               color: index < rating
                   ? AppColors.candleGold
-                  : AppColors.deepText.withValues(alpha: 0.2),
+                  : AppColors.deepText.withValues(alpha: 0.35),
               size: 15,
             ),
           ),

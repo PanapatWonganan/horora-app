@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/utils/app_icons.dart';
 
 class TopicSelectionDialog extends StatefulWidget {
@@ -62,7 +63,7 @@ class _TopicSelectionDialogState extends State<TopicSelectionDialog> {
     return Dialog(
       backgroundColor: AppColors.lightSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.dialog),
         side: BorderSide(
           color: AppColors.warmCardBorder.withValues(alpha: 0.7),
           width: 1,

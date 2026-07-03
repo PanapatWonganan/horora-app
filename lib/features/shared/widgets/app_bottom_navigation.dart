@@ -148,7 +148,7 @@ class AppBottomNavigation extends StatelessWidget {
               label,
               style: TextStyle(
                 color: color,
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
@@ -358,7 +358,7 @@ class _MeritCtaTabState extends State<_MeritCtaTab>
                 color: isSelected
                     ? AppBottomNavigation._navActive
                     : AppColors.onBackdrop,
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
             ),

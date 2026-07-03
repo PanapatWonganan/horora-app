@@ -166,7 +166,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           'ทำบุญออนไลน์ · บุญถึงมือจริง',
           style: GoogleFonts.kanit(
             color: AppColors.onBackdropMuted.withValues(alpha: 0.88),
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
             letterSpacing: 4.5,
           ),

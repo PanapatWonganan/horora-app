@@ -346,7 +346,7 @@ class _MeritOrderFormScreenState extends State<MeritOrderFormScreen> {
                   item,
                   style: const TextStyle(
                     color: AppColors.deepText,
-                    fontSize: 10,
+                    fontSize: 12,
                   ),
                 ),
               )).toList(),

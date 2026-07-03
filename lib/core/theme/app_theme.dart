@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
+import 'app_dimensions.dart';
 
 class AppTheme {
   // Light Theme
@@ -41,7 +42,7 @@ class AppTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           textStyle: GoogleFonts.kanit(
             fontSize: 16,
@@ -55,7 +56,7 @@ class AppTheme {
           side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           textStyle: GoogleFonts.kanit(
             fontSize: 16,
@@ -78,19 +79,19 @@ class AppTheme {
         fillColor: AppColors.lightSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
         hintStyle: GoogleFonts.kanit(
@@ -102,7 +103,7 @@ class AppTheme {
         color: AppColors.lightSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
       dividerTheme: DividerThemeData(
@@ -127,13 +128,13 @@ class AppTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.lightSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.dialog)),
         ),
       ),
       dialogTheme: DialogTheme(
         backgroundColor: AppColors.lightSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.dialog),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -220,10 +221,14 @@ class AppTheme {
           color: Colors.white,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
-      fontFamily: 'Kanit',
+      // The bundled Kanit font files are 0-byte placeholders (see pubspec),
+      // so a literal 'Kanit' family name would fall back to the system font
+      // for any widget using a plain TextStyle. Resolve to GoogleFonts'
+      // runtime-loaded Kanit family instead so the raw-family fallback works.
+      fontFamily: GoogleFonts.kanit().fontFamily,
     );
   }
 
@@ -264,7 +269,7 @@ class AppTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           textStyle: GoogleFonts.kanit(
             fontSize: 16,
@@ -278,7 +283,7 @@ class AppTheme {
           side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
           textStyle: GoogleFonts.kanit(
             fontSize: 16,
@@ -301,19 +306,19 @@ class AppTheme {
         fillColor: AppColors.darkSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
         hintStyle: GoogleFonts.kanit(
@@ -325,7 +330,7 @@ class AppTheme {
         color: AppColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
       dividerTheme: DividerThemeData(
@@ -350,13 +355,13 @@ class AppTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.dialog)),
         ),
       ),
       dialogTheme: DialogTheme(
         backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.dialog),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -443,10 +448,12 @@ class AppTheme {
           color: Colors.white,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
-      fontFamily: 'Kanit',
+      // See lightTheme() for why this resolves via GoogleFonts instead of
+      // the literal (unavailable) 'Kanit' asset family.
+      fontFamily: GoogleFonts.kanit().fontFamily,
     );
   }
 
@@ -526,7 +533,7 @@ class AppTheme {
         color: textColor,
       ),
       labelSmall: GoogleFonts.kanit(
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: FontWeight.w500,
         color: textColor,
       ),

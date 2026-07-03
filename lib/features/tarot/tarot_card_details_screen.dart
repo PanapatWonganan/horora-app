@@ -477,7 +477,7 @@ ${_reading!.interpretation}
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.fraunces(
-                          fontSize: 9,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.2,
                           color: AppColors.primary.withValues(alpha: 0.8),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/affiliate_models.dart';
@@ -93,7 +94,7 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
                           ),
                         )
                       : SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                          padding: AppSpacing.pagePadding.copyWith(top: 8, bottom: 24),
                           child: Column(
                     children: [
                       // Referral code card

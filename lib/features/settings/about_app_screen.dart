@@ -254,7 +254,7 @@ class AboutAppScreen extends StatelessWidget {
     return Text(
       '© 2025 Horora. All rights reserved.',
       style: SacredText.kanit(
-        color: AppColors.onBackdropMuted.withValues(alpha: 0.7),
+        color: AppColors.onBackdropMuted,
         fontSize: 12,
       ),
       textAlign: TextAlign.center,

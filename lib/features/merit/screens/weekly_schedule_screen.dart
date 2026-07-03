@@ -502,7 +502,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                                   'วันนี้',
                                   style: GoogleFonts.kanit(
                                     color: MeritColors.accentDark,
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -1113,7 +1113,7 @@ class _ProofCard extends StatelessWidget {
                           'สำเร็จ',
                           style: GoogleFonts.kanit(
                             color: AppColors.success,
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

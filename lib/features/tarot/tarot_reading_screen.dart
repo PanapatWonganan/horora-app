@@ -1596,7 +1596,7 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
                         Text(
                           'THE CARDS SPEAK',
                           style: GoogleFonts.fraunces(
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 2.5,
                             color: AppColors.mutedText.withValues(alpha: 0.8),

@@ -92,7 +92,7 @@ class _TarotScreenState extends State<TarotScreen> {
               'THE ORACLE · ทาโรต์',
               style: GoogleFonts.fraunces(
                 color: AppColors.onBackdropMuted,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 3,
               ),

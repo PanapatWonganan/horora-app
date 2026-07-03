@@ -192,7 +192,7 @@ class _TarotSpreadCardState extends State<TarotSpreadCard> {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.fraunces(
                         color: accent.withValues(alpha: 0.85),
-                        fontSize: 9,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.8,
                       ),

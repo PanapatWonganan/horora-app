@@ -177,7 +177,7 @@ class MeritOverline extends StatelessWidget {
     return Text(
       text.toUpperCase(),
       style: GoogleFonts.fraunces(
-        fontSize: 11,
+        fontSize: 12,
         color: color ?? (onCard ? MeritColors.accentDark : AppColors.onBackdropMuted),
         fontWeight: FontWeight.w600,
         letterSpacing: 2.8,
@@ -817,7 +817,7 @@ class _StepRowState extends State<_StepRow> with SingleTickerProviderStateMixin 
                             'กำลังดำเนินการ',
                             style: GoogleFonts.kanit(
                               color: MeritColors.accentDark,
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -1314,7 +1314,7 @@ class MeritAnumothanaCard extends StatelessWidget {
               'คำอธิษฐาน',
               style: GoogleFonts.kanit(
                 color: AppColors.mutedText,
-                fontSize: 11.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -1638,7 +1638,7 @@ class MeritDestinationBanner extends StatelessWidget {
                                   'ยืนยันแล้ว',
                                   style: GoogleFonts.kanit(
                                     color: AppColors.success,
-                                    fontSize: 10.5,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../models/affiliate_models.dart';
 import '../services/affiliate_service.dart';
@@ -82,7 +83,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                           backgroundColor: AppColors.ivorySilk,
                           child: SingleChildScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                            padding: AppSpacing.pagePadding.copyWith(top: 8, bottom: 24),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -264,7 +265,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: SacredText.kanit(fontSize: 11, color: AppColors.mutedText),
+            style: SacredText.kanit(fontSize: 12, color: AppColors.mutedText),
             textAlign: TextAlign.center,
           ),
         ],
@@ -313,7 +314,7 @@ class _AffiliateDashboardScreenState extends State<AffiliateDashboardScreen> {
                   _getNextTierMessage(stats.tier, stats.monthlyOrders),
                   style: SacredText.kanit(
                       fontSize: 12,
-                      color: AppColors.mutedText.withValues(alpha: 0.8)),
+                      color: AppColors.mutedText),
                 ),
               ],
             ),

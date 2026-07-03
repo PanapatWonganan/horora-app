@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_dimensions.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../models/affiliate_models.dart';
 import '../services/affiliate_service.dart';
@@ -93,7 +94,7 @@ class _AffiliateWithdrawScreenState extends State<AffiliateWithdrawScreen> {
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                padding: AppSpacing.pagePadding.copyWith(top: 8, bottom: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

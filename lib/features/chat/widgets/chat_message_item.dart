@@ -229,7 +229,7 @@ class ChatMessageItem extends StatelessWidget {
                     'ธาตุ$element',
                     style: GoogleFonts.kanit(
                       color: elementColor,
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

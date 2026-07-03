@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'app_colors.dart';
+import 'app_dimensions.dart';
 import 'celestial_effects.dart';
 import '../utils/app_icons.dart';
 
@@ -376,7 +377,7 @@ class SacredCard extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
-    this.radius = 22,
+    this.radius = AppRadius.card,
     this.onTap,
     this.highlight = false,
   });
@@ -515,7 +516,7 @@ class SacredPrimaryButton extends StatelessWidget {
               )
             : null,
         color: filled ? null : AppColors.candleGold.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: filled
             ? null
             : Border.all(
@@ -570,7 +571,7 @@ class SacredPrimaryButton extends StatelessWidget {
       opacity: on || isLoading ? 1 : 0.5,
       child: SacredPressable(
         onTap: on ? onTap! : () {},
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         child: inner,
       ),
     );
@@ -638,7 +639,7 @@ class SacredTrustStrip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.onBackdrop.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(40),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
               border: Border.all(
                 color: AppColors.onBackdrop.withValues(alpha: 0.12),
                 width: 1,
@@ -692,26 +693,26 @@ InputDecoration sacredInputDecoration({
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: const BorderSide(color: AppColors.warmCardBorder, width: 1),
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: BorderSide(
         color: AppColors.warmCardBorder.withValues(alpha: 0.8),
         width: 1,
       ),
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: const BorderSide(color: AppColors.candleGold, width: 1.4),
     ),
     errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: const BorderSide(color: AppColors.error, width: 1),
     ),
     focusedErrorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       borderSide: const BorderSide(color: AppColors.error, width: 1.4),
     ),
     errorStyle: SacredText.kanit(color: AppColors.error, fontSize: 12),
