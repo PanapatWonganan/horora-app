@@ -29,6 +29,11 @@ class MeritWeeklyOrderScreen extends StatefulWidget {
 
 class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  // Errors only appear after the first submit attempt; before that the form
+  // stays calm (prefill would otherwise count as "interaction" and surface
+  // the phone error prematurely on a pristine screen).
+  bool _hasAttemptedSubmit = false;
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _wishController = TextEditingController();
@@ -46,8 +51,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   static const List<WeeklyOrderPackage> _packages =
       WeeklyOrderPackage.defaultPackages;
 
-  WeeklyOrderPackage? get _selectedPackageData =>
-      _selectedPackage == null ? null : WeeklyOrderPackage.byId(_selectedPackage!);
+  WeeklyOrderPackage? get _selectedPackageData => _selectedPackage == null
+      ? null
+      : WeeklyOrderPackage.byId(_selectedPackage!);
 
   double get _basePrice => _selectedPackageData?.price ?? 0;
 
@@ -111,7 +117,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('d MMMM yyyy', 'th_TH').format(widget.selectedDate);
+    final dateStr =
+        DateFormat('d MMMM yyyy', 'th_TH').format(widget.selectedDate);
 
     return Scaffold(
       body: SilkCandleBackdrop(
@@ -124,14 +131,14 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Form(
                     key: _formKey,
-                    // Re-validates on every keystroke ONCE a field has been
-                    // submitted/touched — this is what clears a stale error
-                    // (red border + "กรุณาระบุชื่อ") the moment the user fixes
-                    // the field, instead of it persisting until the next
-                    // submit tap (Flutter's FormField only re-validates on
-                    // Form.validate() by default; onUserInteraction makes it
-                    // re-check as the user types/edits).
-                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    // Before the first submit attempt the form stays calm
+                    // (no red borders on a pristine screen). After the first
+                    // attempt, onUserInteraction re-validates on every
+                    // keystroke so a stale error clears the moment the user
+                    // fixes the field.
+                    autovalidateMode: _hasAttemptedSubmit
+                        ? AutovalidateMode.onUserInteraction
+                        : AutovalidateMode.disabled,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -140,7 +147,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         MeritDestinationBanner(
                           templeName: widget.schedule.locationName,
                           belief: widget.schedule.belief,
-                          subline: '${widget.schedule.day.displayName} · $dateStr',
+                          subline:
+                              '${widget.schedule.day.displayName} · $dateStr',
                         ),
                         const SizedBox(height: 16),
 
@@ -196,14 +204,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
+            icon: const SvgIcon(AppIcons.arrowBack,
+                size: 20, color: AppColors.onBackdrop),
             tooltip: 'ย้อนกลับ',
           ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SacredOverline('Merit · ร่วมบุญ', color: AppColors.onBackdropMuted, fontSize: 12, letterSpacing: 2.8),
+                const SacredOverline('Merit · ร่วมบุญ',
+                    color: AppColors.onBackdropMuted,
+                    fontSize: 12,
+                    letterSpacing: 2.8),
                 const SizedBox(height: 2),
                 Text(
                   'รายละเอียดคำสั่งบุญ',
@@ -221,7 +233,6 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       ),
     );
   }
-
 
   Widget _buildSectionTitle(String title) {
     // Section titles here sit directly on the deep celestial backdrop, so they
@@ -255,7 +266,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.ricePaper : MeritColors.cardBackground,
+              color:
+                  isSelected ? AppColors.ricePaper : MeritColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isSelected
@@ -279,42 +291,74 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isSelected
-                                    ? MeritColors.accent.withValues(alpha: 0.16)
-                                    : Colors.transparent,
-                                border: Border.all(
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
                                   color: isSelected
-                                      ? MeritColors.accentDark
-                                      : AppColors.mutedText,
-                                  width: 2,
+                                      ? MeritColors.accent
+                                          .withValues(alpha: 0.16)
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? MeritColors.accentDark
+                                        : AppColors.mutedText,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: isSelected
+                                    ? const Icon(Icons.check,
+                                        size: 16, color: AppColors.deepText)
+                                    : null,
+                              ),
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Text(
+                                  package.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.deepText,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              child: isSelected
-                                  ? const Icon(Icons.check, size: 16, color: AppColors.deepText)
-                                  : null,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              package.name,
-                              style: const TextStyle(
-                                color: AppColors.deepText,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                              // "ยอดนิยม" sits inline next to the name — an
+                              // overlay at the card corner covered the price.
+                              if (isPopular) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: MeritColors.accentGradient,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    'ยอดนิยม',
+                                    style: GoogleFonts.kanit(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                         Text(
                           package.priceFormatted,
                           style: TextStyle(
-                            color: isSelected ? AppColors.deepText : MeritColors.accentDark,
+                            color: isSelected
+                                ? AppColors.deepText
+                                : MeritColors.accentDark,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -327,7 +371,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       runSpacing: 8,
                       children: package.features.map((f) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? MeritColors.accent.withValues(alpha: 0.12)
@@ -337,7 +382,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                           child: Text(
                             f,
                             style: TextStyle(
-                              color: isSelected ? AppColors.deepText : AppColors.mutedText,
+                              color: isSelected
+                                  ? AppColors.deepText
+                                  : AppColors.mutedText,
                               fontSize: 12,
                             ),
                           ),
@@ -346,36 +393,6 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                     ),
                   ],
                 ),
-                if (isPopular)
-                  Positioned(
-                    top: -4,
-                    right: -4,
-                    child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: MeritColors.accentGradient,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: MeritColors.accent.withValues(alpha: 0.35),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'ยอดนิยม',
-                        style: GoogleFonts.kanit(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
@@ -390,7 +407,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     if (lower.contains('ส้ม') || lower.contains('ผลไม้')) return '🍊';
     if (lower.contains('ธูป') || lower.contains('หอม')) return '🪔';
     if (lower.contains('เทียน')) return '🕯️';
-    if (lower.contains('ดอกไม้') || lower.contains('มาลัย') || lower.contains('พวง')) return '💐';
+    if (lower.contains('ดอกไม้') ||
+        lower.contains('มาลัย') ||
+        lower.contains('พวง')) {
+      return '💐';
+    }
     if (lower.contains('น้ำ')) return '💧';
     if (lower.contains('ข้าว')) return '🍚';
     if (lower.contains('ขนม')) return '🍡';
@@ -438,9 +459,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               color: MeritColors.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected
-                    ? MeritColors.accentDark
-                    : AppColors.divider,
+                color: isSelected ? MeritColors.accentDark : AppColors.divider,
                 width: 2,
               ),
               boxShadow: [
@@ -461,8 +480,10 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        MeritColors.accent.withValues(alpha: isSelected ? 0.4 : 0.25),
-                        AppColors.secondary.withValues(alpha: isSelected ? 0.4 : 0.25),
+                        MeritColors.accent
+                            .withValues(alpha: isSelected ? 0.4 : 0.25),
+                        AppColors.secondary
+                            .withValues(alpha: isSelected ? 0.4 : 0.25),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -507,7 +528,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 Text(
                   '+${addon.priceFormatted}',
                   style: TextStyle(
-                    color: isSelected ? MeritColors.accentDark : AppColors.mutedText,
+                    color: isSelected
+                        ? MeritColors.accentDark
+                        : AppColors.mutedText,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -581,7 +604,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                       fontSize: 16,
                     ),
                   ),
-                  const SvgIcon(AppIcons.calendar, size: 20, color: AppColors.mutedText),
+                  const SvgIcon(AppIcons.calendar,
+                      size: 20, color: AppColors.mutedText),
                 ],
               ),
             ),
@@ -686,7 +710,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           ] else
             Row(
               children: [
-                const SvgIcon(AppIcons.info, size: 16, color: AppColors.mutedText),
+                const SvgIcon(AppIcons.info,
+                    size: 16, color: AppColors.mutedText),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -754,7 +779,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SvgIcon(AppIcons.heart, size: 22, color: AppColors.deepText),
+              const SvgIcon(AppIcons.heart,
+                  size: 22, color: AppColors.deepText),
               const SizedBox(width: 10),
               Text(
                 hasPackage
@@ -776,6 +802,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   void _submitOrder() {
     final selectedPackage = _selectedPackageData;
     if (selectedPackage == null) return;
+    if (!_hasAttemptedSubmit) {
+      setState(() => _hasAttemptedSubmit = true);
+    }
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -784,7 +813,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     final order = MeritOrder(
       id: null,
       orderNumber: null,
-      locationId: widget.schedule.day.name, // ใช้ day name เป็น location ID ชั่วคราว
+      locationId:
+          widget.schedule.day.name, // ใช้ day name เป็น location ID ชั่วคราว
       packageId: selectedPackage.id,
       prayerName: _nameController.text,
       prayerBirthdate: _birthDate,
