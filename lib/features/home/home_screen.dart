@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/routes/routes.dart';
@@ -84,8 +85,16 @@ class _HomeScreenState extends State<HomeScreen>
     buttonUrl: 'https://lin.ee/XIF2jaM', // LINE URL — unchanged.
   );
 
-  // Whether the gentle in-page offer card is still shown (user can dismiss it).
-  bool _showGentleOffer = true;
+  // Whether the gentle in-page offer card is shown. Starts hidden (not true)
+  // so we never flash the card before the SharedPreferences dismissal check
+  // resolves — [_loadGentleOfferVisibility] flips it on if the 14-day cap
+  // has elapsed (or the offer was never dismissed).
+  bool _showGentleOffer = false;
+
+  // Key + cap for the gentle offer's dismissal frequency (Requirement 3):
+  // once dismissed, stay hidden for this many days before reappearing.
+  static const String _gentleOfferDismissedAtKey = 'gentle_offer_dismissed_at';
+  static const int _gentleOfferDismissDays = 14;
 
   @override
   void initState() {
@@ -95,9 +104,50 @@ class _HomeScreenState extends State<HomeScreen>
       duration: const Duration(seconds: 60),
     )..repeat();
     _loadUserName();
+    _loadGentleOfferVisibility();
 
     // No automatic commercial popup on Home startup. A calm, dismissible offer
     // card lives in-page instead (see [_buildGentleOffer]).
+  }
+
+  /// Loads the last-dismissed timestamp for the gentle offer and shows the
+  /// card only if it was never dismissed, or the 14-day cap has elapsed.
+  /// The card starts hidden (see [_showGentleOffer]) until this resolves, so
+  /// there is no dismissed-card flash on launch.
+  Future<void> _loadGentleOfferVisibility() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final dismissedAtStr = prefs.getString(_gentleOfferDismissedAtKey);
+      bool shouldShow = true;
+      if (dismissedAtStr != null) {
+        final dismissedAt = DateTime.tryParse(dismissedAtStr);
+        if (dismissedAt != null) {
+          final daysSinceDismissed =
+              DateTime.now().difference(dismissedAt).inDays;
+          shouldShow = daysSinceDismissed >= _gentleOfferDismissDays;
+        }
+      }
+      if (mounted) setState(() => _showGentleOffer = shouldShow);
+    } catch (e) {
+      // Fail safe: keep the offer hidden rather than risk showing it when we
+      // can't confirm the dismissal state.
+      debugPrint('HomeScreen._loadGentleOfferVisibility error: $e');
+    }
+  }
+
+  /// Persists "now" as the dismissal time so the offer stays hidden for
+  /// [_gentleOfferDismissDays] days, then hides the card for this session.
+  Future<void> _dismissGentleOffer() async {
+    setState(() => _showGentleOffer = false);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _gentleOfferDismissedAtKey,
+        DateTime.now().toIso8601String(),
+      );
+    } catch (e) {
+      debugPrint('HomeScreen._dismissGentleOffer error: $e');
+    }
   }
 
   @override
@@ -201,25 +251,26 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(height: 24),
                       StaggeredReveal(index: 0, child: _buildHeader()),
                       const SizedBox(height: 32),
+                      // ดูดวงประจำวัน — the free daily reading opens Home first:
+                      // value before any commerce ask.
+                      StaggeredReveal(index: 1, child: _buildDailyHoroscope()),
+                      const SizedBox(height: 34),
                       // แนวทางวันนี้ + ร่วมบุญ — astrology guidance and the
                       // suitable merit of the day, woven into one calm card.
-                      StaggeredReveal(index: 1, child: _buildMeritHero()),
+                      // Framed as the action suggested by today's reading above —
+                      // Home's single merit ask (weekly planning lives in the
+                      // merit tab, not duplicated here).
+                      StaggeredReveal(index: 2, child: _buildMeritHero()),
                       const SizedBox(height: 14),
                       // Quiet trust strip for the merit flow — sits just under
                       // the hero so the promise (real temples, full proof,
                       // trackable) is right where intent forms. Subtle, not salesy.
-                      StaggeredReveal(index: 2, child: _buildTrustStrip()),
+                      StaggeredReveal(index: 3, child: _buildTrustStrip()),
                       const SizedBox(height: 34),
-                      // ดูดวงประจำวัน — daily reading.
-                      StaggeredReveal(index: 3, child: _buildDailyHoroscope()),
-                      const SizedBox(height: 34),
-                      // ตารางร่วมบุญประจำสัปดาห์ — gentle daily-return rhythm.
-                      StaggeredReveal(index: 4, child: _buildMeritWeekStrip()),
-                      const SizedBox(height: 34),
-                      StaggeredReveal(index: 5, child: _buildFeatures()),
+                      StaggeredReveal(index: 4, child: _buildFeatures()),
                       if (_showGentleOffer) ...[
                         const SizedBox(height: 34),
-                        StaggeredReveal(index: 6, child: _buildGentleOffer()),
+                        StaggeredReveal(index: 5, child: _buildGentleOffer()),
                       ],
                       const SizedBox(height: 40),
                     ],
@@ -665,7 +716,7 @@ class _HomeScreenState extends State<HomeScreen>
               width: 44,
               height: 44,
               child: GestureDetector(
-                onTap: () => setState(() => _showGentleOffer = false),
+                onTap: _dismissGentleOffer,
                 behavior: HitTestBehavior.opaque,
                 child: Center(
                   child: Icon(
@@ -956,118 +1007,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
       ],
-    );
-  }
-
-  /// 📅 Weekly merit schedule mini-strip — a horizontal row of 7 day chips,
-  /// each showing that day's merit place. Highlights today and drives the
-  /// daily-return habit. Reads the static const schedule; taps go to merit.
-  Widget _buildMeritWeekStrip() {
-    final todayWeekday = _today.weekday;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionTitle('ร่วมบุญประจำสัปดาห์', overline: 'Weekly Merit'),
-        const SizedBox(height: 14),
-        SizedBox(
-          // Grows with font scale so two-line temple names don't clip
-          // (identical to the old fixed 100 at scale 1.0).
-          height: 100 * MediaQuery.textScalerOf(context).scale(1.0),
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(right: 4),
-            itemCount: WeeklyMeritSchedule.defaultSchedule.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (context, i) {
-              final s = WeeklyMeritSchedule.defaultSchedule[i];
-              final isToday = s.day.weekdayNumber == todayWeekday;
-              return _meritDayChip(s, isToday);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _meritDayChip(WeeklyMeritSchedule s, bool isToday) {
-    return _pressable(
-      borderRadius: BorderRadius.circular(18),
-      onTap: () => Navigator.pushNamed(context, AppRoutes.merit),
-      child: Container(
-        width: 102,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-        decoration: BoxDecoration(
-          // Both states stay on calm ivory — "today" is marked with a candle-
-          // gold hairline border and a soft gold wash, not a bright gradient.
-          color: AppColors.lightSurface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isToday
-                ? AppColors.candleGold.withValues(alpha: 0.85)
-                : AppColors.divider.withValues(alpha: 0.55),
-            width: isToday ? 1.4 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.templeIndigo
-                  .withValues(alpha: isToday ? 0.14 : 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: isToday
-                        ? AppColors.candleGold.withValues(alpha: 0.20)
-                        : AppColors.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    s.day.shortName,
-                    style: GoogleFonts.kanit(
-                      color:
-                          isToday ? AppColors.deepGoldBrown : AppColors.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (isToday) ...[
-                  const SizedBox(width: 6),
-                  const SvgIcon(
-                    AppIcons.temple,
-                    size: 14,
-                    color: AppColors.deepGoldBrown,
-                  ),
-                ],
-              ],
-            ),
-            Text(
-              s.locationName,
-              maxLines: 2,
-              overflow: TextOverflow.fade,
-              softWrap: true,
-              style: GoogleFonts.kanit(
-                color: AppColors.deepText,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w500,
-                height: 1.25,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

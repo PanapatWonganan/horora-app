@@ -112,3 +112,9 @@ Located at `../backend/horora-api/` (relative to this Flutter project):
 - Laravel 12 + Filament v3 (admin panel)
 - API auth via Sanctum (Bearer tokens)
 - Admin login: `/admin` path, requires `is_admin = true` on user record
+
+## Monetization UX rules
+
+- **Value before ask** — free daily content (e.g. the daily horoscope reading) renders above any commerce ask on a screen.
+- **One primary ask per screen** — Home's single ask is the merit hero; weekly merit planning lives in the merit tab, not duplicated on Home.
+- **Dismissible offers stay dismissed** — once a user dismisses an offer card, it stays hidden for at least 14 days (persisted, not just session state).
