@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
@@ -11,14 +12,39 @@ import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
 import '../services/merit_service.dart';
 import '../widgets/merit_ui.dart';
+import 'merit_order_status_screen.dart';
 
 /// หน้าชำระเงินและ Upload slip
 class MeritPaymentScreen extends StatefulWidget {
   final MeritOrder order;
 
+  // ── Optional display-only breakdown params ──────────────────────────────
+  // These are purely presentational: `widget.order.price` remains the single
+  // source of truth for the amount actually charged/shown in ยอดชำระ. When
+  // absent (any caller other than MeritWeeklyOrderScreen), the summary renders
+  // exactly as before — a single "แพ็คเกจ" line is skipped and only the
+  // existing rows show.
+  final String? packageName;
+  final double? packagePrice;
+  final List<MeritAddon>? selectedAddons;
+
+  /// The date the merit visit is scheduled for (widget.selectedDate on the
+  /// order form) — used only to render the "ขั้นตอนถัดไป" card's third step.
+  /// Optional so older/other call sites keep working unchanged.
+  final DateTime? scheduledDate;
+
+  /// Thai day label (e.g. "วันศุกร์") for the scheduled date, shown alongside
+  /// [scheduledDate] in the "ขั้นตอนถัดไป" card.
+  final String? scheduledDayLabel;
+
   const MeritPaymentScreen({
     Key? key,
     required this.order,
+    this.packageName,
+    this.packagePrice,
+    this.selectedAddons,
+    this.scheduledDate,
+    this.scheduledDayLabel,
   }) : super(key: key);
 
   @override
@@ -34,6 +60,18 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
   bool _isCreatingOrder = false;
   bool _isUploading = false;
   bool _orderCreated = false;
+
+  // Tracks whether the slip has been successfully submitted yet. Drives the
+  // PopScope back-guard: before a successful submit, leaving the screen shows
+  // a confirmation dialog (the order already exists server-side, so nothing
+  // is "lost", but the slip step is easy to forget). After a successful
+  // submit, back/pop behaves normally.
+  bool _slipSubmitted = false;
+
+  // Set right before the error-path `Navigator.pop(context)` in
+  // `_createOrder()` fires, so the PopScope guard (which only listens for
+  // *user-initiated* back gestures) does not intercept that programmatic pop.
+  bool _leavingAfterCreateFailure = false;
 
   @override
   void initState() {
@@ -61,6 +99,10 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             backgroundColor: AppColors.error,
           ),
         );
+        // Mark this as a programmatic "leave" so PopScope's onPopInvokedWithResult
+        // doesn't treat it as a user back-gesture and show the leave-guard dialog
+        // — there is no slip to lose here, order creation itself failed.
+        _leavingAfterCreateFailure = true;
         Navigator.pop(context);
       }
     }
@@ -125,6 +167,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
         uploadToken: _createdOrder!.slipUploadToken,
       );
 
+      _slipSubmitted = true;
       if (mounted) {
         _showSuccessDialog();
       }
@@ -252,12 +295,27 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            if (_createdOrder != null) ...[
+              SacredPrimaryButton(
+                label: 'ดูสถานะคำสั่งบุญ',
+                onTap: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          MeritOrderStatusScreen(order: _createdOrder!),
+                    ),
+                  );
+                },
+                filled: true,
+              ),
+              const SizedBox(height: 12),
+            ],
             SacredPrimaryButton(
               label: 'กลับหน้าหลัก',
               onTap: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
-              filled: true,
+              filled: false,
             ),
           ],
         ),
@@ -275,36 +333,112 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
     );
   }
 
+  void _copyTransferAmount() {
+    // Copy the raw numeric amount (no currency symbol/formatting) so it can
+    // be pasted straight into a banking app's transfer-amount field.
+    Clipboard.setData(
+      ClipboardData(text: widget.order.price.toStringAsFixed(0)),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('คัดลอกยอดโอนแล้ว'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  /// Guards leaving the screen before the slip has been submitted. The order
+  /// already exists server-side by this point (created in `_createOrder` on
+  /// entry), so nothing is lost — but the slip step is easy to forget, so we
+  /// confirm before letting the user navigate away.
+  ///
+  /// Returns true if the pop should proceed.
+  Future<bool> _confirmLeave() async {
+    if (_slipSubmitted || _leavingAfterCreateFailure) return true;
+
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.lightSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'ยังไม่ได้แนบสลิป',
+          style: GoogleFonts.kanit(
+            color: AppColors.deepText,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: Text(
+          'คำสั่งบุญของคุณถูกบันทึกไว้แล้ว โอนแล้วกลับมาแนบสลิปได้ที่ ประวัติการร่วมบุญ',
+          style: GoogleFonts.kanit(
+            color: AppColors.mutedText,
+            fontSize: 14,
+            height: 1.5,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'ออกไปก่อน',
+              style: GoogleFonts.kanit(color: AppColors.mutedText),
+            ),
+          ),
+          SacredPrimaryButton(
+            label: 'อยู่ต่อ',
+            onTap: () => Navigator.of(context).pop(true),
+            filled: true,
+          ),
+        ],
+      ),
+    );
+    return leave == false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SilkCandleBackdrop(
-        warmHero: false,
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: _isCreatingOrder
-                    ? const SacredLoader.large(label: 'กำลังสร้างคำสั่งบุญ…')
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildOrderSummary(),
-                            const SizedBox(height: 24),
-                            _buildPromptPaySection(),
-                            const SizedBox(height: 24),
-                            _buildSlipUploadSection(),
-                            const SizedBox(height: 32),
-                            _buildSubmitButton(),
-                            const SizedBox(height: 20),
-                          ],
+    return PopScope(
+      canPop: _slipSubmitted || _leavingAfterCreateFailure,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        final shouldPop = await _confirmLeave();
+        if (shouldPop && mounted) {
+          navigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: SilkCandleBackdrop(
+          warmHero: false,
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: _isCreatingOrder
+                      ? const SacredLoader.large(label: 'กำลังสร้างคำสั่งบุญ…')
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildOrderSummary(),
+                              const SizedBox(height: 24),
+                              _buildPromptPaySection(),
+                              const SizedBox(height: 24),
+                              _buildSlipUploadSection(),
+                              const SizedBox(height: 24),
+                              _buildNextStepsCard(),
+                              const SizedBox(height: 32),
+                              _buildSubmitButton(),
+                              const SizedBox(height: 20),
+                            ],
+                          ),
                         ),
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -317,7 +451,14 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () async {
+              if (_slipSubmitted || _leavingAfterCreateFailure) {
+                Navigator.pop(context);
+                return;
+              }
+              final shouldPop = await _confirmLeave();
+              if (shouldPop && mounted) Navigator.pop(context);
+            },
             icon: const SvgIcon(AppIcons.arrowBack, size: 20, color: AppColors.onBackdrop),
             tooltip: 'ย้อนกลับ',
           ),
@@ -374,8 +515,18 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
           if (_createdOrder?.orderNumber != null)
             _buildSummaryRow('เลขที่', _createdOrder!.orderNumber!, isHighlight: true),
           _buildSummaryRow('สถานที่', widget.order.location?.nameTh ?? widget.order.locationId),
-          _buildSummaryRow('แพ็คเกจ', widget.order.package?.nameTh ?? widget.order.packageId),
+          if (widget.packageName == null)
+            _buildSummaryRow('แพ็คเกจ', widget.order.package?.nameTh ?? widget.order.packageId),
           _buildSummaryRow('ผู้ขอพร', widget.order.prayerName),
+          if (widget.packageName != null) ...[
+            const Divider(color: AppColors.divider, height: 24),
+            _buildSummaryRow(
+              'แพ็คเกจ',
+              '${widget.packageName} · ฿${(widget.packagePrice ?? 0).toStringAsFixed(0)}',
+            ),
+            for (final addon in widget.selectedAddons ?? const <MeritAddon>[])
+              _buildSummaryRow(addon.name, '+${addon.priceFormatted}'),
+          ],
           const Divider(color: AppColors.divider, height: 24),
           _buildSummaryRow('ยอดชำระ', widget.order.priceFormatted, isBold: true, isPrice: true),
         ],
@@ -496,38 +647,65 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: _copyPromptPayNumber,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        MeritService.promptPayNumber,
-                        style: GoogleFonts.fraunces(
-                          color: AppColors.deepGoldBrown,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
+                Semantics(
+                  button: true,
+                  label: 'คัดลอกเลขบัญชี',
+                  child: GestureDetector(
+                    onTap: _copyPromptPayNumber,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      // ≥44px hit area padded around the visually-unchanged
+                      // number + icon (was a small tap target sitting right
+                      // next to the number).
+                      constraints: const BoxConstraints(minHeight: 44),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            MeritService.promptPayNumber,
+                            style: GoogleFonts.fraunces(
+                              color: AppColors.deepGoldBrown,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.copy, color: AppColors.deepGoldBrown, size: 18),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.copy, color: AppColors.deepGoldBrown, size: 18),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: MeritColors.price,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    'ยอดโอน ${widget.order.priceFormatted}',
-                    style: GoogleFonts.kanit(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                Semantics(
+                  button: true,
+                  label: 'คัดลอกยอดโอน',
+                  child: GestureDetector(
+                    onTap: _copyTransferAmount,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: MeritColors.price,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'ยอดโอน ${widget.order.priceFormatted}',
+                            style: GoogleFonts.kanit(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.copy, color: Colors.white, size: 15),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -669,6 +847,101 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
       enabled: canSubmit,
       filled: true,
       isLoading: _isUploading,
+    );
+  }
+
+  /// "ขั้นตอนถัดไป" — a calm, ivory reassurance card walking the user through
+  /// what happens after they submit the slip. Purely informational; reuses
+  /// the existing ivory/gold-hairline card language (matches
+  /// [_buildOrderSummary] / [MeritWishInput]) rather than inventing a new
+  /// visual style.
+  Widget _buildNextStepsCard() {
+    final scheduledDate = widget.scheduledDate;
+    final dayLabel = widget.scheduledDayLabel;
+    final String thirdStep;
+    if (scheduledDate != null && dayLabel != null) {
+      final dateStr = DateFormat('d MMMM yyyy', 'th_TH').format(scheduledDate);
+      thirdStep = 'ไหว้ให้ใน$dayLabelที่ $dateStr พร้อมส่งรูป/วิดีโอยืนยันถึงคุณ';
+    } else if (scheduledDate != null) {
+      final dateStr = DateFormat('d MMMM yyyy', 'th_TH').format(scheduledDate);
+      thirdStep = 'ไหว้ให้ในวันที่ $dateStr พร้อมส่งรูป/วิดีโอยืนยันถึงคุณ';
+    } else {
+      thirdStep = 'ไหว้ให้ตามกำหนด พร้อมส่งรูป/วิดีโอยืนยันถึงคุณ';
+    }
+
+    final steps = <String>[
+      'โอนเงินและแนบสลิปด้านบน',
+      'ทีมงานตรวจสอบและยืนยันภายใน 24 ชม.',
+      thirdStep,
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.ivorySilk,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: MeritColors.accent.withValues(alpha: 0.35)),
+        boxShadow: MeritUI.softShadow(),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ขั้นตอนถัดไป',
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 14),
+          for (int i = 0; i < steps.length; i++) ...[
+            _buildNextStepRow(i + 1, steps[i]),
+            if (i != steps.length - 1) const SizedBox(height: 12),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNextStepRow(int number, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: MeritColors.accentGradient),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              '$number',
+              style: GoogleFonts.kanit(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              text,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontSize: 13.5,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

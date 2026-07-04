@@ -12,6 +12,58 @@ import '../models/merit_models.dart';
 import '../widgets/merit_ui.dart';
 import 'merit_payment_screen.dart';
 
+/// Cap on คำอธิษฐาน (wish) input length — mirrors [MeritWishInput]'s default
+/// `maxLength` so the pure fill/append helper below never produces a string
+/// the field itself would reject.
+const int kMeritWishMaxLength = 200;
+
+/// Pure helper for the wish suggestion chips (Task 21.B): tapping a chip
+/// either replaces an empty wish box or appends the chip's text (space
+/// separated) to existing text — always respecting [kMeritWishMaxLength].
+///
+/// Extracted as a standalone function (no widget/BuildContext dependency) so
+/// it's cheaply unit-testable without pumping a widget tree.
+String applyWishChip(String currentText, String chipText, {int maxLength = kMeritWishMaxLength}) {
+  final trimmedCurrent = currentText.trim();
+  final combined = trimmedCurrent.isEmpty ? chipText : '$trimmedCurrent $chipText';
+  if (combined.length <= maxLength) return combined;
+  return combined.substring(0, maxLength);
+}
+
+/// One ready-made wish suggestion chip's label.
+class MeritWishSuggestion {
+  final String label;
+  const MeritWishSuggestion(this.label);
+}
+
+/// Picks up to 4 wish suggestions based on keywords in the schedule's
+/// [belief] string, always ending with a generic catch-all. Belief-specific
+/// matches are added first (in a fixed priority order) so the most relevant
+/// suggestions for this destination show up before the generic one, then the
+/// list is capped at 4.
+List<MeritWishSuggestion> wishSuggestionsForBelief(String belief) {
+  const generic = MeritWishSuggestion('ขอให้ชีวิตราบรื่น สิ่งดี ๆ เข้ามา');
+  final matches = <MeritWishSuggestion>[];
+
+  if (belief.contains('โชคลาภ') || belief.contains('การเงิน') || belief.contains('มั่งคั่ง')) {
+    matches.add(const MeritWishSuggestion('ขอให้การเงินคล่องตัว มีโชคลาภ'));
+  }
+  if (belief.contains('ความรัก') || belief.contains('คู่ครอง')) {
+    matches.add(const MeritWishSuggestion('ขอให้พบคู่ที่ดี ความรักราบรื่น'));
+  }
+  if (belief.contains('สุขภาพ')) {
+    matches.add(const MeritWishSuggestion('ขอให้สุขภาพแข็งแรง'));
+  }
+  if (belief.contains('การงาน') || belief.contains('ความสำเร็จ')) {
+    matches.add(const MeritWishSuggestion('ขอให้การงานก้าวหน้า'));
+  }
+
+  // Cap belief-specific matches at 3 so the generic catch-all always has a
+  // slot within the 4-chip limit, then append it.
+  final capped = matches.length > 3 ? matches.sublist(0, 3) : matches;
+  return [...capped, generic];
+}
+
 /// หน้าสั่งจองฝากมูตามตารางสัปดาห์
 class MeritWeeklyOrderScreen extends StatefulWidget {
   final WeeklyMeritSchedule schedule;
@@ -175,6 +227,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         const SizedBox(height: 20),
 
                         // Dedication / wish — premium temple-paper input.
+                        _buildWishSuggestionChips(),
+                        const SizedBox(height: 12),
                         MeritWishInput(controller: _wishController),
                         const SizedBox(height: 24),
 
@@ -658,6 +712,49 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     );
   }
 
+  /// Ready-made wish chips, tuned to this schedule's `belief` keywords.
+  /// Tapping a chip fills the (empty) wish box or appends to existing text —
+  /// see [applyWishChip]. Styled like the app's existing ivory pill chips
+  /// ([MeritTrustChip]) with a gold hairline; no selected state since each
+  /// tap is a one-shot filler, not a persistent choice.
+  Widget _buildWishSuggestionChips() {
+    final suggestions = wishSuggestionsForBelief(widget.schedule.belief);
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: suggestions.map((s) {
+        return GestureDetector(
+          onTap: () => _onWishChipTap(s.label),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+            decoration: BoxDecoration(
+              color: MeritColors.cardBackground.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: MeritColors.accent.withValues(alpha: 0.35)),
+            ),
+            child: Text(
+              s.label,
+              style: GoogleFonts.kanit(
+                color: AppColors.deepText,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _onWishChipTap(String chipText) {
+    setState(() {
+      _wishController.text = applyWishChip(_wishController.text, chipText);
+      _wishController.selection = TextSelection.collapsed(
+        offset: _wishController.text.length,
+      );
+    });
+  }
+
   Widget _buildPriceSummary() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -857,11 +954,26 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       ),
     );
 
+    // Display-only breakdown data for the payment screen's สรุปคำสั่งบุญ —
+    // MeritOrder itself carries only the final `price` total, so the
+    // package/add-on detail is passed alongside it via constructor params
+    // rather than widening the model.
+    final selectedAddonObjects = widget.schedule.addons
+        .where((a) => _selectedAddons.contains(a.id))
+        .toList();
+
     // ไปหน้าชำระเงิน
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MeritPaymentScreen(order: order),
+        builder: (context) => MeritPaymentScreen(
+          order: order,
+          packageName: selectedPackage.name,
+          packagePrice: selectedPackage.price,
+          selectedAddons: selectedAddonObjects,
+          scheduledDate: widget.selectedDate,
+          scheduledDayLabel: widget.schedule.day.displayName,
+        ),
       ),
     );
   }
