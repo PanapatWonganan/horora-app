@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_routes.dart';
 import '../../features/welcome/welcome_screen.dart';
 import '../../features/onboarding/screens/onboarding_router.dart';
+import '../../features/onboarding/screens/conversion/paywall_page.dart';
 import '../../features/auth/login/login_screen.dart';
 import '../../features/auth/register/register_screen.dart';
 import '../../features/auth/forgot_password/forgot_password_screen.dart';
@@ -51,6 +52,15 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const OnboardingRouter());
       case AppRoutes.authWrapper:
         return MaterialPageRoute(builder: (_) => const AuthWrapper());
+      case AppRoutes.paywall:
+        // Deferred-paywall placement variant (dormant by default — see
+        // PaywallPlacement in ab_test_service.dart). Full-screen modal-style
+        // route so skip/close just pops back to whatever full-version lock
+        // was tapped.
+        return MaterialPageRoute(
+          builder: (_) => const DeferredPaywallScreen(),
+          fullscreenDialog: true,
+        );
 
       // Authentication
       case AppRoutes.login:

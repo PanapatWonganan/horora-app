@@ -5,6 +5,11 @@ class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String authWrapper = '/auth-wrapper';
 
+  // Paywall (deferred-placement A/B — see ab_test_service.dart PaywallPlacement).
+  // Pushed as a standalone full-screen route when the user taps a
+  // full-version lock outside onboarding (afterFirstReading placement only).
+  static const String paywall = '/paywall';
+
   // Authentication
   static const String login = '/login';
   static const String register = '/register';

@@ -10,6 +10,7 @@ import '../../models/onboarding_models.dart';
 import '../../services/ab_test_service.dart';
 import 'conversion_style.dart';
 import 'conversion_widgets.dart';
+import 'paywall_page.dart';
 
 typedef FlutterTimeOfDay = material.TimeOfDay;
 
@@ -47,10 +48,23 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   PaywallVariant _paywallVariant = PaywallVariant.control;
   bool _paywallShownTracked = false;
 
+  /// Resolved eagerly in [initState] (see [_resolvePaywallPlacement]).
+  /// Defaults to [PaywallPlacement.onboardingEnd] until resolved so the very
+  /// first frame — and every frame in production today — behaves exactly
+  /// like before this experiment existed (matches [kPaywallDeferredWeight]
+  /// being 0.0 by default).
+  PaywallPlacement _paywallPlacement = PaywallPlacement.onboardingEnd;
+
   @override
   void initState() {
     super.initState();
     _abTest.trackFunnelStep('cv_started');
+    _resolvePaywallPlacement();
+  }
+
+  Future<void> _resolvePaywallPlacement() async {
+    final placement = await _abTest.getPaywallPlacement();
+    if (mounted) setState(() => _paywallPlacement = placement);
   }
 
   @override
@@ -98,10 +112,24 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   // 5 funnel events fire from the paywall page: paywall_shown,
   // paywall_plan_selected, paywall_start_trial_tapped, paywall_skipped,
   // paywall_closed. All of them route through ABTestService.trackPaywallEvent
-  // so every event is tagged with the resolved PaywallVariant.
+  // so every event is tagged with the resolved PaywallVariant AND
+  // PaywallPlacement.
+  //
+  // PLACEMENT (see PaywallPlacement in ab_test_service.dart):
+  // - onboardingEnd (today's behavior, kPaywallDeferredWeight is 0.0 so this
+  //   is the only reachable placement in production): the paywall is screen
+  //   11 of this PageView, as always.
+  // - afterFirstReading (dormant): the PageView SKIPS screen 11 entirely —
+  //   reaching index 10 fires paywall_deferred and finishes as guest straight
+  //   to Home, same as if the user had tapped skip. The paywall then only
+  //   appears the first time the user taps a full-version lock — see
+  //   _onRevealLockTapped, wired to the reveal-card lock in
+  //   _dailyReadingCard (screen 8) — reusing this same PaywallPage widget as
+  //   a standalone full-screen route (AppRoutes.paywall).
 
   /// Resolves the persisted paywall variant (once) and fires paywall_shown.
-  /// Called when the PageView lands on the paywall (index 10).
+  /// Called when the PageView lands on the paywall (index 10), only when
+  /// placement is onboardingEnd (see onPageChanged).
   void _onPaywallShown() {
     if (_paywallShownTracked) return;
     _paywallShownTracked = true;
@@ -130,6 +158,31 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
     _finishAsGuest();
   }
 
+  /// Called when the PageView lands on index 10 (screen 11) while placement
+  /// is afterFirstReading: skip the paywall page content, fire
+  /// paywall_deferred instead of paywall_shown, and finish as guest straight
+  /// to Home (identical exit to today's "skip").
+  bool _deferredPaywallTracked = false;
+  void _onPaywallDeferred() {
+    if (_deferredPaywallTracked) return;
+    _deferredPaywallTracked = true;
+    _abTest.trackPaywallEvent('paywall_deferred');
+    _finishAsGuest();
+  }
+
+  /// The reveal-card "🔒 ดูฉบับเต็ม" lock (screen 8, _dailyReadingCard).
+  /// - onboardingEnd placement: inert (matches today's dead-lock behavior —
+  ///   this card is reached before the paywall page anyway).
+  /// - afterFirstReading placement: this is the first full-version lock the
+  ///   user can reach, so it opens the deferred paywall as a full-screen
+  ///   route reusing PaywallPage, firing paywall_shown(placement) when it
+  ///   opens. Skip/close from that route pops back to onboarding, which then
+  ///   continues normally (the route does not finish onboarding itself).
+  void _onRevealLockTapped() {
+    if (_paywallPlacement != PaywallPlacement.afterFirstReading) return;
+    Navigator.pushNamed(context, AppRoutes.paywall);
+  }
+
   // ---- Build ---------------------------------------------------------------
 
   @override
@@ -147,7 +200,15 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
               setState(() => _page = i);
               _abTest.trackFunnelStep('cv_page_$i');
               if (i == 6) _runAnalyzing(); // screen 7 = analyzing
-              if (i == 10) _onPaywallShown(); // screen 11 = paywall
+              if (i == 10) {
+                // screen 11 = paywall (onboardingEnd placement only —
+                // afterFirstReading skips it, see _onPaywallDeferred).
+                if (_paywallPlacement == PaywallPlacement.afterFirstReading) {
+                  _onPaywallDeferred();
+                } else {
+                  _onPaywallShown();
+                }
+              }
             },
             children: [
               _welcome(), // 1
@@ -834,9 +895,17 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
                 color: CvColors.ivoryInk.withValues(alpha: 0.75)),
           ),
           const SizedBox(height: 10),
-          Text('🔒 ดูฉบับเต็ม',
-              style: CvType.body(12,
-                  weight: FontWeight.w600, color: const Color(0xFFA07F3A))),
+          // For onboardingEnd placement (production today) this lock is
+          // inert, same as before this experiment existed — the user reaches
+          // the real paywall two screens later anyway. For afterFirstReading
+          // placement, this is the first full-version lock reachable, so it
+          // opens the deferred paywall (see _onRevealLockTapped).
+          GestureDetector(
+            onTap: _onRevealLockTapped,
+            child: Text('🔒 ดูฉบับเต็ม',
+                style: CvType.body(12,
+                    weight: FontWeight.w600, color: const Color(0xFFA07F3A))),
+          ),
         ],
       ),
     );
@@ -1073,125 +1142,20 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   // ========================================================================
   // SCREEN 11 — SOFT PAYWALL (placeholder — no payment SDK)
   // ========================================================================
+  //
+  // Pure extraction: the actual page content lives in PaywallPage
+  // (paywall_page.dart) so it can be reused as a standalone full-screen
+  // route for the deferred-placement variant (see AppRoutes.paywall /
+  // AppRouter). Same widget tree as before for the control path.
   Widget _paywall() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 4),
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: _onPaywallClosed,
-              child: Text('✕',
-                  style: CvType.body(14, color: CvColors.creamA(0.65))),
-            ),
-          ),
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('ทดลองฟรี 7 วัน', style: CvType.eyebrow(size: 11)),
-                const SizedBox(height: 6),
-                Text('ปลดล็อกแนวทาง\nเต็มทุกวัน',
-                    style: CvType.display(24, height: 1.3)),
-                const SizedBox(height: 18),
-                ..._paywallBenefits.map((b) => Padding(
-                      padding: const EdgeInsets.only(bottom: 11),
-                      child: Row(
-                        children: [
-                          const Text('✦  ',
-                              style: TextStyle(
-                                  color: CvColors.goldMid, fontSize: 15)),
-                          Expanded(
-                            child: Text(b,
-                                style: CvType.body(13,
-                                    weight: FontWeight.w500,
-                                    color: CvColors.creamA(0.9))),
-                          ),
-                        ],
-                      ),
-                    )),
-                const SizedBox(height: 20),
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _onPaywallPlanSelected('yearly'),
-                          child: const _PlanCard(
-                            title: 'รายปี',
-                            price: '฿599',
-                            per: '฿50/เดือน',
-                            badge: 'ประหยัด 50%',
-                            highlighted: true,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 11),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _onPaywallPlanSelected('monthly'),
-                          child: const _PlanCard(
-                            title: 'รายเดือน',
-                            price: '฿99',
-                            per: 'ต่อเดือน',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(24, 14, 24, 22),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0x001F1733), CvColors.bgFooter],
-              stops: [0.0, 0.4],
-            ),
-          ),
-          child: Column(
-            children: [
-              // Placeholder: both trial + skip enter Home as guest for now.
-              CvGoldButton(
-                  label: 'เริ่มทดลองฟรี 7 วัน',
-                  onPressed: _onPaywallStartTrialTapped),
-              const SizedBox(height: 9),
-              Text('จากนั้น ฿599/ปี · ยกเลิกได้ทุกเมื่อ',
-                  style: CvType.body(12, color: CvColors.creamA(0.65))),
-              // Dormant softGate delta: only rendered when the paywall
-              // experiment assigns PaywallVariant.softGate (never true today
-              // — kPaywallSoftGateWeight is 0.0). Control's skip link below
-              // is unchanged either way.
-              if (_paywallVariant == PaywallVariant.softGate) ...[
-                const SizedBox(height: 4),
-                Text('ทดลองดูดวงฟรีวันนี้',
-                    style: CvType.body(12,
-                        weight: FontWeight.w500, color: CvColors.goldSoft)),
-              ],
-              CvTextLink(label: 'ข้ามไปก่อน', onPressed: _onPaywallSkipped),
-            ],
-          ),
-        ),
-      ],
+    return PaywallPage(
+      paywallVariant: _paywallVariant,
+      onPlanSelected: _onPaywallPlanSelected,
+      onStartTrialTapped: _onPaywallStartTrialTapped,
+      onSkipped: _onPaywallSkipped,
+      onClosed: _onPaywallClosed,
     );
   }
-
-  static const _paywallBenefits = [
-    'ดวงรายวันเฉพาะคุณ ฉบับเต็ม',
-    'จับคู่วัด/พิธีที่เหมาะกับคุณ',
-    'เตือนฤกษ์มงคลไม่จำกัด',
-    'หลักฐาน + ใบอนุโมทนาครบ',
-  ];
 
   // ---- Helpers -------------------------------------------------------------
 
@@ -1302,89 +1266,6 @@ class _IvoryChip extends StatelessWidget {
       child: Text(text,
           style: CvType.body(12,
               weight: FontWeight.w500, color: CvColors.ivoryInkSoft)),
-    );
-  }
-}
-
-class _PlanCard extends StatelessWidget {
-  final String title;
-  final String price;
-  final String per;
-  final String? badge;
-  final bool highlighted;
-  const _PlanCard({
-    required this.title,
-    required this.price,
-    required this.per,
-    this.badge,
-    this.highlighted = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Reserve a uniform strip at the top of every card so the body lines up
-    // whether or not a badge sits over the border.
-    const badgeReserve = 9.0;
-
-    // Card is the sizing child (top margin reserves space for the badge so
-    // both cards' borders align); badge is overlaid on top.
-    final card = Container(
-      margin: const EdgeInsets.only(top: badgeReserve),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: highlighted ? CvColors.goldA(0.16) : CvColors.whiteA(0.05),
-        border: Border.all(
-          color: highlighted ? CvColors.gold : CvColors.whiteA(0.1),
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title,
-              style: CvType.body(13,
-                  weight: FontWeight.w600,
-                  color: highlighted
-                      ? CvColors.cream
-                      : CvColors.creamA(0.85))),
-          const SizedBox(height: 4),
-          Text(price, style: CvType.display(19)),
-          Text(per,
-              style: CvType.body(12,
-                  color: CvColors.creamA(highlighted ? 0.65 : 0.65))),
-        ],
-      ),
-    );
-
-    return Stack(
-      clipBehavior: Clip.none,
-      fit: StackFit.passthrough,
-      children: [
-        card,
-        if (badge != null)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: CvColors.goldMid,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(badge!,
-                    style: CvType.body(12,
-                            weight: FontWeight.w700,
-                            color: const Color(0xFF3A2C0E))
-                        .copyWith(letterSpacing: 1)),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }

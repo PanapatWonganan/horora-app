@@ -40,6 +40,43 @@ const double kPaywallSoftGateWeight = 0.0;
 const String _kPreviewPaywallVariantDefine =
     String.fromEnvironment('PREVIEW_PAYWALL_VARIANT');
 
+/// A/B Test variants for paywall PLACEMENT (independent of [PaywallVariant],
+/// which controls paywall *copy*). `onboardingEnd` = today's behavior, the
+/// paywall page is screen 11 of the conversion onboarding flow. `afterFirstReading`
+/// = value-first: onboarding skips the paywall page entirely and finishes as
+/// guest straight to Home; the paywall is deferred until the user taps a
+/// full-version lock (see [kPaywallDeferredWeight] doc + conversion_onboarding_screen.dart).
+enum PaywallPlacement {
+  onboardingEnd,
+  afterFirstReading,
+}
+
+/// Rollout weight for [PaywallPlacement.afterFirstReading], as a fraction
+/// 0.0–1.0.
+///
+/// IMPORTANT: pinned to 0.0 (100% onboardingEnd) so shipping this scaffold
+/// does NOT change production behavior — the deferred-placement code path is
+/// fully implemented and reachable, but no user is assigned to it today. The
+/// analytics backend isn't hooked up yet (trackPaywallEvent is debugPrint-only,
+/// see below), so running this experiment now would burn real users with no
+/// way to measure the result.
+///
+/// To go live: change this constant (e.g. 0.5 for a 50/50 split) and ship a
+/// new build — new installs will then be randomly assigned per this weight.
+/// Existing installs keep whatever placement they were already assigned (see
+/// [ABTestService.getPaywallPlacement]).
+const double kPaywallDeferredWeight = 0.0;
+
+/// Debug-only override to preview [PaywallPlacement.afterFirstReading]
+/// without touching [kPaywallDeferredWeight]. Only ever honored when
+/// `kDebugMode` is true, so this can never affect release builds.
+///
+/// Preview it by launching with:
+///   flutter run --dart-define=PREVIEW_PAYWALL_PLACEMENT=afterFirstReading
+/// Any other value (or omitting the flag) falls back to normal assignment.
+const String _kPreviewPaywallPlacementDefine =
+    String.fromEnvironment('PREVIEW_PAYWALL_PLACEMENT');
+
 /// Service สำหรับจัดการ A/B Testing
 class ABTestService {
   static final ABTestService _instance = ABTestService._internal();
@@ -51,9 +88,11 @@ class ABTestService {
   static const String _onboardingCompletedKey = 'onboarding_completed';
   static const String _conversionTrackedKey = 'conversion_tracked';
   static const String _paywallVariantKey = 'paywall_ab_variant';
+  static const String _paywallPlacementKey = 'paywall_ab_placement';
 
   OnboardingVariant? _cachedVariant;
   PaywallVariant? _cachedPaywallVariant;
+  PaywallPlacement? _cachedPaywallPlacement;
 
   /// กำหนด Variant สำหรับผู้ใช้ใหม่ (50/50 split)
   /// TODO: เปลี่ยนกลับเป็น random เมื่อ production
@@ -142,6 +181,57 @@ class ABTestService {
     debugPrint('AB Test: Force set paywall variant ${variant.name}');
   }
 
+  /// กำหนด/อ่าน Paywall Placement สำหรับผู้ใช้ (assigned once, then persisted).
+  ///
+  /// Weighting comes from [kPaywallDeferredWeight] — currently 0.0, so this
+  /// always resolves to [PaywallPlacement.onboardingEnd] in production. In
+  /// debug builds only, [_kPreviewPaywallPlacementDefine] can force a
+  /// placement for local preview without touching the weight constant.
+  Future<PaywallPlacement> getPaywallPlacement() async {
+    if (_cachedPaywallPlacement != null) return _cachedPaywallPlacement!;
+
+    if (kDebugMode && _kPreviewPaywallPlacementDefine.isNotEmpty) {
+      final forced = PaywallPlacement.values.where(
+        (v) => v.name == _kPreviewPaywallPlacementDefine,
+      );
+      if (forced.isNotEmpty) {
+        _cachedPaywallPlacement = forced.first;
+        debugPrint(
+            'AB Test: Paywall placement forced via dart-define -> ${forced.first.name}');
+        return _cachedPaywallPlacement!;
+      }
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_paywallPlacementKey);
+
+    if (saved != null) {
+      _cachedPaywallPlacement = PaywallPlacement.values.firstWhere(
+        (v) => v.name == saved,
+        orElse: () => PaywallPlacement.onboardingEnd,
+      );
+    } else {
+      _cachedPaywallPlacement =
+          Random().nextDouble() < kPaywallDeferredWeight
+              ? PaywallPlacement.afterFirstReading
+              : PaywallPlacement.onboardingEnd;
+      await prefs.setString(
+          _paywallPlacementKey, _cachedPaywallPlacement!.name);
+      debugPrint(
+          'AB Test: Assigned paywall placement ${_cachedPaywallPlacement!.name}');
+    }
+
+    return _cachedPaywallPlacement!;
+  }
+
+  /// Force set paywall placement (สำหรับ testing).
+  Future<void> setPaywallPlacement(PaywallPlacement placement) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_paywallPlacementKey, placement.name);
+    _cachedPaywallPlacement = placement;
+    debugPrint('AB Test: Force set paywall placement ${placement.name}');
+  }
+
   /// Track conversion (สมัครสมาชิกสำเร็จ)
   Future<void> trackConversion() async {
     final prefs = await SharedPreferences.getInstance();
@@ -182,20 +272,24 @@ class ABTestService {
     // TODO: ส่งไป Analytics
   }
 
-  /// Track a paywall funnel event, tagged with the paywall variant.
+  /// Track a paywall funnel event, tagged with the paywall variant AND
+  /// placement so events can be segmented by both dimensions.
   ///
-  /// Trigger points (fired from the paywall page in
-  /// conversion_onboarding_screen.dart): paywall_shown,
-  /// paywall_plan_selected, paywall_start_trial_tapped, paywall_skipped,
-  /// paywall_closed.
+  /// Trigger points: paywall_shown, paywall_plan_selected,
+  /// paywall_start_trial_tapped, paywall_skipped, paywall_closed (fired from
+  /// the paywall page, wherever it's presented — end of onboarding or
+  /// deferred), plus paywall_deferred (fired instead of paywall_shown when
+  /// placement is afterFirstReading and onboarding finishes without ever
+  /// showing the paywall).
   ///
   /// Lands in the same place as [trackFunnelStep] today (debugPrint only) —
   /// wiring a real analytics backend (Firebase/Mixpanel/etc.) is a TODO.
   Future<void> trackPaywallEvent(String eventName, {String? detail}) async {
     final variant = await getPaywallVariant();
+    final placement = await getPaywallPlacement();
     final suffix = detail != null ? ', detail=$detail' : '';
-    debugPrint(
-        'AB Test Paywall: variant=${variant.name}, event=$eventName$suffix');
+    debugPrint('AB Test Paywall: variant=${variant.name}, '
+        'placement=${placement.name}, event=$eventName$suffix');
 
     // TODO: ส่งไป Analytics (Firebase, Mixpanel, etc.)
   }
@@ -220,8 +314,10 @@ class ABTestService {
     await prefs.remove(_onboardingCompletedKey);
     await prefs.remove(_conversionTrackedKey);
     await prefs.remove(_paywallVariantKey);
+    await prefs.remove(_paywallPlacementKey);
     _cachedVariant = null;
     _cachedPaywallVariant = null;
+    _cachedPaywallPlacement = null;
     debugPrint('AB Test: Reset all data');
   }
 
@@ -231,6 +327,7 @@ class ABTestService {
     return {
       'variant': _cachedVariant?.name ?? 'not_assigned',
       'paywall_variant': _cachedPaywallVariant?.name ?? 'not_assigned',
+      'paywall_placement': _cachedPaywallPlacement?.name ?? 'not_assigned',
       'onboarding_completed': prefs.getBool(_onboardingCompletedKey) ?? false,
       'conversion_tracked': prefs.getBool(_conversionTrackedKey) ?? false,
     };
