@@ -32,9 +32,28 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   @override
   void initState() {
     super.initState();
-    // เลือกวันปัจจุบันเป็นค่าเริ่มต้น
-    final today = DateTime.now().weekday;
-    _selectedDay = MeritDayX.fromWeekday(today);
+    _selectedDay = _defaultSelectedDay();
+  }
+
+  /// ค่าเริ่มต้นของวันที่เลือก: วันนี้ถ้ามีรอบมู มิเช่นนั้นเลือกวันที่มีรอบมู
+  /// ที่ใกล้ที่สุดถัดไป — กันไม่ให้ผู้ใช้เปิดมาเจอ empty state ทั้งที่สัปดาห์นี้
+  /// ยังมีรอบอื่นให้ร่วมบุญอยู่
+  MeritDay _defaultSelectedDay() {
+    final today = MeritDayX.fromWeekday(DateTime.now().weekday);
+    if (_schedules.any((s) => s.day == today)) {
+      return today;
+    }
+    // หาวันที่มีรอบมูซึ่ง "รอบถัดไป" ใกล้วันนี้ที่สุด
+    WeeklyMeritSchedule? nearest;
+    DateTime? nearestDate;
+    for (final schedule in _schedules) {
+      final date = schedule.day.nextOccurrenceDate();
+      if (nearestDate == null || date.isBefore(nearestDate)) {
+        nearest = schedule;
+        nearestDate = date;
+      }
+    }
+    return nearest?.day ?? today;
   }
 
   WeeklyMeritSchedule? get _selectedSchedule {
@@ -298,10 +317,10 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           final isSelected = _selectedDay == day;
           final isToday = DateTime.now().weekday == day.weekdayNumber;
 
-          // หาวันที่ของสัปดาห์นี้
-          final now = DateTime.now();
-          final diff = day.weekdayNumber - now.weekday;
-          final date = now.add(Duration(days: diff));
+          // วันที่ของ "รอบถัดไป" ของชิปนี้ — วันนี้ถ้าตรงกัน (ยังทันอยู่)
+          // มิเช่นนั้นวันที่ตรงกันถัดไปในอีก 1-6 วันข้างหน้า (ไม่ใช่แค่สัปดาห์
+          // ปฏิทินนี้ ซึ่งอาจเป็นวันที่ผ่านไปแล้ว)
+          final date = day.nextOccurrenceDate();
 
           return _PressScale(
             borderRadius: BorderRadius.circular(20),
@@ -401,7 +420,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'ไม่มีรอบมูในวัน${_selectedDay?.displayName ?? "นี้"}',
+            _selectedDay != null
+                ? 'ไม่มีรอบมูใน${_selectedDay!.displayName}'
+                : 'ไม่มีรอบมูในวันนี้',
             style: GoogleFonts.kanit(
               color: AppColors.deepText,
               fontSize: 16,
@@ -424,12 +445,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   // ── Schedule detail ─────────────────────────────────────────────────────────
 
   Widget _buildScheduleDetail(WeeklyMeritSchedule schedule) {
-    // หาวันที่ของรอบถัดไป
+    // หาวันที่ของรอบถัดไป — ใช้ helper เดียวกับชิปวันที่ (single source of truth)
     final now = DateTime.now();
-    final diff = schedule.day.weekdayNumber - now.weekday;
-    final nextDate = diff >= 0
-        ? now.add(Duration(days: diff))
-        : now.add(Duration(days: 7 + diff));
+    final nextDate = schedule.day.nextOccurrenceDate();
     final dateStr = DateFormat('d MMMM yyyy', 'th_TH').format(nextDate);
     final isToday = schedule.day.weekdayNumber == now.weekday;
 
@@ -564,14 +582,18 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                     color: AppColors.deepText.withValues(alpha: 0.75),
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    'รอบถัดไป: $dateStr',
-                    style: GoogleFonts.kanit(
-                      color: AppColors.deepText.withValues(alpha: 0.85),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      'รอบถัดไป: $dateStr',
+                      style: GoogleFonts.kanit(
+                        color: AppColors.deepText.withValues(alpha: 0.85),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  _buildStartingPricePill(schedule),
                 ],
               ),
             ],
@@ -584,15 +606,6 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         _sectionTitle('ชุดไหว้พื้นฐาน (รวมในราคา)', icon: AppIcons.checkCircle),
         const SizedBox(height: 12),
         _buildRequiredItemsCard(schedule.requiredItems),
-
-        const SizedBox(height: 24),
-
-        // Add-ons
-        if (schedule.addons.isNotEmpty) ...[
-          _sectionTitle('ของไหว้เพิ่มเติม (Add-ons)', icon: AppIcons.star),
-          const SizedBox(height: 12),
-          ...schedule.addons.map((addon) => _buildAddonCard(addon)),
-        ],
 
         const SizedBox(height: 28),
 
@@ -660,111 +673,26 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     );
   }
 
-  String _getAddonEmoji(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('กระดาษ') || lower.contains('ไหว้เจ้า')) return '📜';
-    if (lower.contains('ส้ม') || lower.contains('ผลไม้')) return '🍊';
-    if (lower.contains('ธูป') || lower.contains('หอม')) return '🪔';
-    if (lower.contains('เทียน')) return '🕯️';
-    if (lower.contains('ดอกไม้') ||
-        lower.contains('มาลัย') ||
-        lower.contains('พวง')) {
-      return '💐';
-    }
-    if (lower.contains('น้ำ')) return '💧';
-    if (lower.contains('ข้าว')) return '🍚';
-    if (lower.contains('ขนม')) return '🍡';
-    return '🙏';
-  }
-
-  Widget _buildAddonCard(MeritAddon addon) {
+  /// "เริ่มต้น ฿xxx" gold pill — แสดงราคาต่ำสุดของแพ็คที่เลือกได้ในฟอร์ม
+  /// สั่งจอง คำนวณจากชุดข้อมูลเดียวกับหน้าฟอร์ม ([WeeklyOrderPackage]) ไม่
+  /// hardcode ซ้ำ ให้ราคาบนหน้า landing กับหน้าฟอร์มตรงกันเสมอ
+  Widget _buildStartingPricePill(WeeklyMeritSchedule schedule) {
+    final price = schedule.cheapestPackagePrice;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: MeritColors.cardBackground,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: MeritColors.accent.withValues(alpha: 0.4),
+        gradient: const LinearGradient(
+          colors: MeritColors.accentGradient,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  MeritColors.accent.withValues(alpha: 0.25),
-                  AppColors.secondary.withValues(alpha: 0.25),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: MeritColors.accent.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                _getAddonEmoji(addon.name),
-                style: const TextStyle(fontSize: 24),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  addon.name,
-                  style: GoogleFonts.kanit(
-                    color: AppColors.deepText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (addon.description != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    addon.description!,
-                    style: GoogleFonts.kanit(
-                      color: AppColors.mutedText,
-                      fontSize: 13,
-                      height: 1.3,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: MeritColors.accent.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '+${addon.priceFormatted}',
-              style: GoogleFonts.fraunces(
-                color: MeritColors.accentDark,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        'เริ่มต้น ฿${price.toStringAsFixed(0)}',
+        style: GoogleFonts.kanit(
+          color: Colors.white,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

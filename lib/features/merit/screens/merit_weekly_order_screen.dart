@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/services/auth_service.dart';
+import '../../../core/services/guest_session_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../onboarding/models/onboarding_models.dart';
 import '../models/merit_models.dart';
 import '../widgets/merit_ui.dart';
 import 'merit_payment_screen.dart';
@@ -31,50 +34,22 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   final _wishController = TextEditingController();
   DateTime? _birthDate;
 
-  // เลือก Package
-  String _selectedPackage = 'standard';
+  // เลือกแพ็คร่วมบุญ — ไม่มีค่าเริ่มต้น (null) บังคับให้ผู้ใช้เลือกเองอย่าง
+  // ตั้งใจ แทนที่จะปล่อยให้ ฿499 ถูกเลือกไว้ล่วงหน้าโดยไม่รู้ตัว
+  String? _selectedPackage;
 
   // เลือก Add-ons
   final Set<String> _selectedAddons = {};
 
-  // ราคาพื้นฐานตาม Package
-  final Map<String, double> _packagePrices = {
-    'basic': 299,
-    'standard': 499,
-    'premium': 799,
-  };
+  // ชุดแพ็คร่วมบุญ — hoisted ไปที่ merit_models.dart (WeeklyOrderPackage) เพื่อ
+  // ให้หน้า landing (ราคาเริ่มต้น) กับหน้านี้อ่านข้อมูลชุดเดียวกัน
+  static const List<WeeklyOrderPackage> _packages =
+      WeeklyOrderPackage.defaultPackages;
 
-  final Map<String, String> _packageNames = {
-    'basic': '🙏 แพ็คมงคล',
-    'standard': '⭐ แพ็คเสริมดวง',
-    'premium': '👑 แพ็คพรีเมียม',
-  };
+  WeeklyOrderPackage? get _selectedPackageData =>
+      _selectedPackage == null ? null : WeeklyOrderPackage.byId(_selectedPackage!);
 
-  final Map<String, List<String>> _packageFeatures = {
-    'basic': [
-      '🪷 ชุดไหว้พื้นฐาน',
-      '📸 รูปถ่าย 3 รูป',
-      '💬 รายงานผล LINE',
-    ],
-    'standard': [
-      '🪷 ชุดไหว้พื้นฐาน',
-      '📸 รูปถ่าย 5 รูป',
-      '🎬 วิดีโอสั้น 30 วินาที',
-      '💬 รายงานผล LINE',
-      '📜 ใบรับรองทำบุญ',
-    ],
-    'premium': [
-      '🪷 ชุดไหว้พื้นฐาน',
-      '📸 รูปถ่าย 10 รูป',
-      '🎬 วิดีโอเต็ม 3 นาที',
-      '📡 Live สด (ถ้าพร้อม)',
-      '💬 รายงานผล LINE',
-      '📜 ใบรับรองทำบุญ',
-      '🎁 ของที่ระลึก',
-    ],
-  };
-
-  double get _basePrice => _packagePrices[_selectedPackage] ?? 499;
+  double get _basePrice => _selectedPackageData?.price ?? 0;
 
   double get _addonsPrice {
     double total = 0;
@@ -89,6 +64,42 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   }
 
   double get _totalPrice => _basePrice + _addonsPrice;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefillContactInfo();
+  }
+
+  /// เติมชื่อ/วันเกิดล่วงหน้าจาก (a) บัญชีที่ล็อกอินอยู่ ก่อน (b) ข้อมูล
+  /// onboarding ของ guest — ตามลำดับเดียวกับที่ home_screen ใช้ทักทายผู้ใช้
+  /// เติมเฉพาะตอนฟิลด์ยังว่างเท่านั้น ไม่ทับข้อมูลที่ผู้ใช้พิมพ์เองแล้ว
+  Future<void> _prefillContactInfo() async {
+    try {
+      final user = AuthService.instance.currentUser;
+      final hasAccountName = user?.name.isNotEmpty ?? false;
+      final hasAccountBirthDate = user?.birthDate != null;
+
+      OnboardingData? guestData;
+      if (!hasAccountName || !hasAccountBirthDate) {
+        guestData = await GuestSessionService.instance.loadOnboarding();
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        if (_nameController.text.isEmpty) {
+          final name = hasAccountName ? user!.name : (guestData?.name ?? '');
+          if (name.isNotEmpty) _nameController.text = name;
+        }
+        _birthDate ??=
+            hasAccountBirthDate ? user!.birthDate : guestData?.birthDate;
+      });
+    } catch (e) {
+      // โหลด prefill ไม่สำเร็จ — ปล่อยฟอร์มว่างไว้ ให้ผู้ใช้กรอกเองได้ตามปกติ
+      debugPrint('MeritWeeklyOrderScreen._prefillContactInfo error: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -113,6 +124,14 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Form(
                     key: _formKey,
+                    // Re-validates on every keystroke ONCE a field has been
+                    // submitted/touched — this is what clears a stale error
+                    // (red border + "กรุณาระบุชื่อ") the moment the user fixes
+                    // the field, instead of it persisting until the next
+                    // submit tap (Flutter's FormField only re-validates on
+                    // Form.validate() by default; onUserInteraction makes it
+                    // re-check as the user types/edits).
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -219,16 +238,17 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
   Widget _buildPackageSelector() {
     return Column(
-      children: _packagePrices.keys.map((packageId) {
-        final isSelected = _selectedPackage == packageId;
-        final price = _packagePrices[packageId]!;
-        final name = _packageNames[packageId]!;
-        final features = _packageFeatures[packageId]!;
+      children: _packages.map((package) {
+        final isSelected = _selectedPackage == package.id;
+        // "ยอดนิยม" — เดิม ฿499 (standard) ถูกเลือกไว้ล่วงหน้าโดยอัตโนมัติ
+        // ตอนนี้ไม่มีการเลือกล่วงหน้าแล้ว แต่ยังอยากให้แพ็คนี้ได้รับความสนใจ
+        // อย่างตรงไปตรงมาด้วย badge แทน
+        final isPopular = package.id == 'standard';
 
         return GestureDetector(
           onTap: () {
             setState(() {
-              _selectedPackage = packageId;
+              _selectedPackage = package.id;
             });
           },
           child: Container(
@@ -251,77 +271,111 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isSelected
-                                ? MeritColors.accent.withValues(alpha: 0.16)
-                                : Colors.transparent,
-                            border: Border.all(
-                              color: isSelected
-                                  ? MeritColors.accentDark
-                                  : AppColors.mutedText,
-                              width: 2,
+                        Row(
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected
+                                    ? MeritColors.accent.withValues(alpha: 0.16)
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? MeritColors.accentDark
+                                      : AppColors.mutedText,
+                                  width: 2,
+                                ),
+                              ),
+                              child: isSelected
+                                  ? const Icon(Icons.check, size: 16, color: AppColors.deepText)
+                                  : null,
                             ),
-                          ),
-                          child: isSelected
-                              ? const Icon(Icons.check, size: 16, color: AppColors.deepText)
-                              : null,
+                            const SizedBox(width: 12),
+                            Text(
+                              package.name,
+                              style: const TextStyle(
+                                color: AppColors.deepText,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
                         Text(
-                          name,
-                          style: const TextStyle(
-                            color: AppColors.deepText,
-                            fontSize: 18,
+                          package.priceFormatted,
+                          style: TextStyle(
+                            color: isSelected ? AppColors.deepText : MeritColors.accentDark,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    Text(
-                      '฿${price.toStringAsFixed(0)}',
-                      style: TextStyle(
-                        color: isSelected ? AppColors.deepText : MeritColors.accentDark,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: package.features.map((f) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? MeritColors.accent.withValues(alpha: 0.12)
+                                : AppColors.surfaceMuted,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            f,
+                            style: TextStyle(
+                              color: isSelected ? AppColors.deepText : AppColors.mutedText,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: features.map((f) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                if (isPopular)
+                  Positioned(
+                    top: -4,
+                    right: -4,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? MeritColors.accent.withValues(alpha: 0.12)
-                            : AppColors.surfaceMuted,
-                        borderRadius: BorderRadius.circular(8),
+                        gradient: const LinearGradient(
+                          colors: MeritColors.accentGradient,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: MeritColors.accent.withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: Text(
-                        f,
-                        style: TextStyle(
-                          color: isSelected ? AppColors.deepText : AppColors.mutedText,
-                          fontSize: 12,
+                        'ยอดนิยม',
+                        style: GoogleFonts.kanit(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -488,7 +542,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             controller: _nameController,
             style: const TextStyle(color: AppColors.deepText),
             decoration: _inputDecoration('👤 ชื่อ-นามสกุล ผู้ขอพร'),
-            validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุชื่อ' : null,
+            validator: (v) => (v?.isEmpty ?? true) ? 'กรุณาระบุชื่อ' : null,
           ),
           const SizedBox(height: 16),
 
@@ -540,7 +594,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
             style: const TextStyle(color: AppColors.deepText),
             keyboardType: TextInputType.phone,
             decoration: _inputDecoration('📞 เบอร์โทรศัพท์'),
-            validator: (v) => v?.isEmpty ?? true ? 'กรุณาระบุเบอร์โทร' : null,
+            validator: (v) => (v?.isEmpty ?? true) ? 'กรุณาระบุเบอร์โทร' : null,
+          ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              'ใช้ติดต่อแจ้งผลบุญของคุณเท่านั้น',
+              style: GoogleFonts.kanit(
+                color: AppColors.mutedText,
+                fontSize: 12,
+              ),
+            ),
           ),
         ],
       ),
@@ -588,35 +653,53 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       ),
       child: Column(
         children: [
-          _buildPriceRow('แพ็คเกจ ${_packageNames[_selectedPackage]}', _basePrice),
-          if (_addonsPrice > 0) ...[
-            const SizedBox(height: 8),
-            _buildPriceRow('ของไหว้เพิ่มเติม', _addonsPrice),
-          ],
-          const SizedBox(height: 12),
-          const Divider(color: AppColors.divider),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'ยอดร่วมบุญ',
-                style: TextStyle(
-                  color: AppColors.deepText,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '฿${_totalPrice.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  color: MeritColors.accentDark,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          if (_selectedPackageData != null) ...[
+            _buildPriceRow('แพ็คเกจ ${_selectedPackageData!.name}', _basePrice),
+            if (_addonsPrice > 0) ...[
+              const SizedBox(height: 8),
+              _buildPriceRow('ของไหว้เพิ่มเติม', _addonsPrice),
             ],
-          ),
+            const SizedBox(height: 12),
+            const Divider(color: AppColors.divider),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'ยอดร่วมบุญ',
+                  style: TextStyle(
+                    color: AppColors.deepText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '฿${_totalPrice.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    color: MeritColors.accentDark,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ] else
+            Row(
+              children: [
+                const SvgIcon(AppIcons.info, size: 16, color: AppColors.mutedText),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'ยังไม่ได้เลือกแพ็ค — เลือกด้านบนได้เลย',
+                    style: GoogleFonts.kanit(
+                      color: AppColors.mutedText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -645,46 +728,54 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   }
 
   Widget _buildSubmitButton() {
-    return GestureDetector(
-      onTap: _submitOrder,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: MeritColors.accentGradient,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: MeritColors.accent.withValues(alpha: 0.45),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+    final hasPackage = _selectedPackageData != null;
+    return Opacity(
+      opacity: hasPackage ? 1 : 0.5,
+      child: GestureDetector(
+        onTap: hasPackage ? _submitOrder : null,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: MeritColors.accentGradient,
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SvgIcon(AppIcons.heart, size: 22, color: AppColors.deepText),
-            const SizedBox(width: 10),
-            Text(
-              'ร่วมบุญ ฿${_totalPrice.toStringAsFixed(0)}',
-              style: const TextStyle(
-                color: AppColors.deepText,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: MeritColors.accent.withValues(alpha: 0.45),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SvgIcon(AppIcons.heart, size: 22, color: AppColors.deepText),
+              const SizedBox(width: 10),
+              Text(
+                hasPackage
+                    ? 'ร่วมบุญ ฿${_totalPrice.toStringAsFixed(0)}'
+                    : 'เลือกแพ็คก่อนร่วมบุญ',
+                style: const TextStyle(
+                  color: AppColors.deepText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void _submitOrder() {
+    final selectedPackage = _selectedPackageData;
+    if (selectedPackage == null) return;
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -694,7 +785,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       id: null,
       orderNumber: null,
       locationId: widget.schedule.day.name, // ใช้ day name เป็น location ID ชั่วคราว
-      packageId: _selectedPackage,
+      packageId: selectedPackage.id,
       prayerName: _nameController.text,
       prayerBirthdate: _birthDate,
       prayerWish: _wishController.text.isEmpty ? null : _wishController.text,
@@ -720,15 +811,17 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         sortOrder: 0,
       ),
       package: MeritPackage(
-        id: _selectedPackage,
-        nameTh: _packageNames[_selectedPackage] ?? 'แพ็คเกจ',
+        id: selectedPackage.id,
+        nameTh: selectedPackage.name,
         nameEn: null,
         description: null,
-        items: _packageFeatures[_selectedPackage] ?? [],
-        price: _basePrice,
-        photoCount: _selectedPackage == 'basic' ? 3 : (_selectedPackage == 'standard' ? 5 : 10),
-        hasVideo: _selectedPackage != 'basic',
-        hasLive: _selectedPackage == 'premium',
+        items: selectedPackage.features,
+        price: selectedPackage.price,
+        photoCount: selectedPackage.id == 'basic'
+            ? 3
+            : (selectedPackage.id == 'standard' ? 5 : 10),
+        hasVideo: selectedPackage.id != 'basic',
+        hasLive: selectedPackage.id == 'premium',
         isActive: true,
         sortOrder: 0,
       ),

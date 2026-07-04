@@ -75,6 +75,22 @@ extension MeritDayX on MeritDay {
       orElse: () => MeritDay.monday,
     );
   }
+
+  /// วันที่ของ "รอบถัดไป" ของวันนี้ในสัปดาห์ นับจาก [from] — ถ้าวันนี้ตรงกับ
+  /// [this] ให้ถือว่าวันนี้เองคือรอบถัดไป (ยังทันอยู่) ไม่ใช่รอสัปดาห์หน้า
+  /// มิเช่นนั้นเลื่อนไปวันที่ตรงกันถัดไปในอีก 1-6 วันข้างหน้า
+  ///
+  /// ใช้เป็น single source of truth ทั้งชิปวันที่บนหน้า landing และบรรทัด
+  /// "รอบถัดไป" ในการ์ดรายละเอียด — ไม่ให้ตรรกะวันที่หลุดซิงค์กันระหว่างสองจุด
+  DateTime nextOccurrenceDate({DateTime? from}) {
+    final now = from ?? DateTime.now();
+    final diff = weekdayNumber - now.weekday;
+    final normalizedDiff = diff >= 0 ? diff : diff + 7;
+    // ตัดเวลาออกให้เหลือแค่วันที่ (ปี/เดือน/วัน) กันปัญหาเวลาในวันเดียวกัน
+    // ทำให้ diff คลาดเคลื่อน
+    final today = DateTime(now.year, now.month, now.day);
+    return today.add(Duration(days: normalizedDiff));
+  }
 }
 
 /// ตารางการไปมูประจำสัปดาห์
@@ -202,6 +218,83 @@ class WeeklyMeritSchedule {
       ],
     ),
   ];
+
+  /// ราคาต่ำสุดของแพ็คร่วมบุญที่เลือกได้ในหน้าฟอร์มสั่งจอง (ไม่รวม add-on)
+  /// ใช้แสดง "เริ่มต้น ฿xxx" บนหน้า landing — คำนวณจากชุดข้อมูลเดียวกับที่
+  /// หน้าฟอร์มสั่งจองใช้ ([WeeklyOrderPackage.defaultPackages]) ไม่ hardcode ซ้ำ
+  double get cheapestPackagePrice => WeeklyOrderPackage.cheapestPrice;
+}
+
+/// แพ็คร่วมบุญที่เลือกได้ในหน้าฟอร์มสั่งจองรายสัปดาห์ (ฝากมู · ร่วมบุญ)
+///
+/// Hoisted out of `MeritWeeklyOrderScreen` so both the order form and the
+/// landing screen (`WeeklyScheduleScreen`, for the "เริ่มต้น ฿xxx" price
+/// pill) read from one source of truth instead of two hardcoded copies.
+class WeeklyOrderPackage {
+  final String id;
+  final String name;
+  final double price;
+  final List<String> features;
+
+  const WeeklyOrderPackage({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.features,
+  });
+
+  String get priceFormatted => '฿${price.toStringAsFixed(0)}';
+
+  static const List<WeeklyOrderPackage> defaultPackages = [
+    WeeklyOrderPackage(
+      id: 'basic',
+      name: '🙏 แพ็คมงคล',
+      price: 299,
+      features: [
+        '🪷 ชุดไหว้พื้นฐาน',
+        '📸 รูปถ่าย 3 รูป',
+        '💬 รายงานผล LINE',
+      ],
+    ),
+    WeeklyOrderPackage(
+      id: 'standard',
+      name: '⭐ แพ็คเสริมดวง',
+      price: 499,
+      features: [
+        '🪷 ชุดไหว้พื้นฐาน',
+        '📸 รูปถ่าย 5 รูป',
+        '🎬 วิดีโอสั้น 30 วินาที',
+        '💬 รายงานผล LINE',
+        '📜 ใบรับรองทำบุญ',
+      ],
+    ),
+    WeeklyOrderPackage(
+      id: 'premium',
+      name: '👑 แพ็คพรีเมียม',
+      price: 799,
+      features: [
+        '🪷 ชุดไหว้พื้นฐาน',
+        '📸 รูปถ่าย 10 รูป',
+        '🎬 วิดีโอเต็ม 3 นาที',
+        '📡 Live สด (ถ้าพร้อม)',
+        '💬 รายงานผล LINE',
+        '📜 ใบรับรองทำบุญ',
+        '🎁 ของที่ระลึก',
+      ],
+    ),
+  ];
+
+  /// ราคาต่ำสุดในชุดแพ็คทั้งหมด — ใช้แสดง "เริ่มต้น ฿xxx" ก่อนเข้าฟอร์ม
+  static double get cheapestPrice =>
+      defaultPackages.map((p) => p.price).reduce((a, b) => a < b ? a : b);
+
+  /// หาแพ็คด้วย id — คืนค่า null ถ้าไม่พบ (กันการ throw เวลาข้อมูลไม่ตรง)
+  static WeeklyOrderPackage? byId(String id) {
+    for (final p in defaultPackages) {
+      if (p.id == id) return p;
+    }
+    return null;
+  }
 }
 
 /// รายการของไหว้
