@@ -107,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen>
   int _faithStreak = 0;
   int _faithDailyDone = 0; // ภารกิจวันนี้ 0-3 (เช็คดวง/ถาม AI/เปิดไพ่)
   Set<String> _faithClaimed = const {};
+  bool _faithHasMeritOrder = false;
 
   // ── Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่องหลังเข้า Home
   // ครั้งแรก: ดวงรายวัน → ปุ่มทำบุญ → แท็บสนทนา → แท็บโปรไฟล์
@@ -166,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen>
         _faithStreak = state.streak;
         _faithDailyDone = dailyDone;
         _faithClaimed = state.claimedMilestoneIds;
+        _faithHasMeritOrder = state.hasMeritOrder;
       });
       if (result.isNewDay && !_tourStartedThisSession) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -497,7 +499,13 @@ class _HomeScreenState extends State<HomeScreen>
   /// รางวัลมา)
   Widget _buildQuestStrip() {
     final next = faithNextMilestone(_faithClaimed);
-    final claimable = next != null && _faithPoints >= next.points;
+    // แต้มถึงแต่ติดเงื่อนไข "ต้องเคยฝากมู" → ชวนไปฝากมูแทนคำว่าพร้อมรับ
+    final meritLocked = next != null &&
+        next.requiresMeritOrder &&
+        !_faithHasMeritOrder &&
+        _faithPoints >= next.points;
+    final claimable =
+        next != null && _faithPoints >= next.points && !meritLocked;
     final progress = next == null
         ? 1.0
         : faithSegmentProgress(points: _faithPoints, next: next);
@@ -573,15 +581,19 @@ class _HomeScreenState extends State<HomeScreen>
                   ? 'Level 2 · ${faithLevelName(2)} — รับรางวัลครบแล้ว ✓'
                   : claimable
                       ? '🎁 รางวัลพร้อมรับ — ${next.emoji} ${next.title}'
-                      : 'อีก ${next.points - _faithPoints} ✦ → '
-                          '${next.emoji} ${next.title}',
+                      : meritLocked
+                          ? '🏛️ ฝากมู 1 ครั้ง → ปลดล็อก ${next.emoji} '
+                              '${next.title}'
+                          : 'อีก ${next.points - _faithPoints} ✦ → '
+                              '${next.emoji} ${next.title}',
               style: GoogleFonts.kanit(
-                color: claimable
+                color: (claimable || meritLocked)
                     ? AppColors.candleGold
                     : AppColors.onBackdropMuted,
                 fontSize: 12,
-                fontWeight:
-                    claimable ? FontWeight.w600 : FontWeight.w400,
+                fontWeight: (claimable || meritLocked)
+                    ? FontWeight.w600
+                    : FontWeight.w400,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

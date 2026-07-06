@@ -66,6 +66,7 @@ class StorageConstants {
   static const String faithClaimedMilestones = 'faith_claimed_milestones';
   static const String faithActivityPrefix = 'faith_activity_';
   static const String faithCouponExpiry = 'faith_coupon_expiry';
+  static const String faithHasMeritOrder = 'faith_has_merit_order';
 }
 
 // ค่าคงที่สำหรับราศี

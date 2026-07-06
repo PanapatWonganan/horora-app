@@ -10,10 +10,14 @@ class FaithState {
   final int streak;
   final Set<String> claimedMilestoneIds;
 
+  /// เคยฝากมูจริงอย่างน้อย 1 ครั้ง (ปลดล็อกรางวัลกลุ่มวอลเปเปอร์)
+  final bool hasMeritOrder;
+
   const FaithState({
     required this.points,
     required this.streak,
     required this.claimedMilestoneIds,
+    this.hasMeritOrder = false,
   });
 
   int get level => faithLevelForPoints(points);
@@ -37,6 +41,8 @@ class FaithPointsService {
       claimedMilestoneIds:
           (prefs.getStringList(StorageConstants.faithClaimedMilestones) ?? [])
               .toSet(),
+      hasMeritOrder:
+          prefs.getBool(StorageConstants.faithHasMeritOrder) ?? false,
     );
   }
 
@@ -99,6 +105,8 @@ class FaithPointsService {
         StorageConstants.faithPoints,
         (prefs.getInt(StorageConstants.faithPoints) ?? 0) + kFaithMeritPoints,
       );
+      // ปลดล็อกเงื่อนไข "เคยฝากมูแล้ว" ของรางวัลกลุ่มวอลเปเปอร์
+      await prefs.setBool(StorageConstants.faithHasMeritOrder, true);
       return kFaithMeritPoints;
     } catch (e) {
       debugPrint('FaithPointsService.awardMeritOrder error: $e');

@@ -60,6 +60,11 @@ class FaithMilestone {
   /// รางวัลที่ต้องเป็นสมาชิก Premium ถึงจะรับได้ (แสดง 👑 บนเส้นทาง)
   final bool premiumOnly;
 
+  /// รางวัลที่ต้อง "เคยฝากมูจริงอย่างน้อย 1 ครั้ง" ถึงปลดล็อก — แต้มถึง
+  /// อย่างเดียวไม่พอ (ทำให้วอลเปเปอร์เป็นของที่ตามหลังออเดอร์เสมอ →
+  /// เส้นทางรางวัลทำหน้าที่ upsell ไม่ใช่ของแจกง่าย)
+  final bool requiresMeritOrder;
+
   const FaithMilestone({
     required this.id,
     required this.points,
@@ -68,22 +73,16 @@ class FaithMilestone {
     required this.description,
     required this.reward,
     this.premiumOnly = false,
+    this.requiresMeritOrder = false,
   });
 
-  /// เส้นทาง Level 1 → 2 — สลับรางวัลใจ (spiritual) กับรางวัลขาย
-  /// (commercial) เพื่อไม่ให้เส้นทางรู้สึกเป็นแค่คูปองลดราคา
+  /// เส้นทาง Level 1 → 2 — รางวัลใจ (spiritual) มาก่อน, คูปองมาก่อน
+  /// วอลเปเปอร์เพื่อเร่ง "ออเดอร์แรก" (+50 ✦ จากฝากมูคือทางลัดสู่ 150)
+  /// และของพรีเมียม (วอลเปเปอร์) อยู่ท้ายเส้นทาง ผูกกับการฝากมูจริง
   static const List<FaithMilestone> defaults = [
     FaithMilestone(
-      id: 'wallpaper_teaser',
-      points: 30,
-      emoji: '🖼️',
-      title: 'วอลเปเปอร์มงคล 1 ภาพ',
-      description: 'ภาพตัวอย่างจากคอลเลคชั่นมงคล มูลค่า ฿199 — รับผ่าน LINE',
-      reward: FaithRewardType.wallpaperTeaser,
-    ),
-    FaithMilestone(
       id: 'lucky_numbers',
-      points: 70,
+      points: 30,
       emoji: '🔢',
       title: 'เลขนำโชค + บทสวดเฉพาะคุณ',
       description: 'เลขมงคลประจำสัปดาห์และบทสวดเสริมดวงตามวันเกิดของคุณ',
@@ -91,11 +90,21 @@ class FaithMilestone {
     ),
     FaithMilestone(
       id: 'merit_coupon',
-      points: 120,
+      points: 70,
       emoji: '🎟️',
       title: 'ส่วนลดฝากมู ฿30',
       description: 'ใช้ได้กับทุกแพ็คภายใน 14 วันหลังกดรับ',
       reward: FaithRewardType.meritCoupon,
+    ),
+    FaithMilestone(
+      id: 'wallpaper_teaser',
+      points: 150,
+      emoji: '🖼️',
+      title: 'วอลเปเปอร์มงคล 1 ภาพ',
+      description: 'ภาพจากคอลเลคชั่นมงคล มูลค่า ฿199 — ปลดล็อกเมื่อเคย'
+          'ฝากมูอย่างน้อย 1 ครั้ง',
+      reward: FaithRewardType.wallpaperTeaser,
+      requiresMeritOrder: true,
     ),
     FaithMilestone(
       id: 'level2_box',
@@ -109,16 +118,27 @@ class FaithMilestone {
   ];
 }
 
-enum FaithMilestoneState { locked, claimable, claimed }
+enum FaithMilestoneState {
+  locked,
+
+  /// แต้มถึงแล้ว แต่ติดเงื่อนไข "ต้องเคยฝากมู" — โชว์ CTA พาไปฝากมูแทน
+  lockedNeedsMerit,
+  claimable,
+  claimed,
+}
 
 FaithMilestoneState faithMilestoneState({
   required FaithMilestone milestone,
   required int points,
   required Set<String> claimedIds,
+  bool hasMeritOrder = false,
 }) {
   if (claimedIds.contains(milestone.id)) return FaithMilestoneState.claimed;
-  if (points >= milestone.points) return FaithMilestoneState.claimable;
-  return FaithMilestoneState.locked;
+  if (points < milestone.points) return FaithMilestoneState.locked;
+  if (milestone.requiresMeritOrder && !hasMeritOrder) {
+    return FaithMilestoneState.lockedNeedsMerit;
+  }
+  return FaithMilestoneState.claimable;
 }
 
 // ── Check-in (pure) ──────────────────────────────────────────────────────────

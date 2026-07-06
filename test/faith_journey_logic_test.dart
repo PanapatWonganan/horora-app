@@ -108,6 +108,32 @@ void main() {
       );
     });
 
+    test('wallpaper teaser requires a real merit order, not just points', () {
+      final teaser = FaithMilestone.defaults
+          .firstWhere((m) => m.id == 'wallpaper_teaser');
+      // แต้มถึงแต่ยังไม่เคยฝากมู → ติดล็อกเงื่อนไข (จุด upsell)
+      expect(
+        faithMilestoneState(
+            milestone: teaser, points: 999, claimedIds: {}),
+        FaithMilestoneState.lockedNeedsMerit,
+      );
+      // ฝากมูแล้ว → รับได้
+      expect(
+        faithMilestoneState(
+            milestone: teaser,
+            points: teaser.points,
+            claimedIds: {},
+            hasMeritOrder: true),
+        FaithMilestoneState.claimable,
+      );
+      // แต้มไม่ถึง → locked ปกติ (ยังไม่ต้องพูดเรื่องเงื่อนไข)
+      expect(
+        faithMilestoneState(
+            milestone: teaser, points: 0, claimedIds: {}),
+        FaithMilestoneState.locked,
+      );
+    });
+
     test('milestones are sorted ascending and end at the Level 2 box', () {
       final pts = FaithMilestone.defaults.map((m) => m.points).toList();
       final sorted = [...pts]..sort();
@@ -146,10 +172,10 @@ void main() {
 
   group('home quest strip', () {
     test('next milestone is the first unclaimed one, even if reachable', () {
-      expect(faithNextMilestone({})!.id, 'wallpaper_teaser');
-      expect(faithNextMilestone({'wallpaper_teaser'})!.id, 'lucky_numbers');
+      expect(faithNextMilestone({})!.id, 'lucky_numbers');
+      expect(faithNextMilestone({'lucky_numbers'})!.id, 'merit_coupon');
       // ข้ามรับอันกลาง — อันแรกที่ยังไม่รับยังเป็น "ถัดไป"
-      expect(faithNextMilestone({'lucky_numbers'})!.id, 'wallpaper_teaser');
+      expect(faithNextMilestone({'merit_coupon'})!.id, 'lucky_numbers');
       expect(
         faithNextMilestone({
           'wallpaper_teaser',

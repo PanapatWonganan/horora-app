@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/constants.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -444,6 +445,7 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
       milestone: m,
       points: state.points,
       claimedIds: state.claimedMilestoneIds,
+      hasMeritOrder: state.hasMeritOrder,
     );
     final isLocked = status == FaithMilestoneState.locked;
 
@@ -558,13 +560,42 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
                   const SizedBox(height: 10),
                   switch (status) {
                     FaithMilestoneState.locked => Text(
-                        'อีก ${m.points - state.points} ✦ ปลดล็อก '
-                        '(${m.points} ✦)',
+                        m.requiresMeritOrder && !state.hasMeritOrder
+                            ? 'อีก ${m.points - state.points} ✦ '
+                                '+ ฝากมู 1 ครั้ง ปลดล็อก'
+                            : 'อีก ${m.points - state.points} ✦ ปลดล็อก '
+                                '(${m.points} ✦)',
                         style: GoogleFonts.kanit(
                           color: AppColors.onBackdropMuted,
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                         ),
+                      ),
+                    // แต้มถึงแล้วแต่ยังไม่เคยฝากมู — จุด upsell ของเส้นทาง:
+                    // พาไปหน้าฝากมูตรงๆ (ออเดอร์แรกได้ +50 ✦ ด้วย)
+                    FaithMilestoneState.lockedNeedsMerit => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'แต้มถึงแล้ว — ฝากมูอย่างน้อย 1 ครั้ง'
+                            'เพื่อปลดล็อกรางวัลนี้',
+                            style: GoogleFonts.kanit(
+                              color: AppColors.deepGoldBrown,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            child: SacredPrimaryButton(
+                              label: 'ไปฝากมู · ร่วมบุญ',
+                              filled: true,
+                              onTap: () => Navigator.pushNamed(
+                                  context, AppRoutes.merit),
+                            ),
+                          ),
+                        ],
                       ),
                     FaithMilestoneState.claimable => SizedBox(
                         width: double.infinity,
