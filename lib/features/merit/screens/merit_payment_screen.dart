@@ -11,6 +11,7 @@ import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
+import '../../journey/services/faith_points_service.dart';
 import '../services/merit_service.dart';
 import '../widgets/merit_ui.dart';
 import 'merit_order_status_screen.dart';
@@ -90,6 +91,8 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
         _orderCreated = true;
         _isCreatingOrder = false;
       });
+      // พลังศรัทธา: ฝากมูสำเร็จ +50 (fire-and-forget)
+      FaithPointsService.instance.awardMeritOrder();
     } catch (e) {
       debugPrint('Error creating order: $e');
       setState(() => _isCreatingOrder = false);

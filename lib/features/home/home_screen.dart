@@ -15,6 +15,7 @@ import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/guest_session_service.dart';
 import '../../core/utils/app_icons.dart';
+import '../journey/services/faith_points_service.dart';
 import '../merit/models/merit_models.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import 'widgets/daily_horoscope_card.dart';
@@ -99,8 +100,14 @@ class _HomeScreenState extends State<HomeScreen>
   static const String _gentleOfferDismissedAtKey = 'gentle_offer_dismissed_at';
   static const int _gentleOfferDismissDays = 14;
 
+  // ── เส้นทางสายมู: chip พลังศรัทธา ✦ + เช็คอินรายวันอัตโนมัติ
+  // (Home คือหน้าดวงประจำวัน — เปิดครั้งแรกของวัน = เช็คอิน)
+  int _faithPoints = 0;
+  int _faithStreak = 0;
+
   // ── Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่องหลังเข้า Home
   // ครั้งแรก: ดวงรายวัน → ปุ่มทำบุญ → แท็บสนทนา → แท็บโปรไฟล์
+  bool _tourStartedThisSession = false;
   late final ShowcaseView _showcaseView;
   final GlobalKey _scDailyReading = GlobalKey();
   final GlobalKey _scMeritTab = GlobalKey();
@@ -132,10 +139,42 @@ class _HomeScreenState extends State<HomeScreen>
       onDismiss: (key) => debugPrint('HOME_TOUR onDismiss'),
       onFinish: () => debugPrint('HOME_TOUR onFinish'),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _maybeStartShowcase();
+      // เช็คอินหลังตัดสินใจเรื่อง tour แล้ว — วันแรกที่มี tour จะเก็บแต้ม
+      // เงียบๆ ไม่เด้ง snackbar ทับ overlay
+      await _runFaithCheckin();
+    });
 
     // No automatic commercial popup on Home startup. A calm, dismissible offer
     // card lives in-page instead (see [_buildGentleOffer]).
+  }
+
+  /// เช็คอินรายวัน + โหลดตัวเลขขึ้น chip — feedback เป็น snackbar เบาๆ
+  /// เฉพาะวันที่ได้แต้มจริงและไม่มี tour ทับอยู่
+  Future<void> _runFaithCheckin() async {
+    try {
+      final result = await FaithPointsService.instance.dailyCheckin();
+      final state = await FaithPointsService.instance.loadState();
+      if (!mounted) return;
+      setState(() {
+        _faithPoints = state.points;
+        _faithStreak = state.streak;
+      });
+      if (result.isNewDay && !_tourStartedThisSession) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '☀️ เช็คอินวันนี้ +${result.pointsEarned} ✦ · '
+              'ต่อเนื่อง ${result.newStreak} วัน',
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('HomeScreen._runFaithCheckin error: $e');
+    }
   }
 
   /// เริ่ม feature tour เฉพาะครั้งแรกของเครื่อง — บันทึกว่า "เห็นแล้ว"
@@ -147,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen>
       if (prefs.getBool(StorageConstants.homeShowcaseSeen) ?? false) return;
       await prefs.setBool(StorageConstants.homeShowcaseSeen, true);
       if (!mounted) return;
+      _tourStartedThisSession = true;
       _showcaseView.startShowCase(
         [_scDailyReading, _scMeritTab, _scChatTab, _scProfileTab],
         delay: const Duration(milliseconds: 900),
@@ -497,6 +537,51 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 10),
+              // Chip พลังศรัทธา — value ไม่ใช่ ask: ทางเข้า "เส้นทางสายมู"
+              GestureDetector(
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRoutes.faithJourney),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.ivorySilk.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color:
+                          AppColors.candleGold.withValues(alpha: 0.45),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '✦ $_faithPoints',
+                        style: GoogleFonts.kanit(
+                          color: AppColors.candleGold,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (_faithStreak > 0) ...[
+                        Text(
+                          '  ·  🔥 $_faithStreak วันติด',
+                          style: GoogleFonts.kanit(
+                            color: AppColors.onBackdrop,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right,
+                          color: AppColors.onBackdropMuted, size: 16),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

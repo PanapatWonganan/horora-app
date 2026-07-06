@@ -6,6 +6,7 @@ import '../../core/theme/sacred_ui.dart';
 import '../../core/routes/routes.dart';
 import '../../core/services/auth_guard.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
+import '../journey/services/faith_points_service.dart';
 import 'viewmodels/chat_viewmodel.dart';
 import 'widgets/chat_empty_state.dart';
 import 'widgets/chat_message_item.dart';
@@ -178,6 +179,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     return ChatEmptyState(
                       onQuestionTap: (question) {
                         viewModel.sendMessage(question);
+                        // พลังศรัทธา: ถาม AI วันละครั้ง (fire-and-forget)
+                        FaithPointsService.instance
+                            .awardDailyActivity('ai_chat');
                       },
                     );
                   }
@@ -228,6 +232,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 return ChatInput(
                   onSendMessage: (message) {
                     viewModel.sendMessage(message);
+                    // พลังศรัทธา: ถาม AI วันละครั้ง (fire-and-forget)
+                    FaithPointsService.instance.awardDailyActivity('ai_chat');
                   },
                   isTyping: viewModel.isTyping,
                 );

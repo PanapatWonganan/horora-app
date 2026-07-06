@@ -13,6 +13,7 @@ import '../../../core/utils/app_icons.dart';
 import '../../../core/widgets/sacred_showcase.dart';
 import '../../onboarding/models/onboarding_models.dart';
 import '../models/merit_models.dart';
+import '../../journey/services/faith_points_service.dart';
 import '../services/merit_service.dart';
 import '../widgets/merit_ui.dart';
 import 'merit_order_status_screen.dart';
@@ -1032,6 +1033,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       // mark สิทธิ์หลังสร้างสำเร็จเท่านั้น — สร้างพลาดยังกลับมาใช้สิทธิ์ได้
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(StorageConstants.freeMeritUsed, true);
+      // พลังศรัทธา: ฝากมูสำเร็จ +50 (รวมมูฟรีครั้งแรก)
+      await FaithPointsService.instance.awardMeritOrder();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

@@ -29,6 +29,9 @@ import '../../features/settings/notifications_screen.dart';
 import '../../features/settings/language_screen.dart';
 import '../../features/settings/help_support_screen.dart';
 import '../../features/settings/about_app_screen.dart';
+// Import journey screen (เส้นทางสายมู)
+import '../../features/journey/screens/faith_journey_screen.dart';
+
 // Import merit screens
 import '../../features/merit/screens/weekly_schedule_screen.dart';
 import '../../features/merit/screens/merit_history_screen.dart';
@@ -162,6 +165,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const HelpSupportScreen());
       case AppRoutes.about:
         return MaterialPageRoute(builder: (_) => const AboutAppScreen());
+
+      // เส้นทางสายมู (retention journey)
+      case AppRoutes.faithJourney:
+        return MaterialPageRoute(builder: (_) => const FaithJourneyScreen());
 
       // Merit Screens (ทำบุญออนไลน์)
       case AppRoutes.merit:

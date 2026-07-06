@@ -67,6 +67,9 @@ class AppRoutes {
   static const String meritHistory = '/merit/history';
   static const String meritOrderStatus = '/merit/status';
 
+  // เส้นทางสายมู (retention journey)
+  static const String faithJourney = '/faith-journey';
+
   // Affiliate (ระบบตัวแทน)
   static const String affiliateDashboard = '/affiliate';
   static const String affiliateRegister = '/affiliate/register';

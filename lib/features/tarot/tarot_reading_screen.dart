@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../journey/services/faith_points_service.dart';
 
 import '../../core/models/tarot_card_model.dart';
 import '../../core/utils/simple_markdown.dart';
@@ -491,6 +492,9 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
       // บันทึก action สำเร็จ และเช็คว่าควรขอ rating หรือไม่
       RatingService.instance.onSuccessfulAction();
+
+      // พลังศรัทธา: เปิดไพ่สำเร็จ วันละครั้ง (fire-and-forget)
+      FaithPointsService.instance.awardDailyActivity('tarot');
 
       // บันทึกการอ่าน
       _saveTarotReading({
