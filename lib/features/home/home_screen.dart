@@ -15,6 +15,7 @@ import '../../core/theme/celestial_effects.dart';
 import '../../core/services/analytics_service.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/guest_session_service.dart';
+import '../../core/services/local_reminder_service.dart';
 import '../../core/utils/app_icons.dart';
 import '../journey/models/faith_models.dart';
 import '../journey/services/faith_points_service.dart';
@@ -178,6 +179,13 @@ class _HomeScreenState extends State<HomeScreen>
           'points': result.pointsEarned,
         });
       }
+      // ตั้งเตือนเช็คอินครั้งถัดไป (พรุ่งนี้ 19:00) — เปิดแอปวันนี้ =
+      // เช็คอินแล้วเสมอ (checkin อัตโนมัติด้านบน) fire-and-forget:
+      // schedule พลาดห้ามกระทบ UI
+      LocalReminderService.instance.scheduleDailyCheckinReminder(
+        streak: state.streak,
+        checkedInToday: true,
+      );
       if (result.isNewDay && !_tourStartedThisSession) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

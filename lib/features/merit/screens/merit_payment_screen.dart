@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../config/constants.dart';
 import '../../../core/services/analytics_service.dart';
+import '../../../core/services/local_reminder_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
@@ -99,6 +100,8 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
       });
       // พลังศรัทธา: ฝากมูสำเร็จ +50 (fire-and-forget)
       FaithPointsService.instance.awardMeritOrder();
+      // ออเดอร์สร้างสำเร็จแล้ว — ยกเลิกเตือนออเดอร์ค้าง 24 ชม.
+      LocalReminderService.instance.cancelAbandonedOrderReminder();
     } catch (e) {
       debugPrint('Error creating order: $e');
       setState(() => _isCreatingOrder = false);

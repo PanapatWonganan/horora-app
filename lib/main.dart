@@ -6,6 +6,7 @@ import 'app.dart';
 import 'core/repositories/horoscope_repository.dart';
 import 'core/api/api_client.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/local_reminder_service.dart';
 import 'core/services/laravel_auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/constants.dart';
@@ -46,6 +47,14 @@ void main() async {
     await NotificationService().initialize();
   } catch (e) {
     debugPrint('Warning: Notifications not initialized: $e');
+  }
+
+  // Initialize Local Reminders (เตือนเช็คอิน 19:00 + ออเดอร์ค้าง 24 ชม.)
+  // ต้องมาหลัง OneSignal เพราะพึ่ง permission prompt ของ OneSignal
+  try {
+    await LocalReminderService.instance.initialize();
+  } catch (e) {
+    debugPrint('Warning: Local reminders not initialized: $e');
   }
 
   runApp(const AstrologyApp());

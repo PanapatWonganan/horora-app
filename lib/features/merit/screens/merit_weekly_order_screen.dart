@@ -7,6 +7,7 @@ import '../../../config/constants.dart';
 import '../../../core/services/analytics_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
+import '../../../core/services/local_reminder_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
@@ -155,6 +156,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
     AnalyticsService.instance.log('merit_order_view');
     _prefillContactInfo();
     _loadFreeTrialEligibility();
+    // เข้าหน้าเลือกแพ็ค = intent สูง — ตั้งเตือนออเดอร์ค้างอีก 24 ชม.
+    // (จะถูก cancel เมื่อสร้างออเดอร์สำเร็จ ทั้ง path ฟรีและจ่ายเงิน)
+    LocalReminderService.instance.scheduleAbandonedOrderReminder();
 
     _showcaseView = ShowcaseView.register(
       scope: SacredShowcase.meritOrderScope,
@@ -1044,6 +1048,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       await prefs.setBool(StorageConstants.freeMeritUsed, true);
       // พลังศรัทธา: ฝากมูสำเร็จ +50 (รวมมูฟรีครั้งแรก)
       await FaithPointsService.instance.awardMeritOrder();
+      // ออเดอร์สำเร็จแล้ว — ไม่ต้องเตือนออเดอร์ค้างอีก
+      LocalReminderService.instance.cancelAbandonedOrderReminder();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
