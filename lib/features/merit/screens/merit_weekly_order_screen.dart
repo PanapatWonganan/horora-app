@@ -13,7 +13,9 @@ import '../../../core/utils/app_icons.dart';
 import '../../../core/widgets/sacred_showcase.dart';
 import '../../onboarding/models/onboarding_models.dart';
 import '../models/merit_models.dart';
+import '../services/merit_service.dart';
 import '../widgets/merit_ui.dart';
+import 'merit_order_status_screen.dart';
 import 'merit_payment_screen.dart';
 
 /// Cap on คำอธิษฐาน (wish) input length — mirrors [MeritWishInput]'s default
@@ -107,6 +109,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   static const List<WeeklyOrderPackage> _packages =
       WeeklyOrderPackage.defaultPackages;
 
+  // สิทธิ์ "มูฟรีครั้งแรก" — โหลดจาก prefs ตอนเปิดหน้า ถ้ายังไม่เคยใช้
+  // จะแทรกการ์ดแพ็คฟรีไว้บนสุดของตัวเลือก
+  bool _freeTrialEligible = false;
+  bool _isSubmittingFree = false;
+
+  List<WeeklyOrderPackage> get _visiblePackages => _freeTrialEligible
+      ? const [WeeklyOrderPackage.freeTrial, ...WeeklyOrderPackage.defaultPackages]
+      : _packages;
+
+  bool get _isFreeSelected =>
+      _selectedPackage == WeeklyOrderPackage.freeTrial.id;
+
   // Tour หน้านี้ (ครั้งแรกเท่านั้น) 2 step: เลือกชุดร่วมบุญ → กรอกชื่อ
   // ผู้ขอพร — พาผู้ใช้ไล่จากเลือกแพ็คลงไปถึงฟอร์มกรอกข้อมูลเลย
   late final ShowcaseView _showcaseView;
@@ -137,6 +151,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   void initState() {
     super.initState();
     _prefillContactInfo();
+    _loadFreeTrialEligibility();
 
     _showcaseView = ShowcaseView.register(
       scope: SacredShowcase.meritOrderScope,
@@ -164,6 +179,18 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       );
     } catch (e) {
       debugPrint('MeritWeeklyOrderScreen._maybeStartShowcase error: $e');
+    }
+  }
+
+  /// เช็คสิทธิ์มูฟรีครั้งแรกจากเครื่อง — ผิดพลาดถือว่าไม่มีสิทธิ์ (ปลอดภัย
+  /// กว่าแจกสิทธิ์ซ้ำ)
+  Future<void> _loadFreeTrialEligibility() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final used = prefs.getBool(StorageConstants.freeMeritUsed) ?? false;
+      if (mounted && !used) setState(() => _freeTrialEligible = true);
+    } catch (e) {
+      debugPrint('MeritWeeklyOrderScreen._loadFreeTrialEligibility error: $e');
     }
   }
 
@@ -253,11 +280,14 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                         _buildPackageSelector(),
                         const SizedBox(height: 24),
 
-                        // Add-ons
-                        _buildSectionTitle('✨ เพิ่มของถวายพิเศษ'),
-                        const SizedBox(height: 12),
-                        _buildAddonsSelector(),
-                        const SizedBox(height: 24),
+                        // Add-ons — ซ่อนเมื่อเลือกแพ็คฟรี (สิทธิ์ฟรีคือ
+                        // ไหว้ + รูป 1 ใบเท่านั้น ไม่มีของถวายเพิ่ม)
+                        if (!_isFreeSelected) ...[
+                          _buildSectionTitle('✨ เพิ่มของถวายพิเศษ'),
+                          const SizedBox(height: 12),
+                          _buildAddonsSelector(),
+                          const SizedBox(height: 24),
+                        ],
 
                         // Form Fields
                         _buildSectionTitle('🙏 ข้อมูลผู้ร่วมบุญ'),
@@ -342,17 +372,20 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
   Widget _buildPackageSelector() {
     return Column(
-      children: _packages.map((package) {
+      children: _visiblePackages.map((package) {
         final isSelected = _selectedPackage == package.id;
         // "ยอดนิยม" — เดิม ฿499 (standard) ถูกเลือกไว้ล่วงหน้าโดยอัตโนมัติ
         // ตอนนี้ไม่มีการเลือกล่วงหน้าแล้ว แต่ยังอยากให้แพ็คนี้ได้รับความสนใจ
         // อย่างตรงไปตรงมาด้วย badge แทน
         final isPopular = package.id == 'standard';
+        final isFree = package.id == WeeklyOrderPackage.freeTrial.id;
 
         final card = GestureDetector(
           onTap: () {
             setState(() {
               _selectedPackage = package.id;
+              // แพ็คฟรีไม่รวม add-on (ของถวายมีต้นทุน) — ล้างที่เลือกไว้
+              if (isFree) _selectedAddons.clear();
             });
           },
           child: Container(
@@ -420,6 +453,27 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                                   ),
                                 ),
                               ),
+                              // Badge "ครั้งแรกเท่านั้น" ของแพ็คฟรี —
+                              // สไตล์เดียวกับ ยอดนิยม แต่โทนเขียวไว้วางใจ
+                              if (isFree) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4C7A5A),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    'ครั้งแรกเท่านั้น',
+                                    style: GoogleFonts.kanit(
+                                      color: Colors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
                               // "ยอดนิยม" sits inline next to the name — an
                               // overlay at the card corner covered the price.
                               if (isPopular) ...[
@@ -447,11 +501,13 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
                           ),
                         ),
                         Text(
-                          package.priceFormatted,
+                          isFree ? 'ฟรี' : package.priceFormatted,
                           style: TextStyle(
-                            color: isSelected
-                                ? AppColors.deepText
-                                : MeritColors.accentDark,
+                            color: isFree
+                                ? const Color(0xFF4C7A5A)
+                                : (isSelected
+                                    ? AppColors.deepText
+                                    : MeritColors.accentDark),
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -491,8 +547,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           ),
         );
 
-        // การ์ดใบแรกเป็นเป้าของ step 1 "เลือกชุดร่วมบุญ" (ครั้งแรกเท่านั้น)
-        if (package.id != _packages.first.id) return card;
+        // การ์ดใบแรกที่มองเห็นเป็นเป้าของ step 1 "เลือกชุดร่วมบุญ"
+        // (ครั้งแรกเท่านั้น — ถ้ามีสิทธิ์มูฟรี การ์ดฟรีคือใบแรก)
+        if (package.id != _visiblePackages.first.id) return card;
         return SacredShowcase.wrap(
           showcaseKey: _scFirstPackage,
           scope: SacredShowcase.meritOrderScope,
@@ -943,7 +1000,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               const SizedBox(width: 10),
               Text(
                 hasPackage
-                    ? 'ร่วมบุญ ฿${_totalPrice.toStringAsFixed(0)}'
+                    ? (_isFreeSelected
+                        ? (_isSubmittingFree
+                            ? 'กำลังส่งคำขอ...'
+                            : 'รับสิทธิ์มูฟรีครั้งแรก')
+                        : 'ร่วมบุญ ฿${_totalPrice.toStringAsFixed(0)}')
                     : 'เลือกแพ็คก่อนร่วมบุญ',
                 style: const TextStyle(
                   color: AppColors.deepText,
@@ -956,6 +1017,47 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         ),
       ),
     );
+  }
+
+  /// ส่งคำสั่ง "มูฟรีครั้งแรก": สร้างออเดอร์ ฿0 ทันที (ไม่ผ่านหน้าชำระเงิน)
+  /// สำเร็จแล้ว mark สิทธิ์ว่าใช้แล้ว + พาไปหน้าสถานะคำสั่งบุญ
+  Future<void> _submitFreeOrder(MeritOrder order) async {
+    if (_isSubmittingFree) return;
+    setState(() => _isSubmittingFree = true);
+    try {
+      final created = await MeritService.instance.createWeeklyOrder(order);
+      if (created == null) {
+        throw Exception('ไม่ได้รับข้อมูลคำสั่งบุญจากระบบ');
+      }
+      // mark สิทธิ์หลังสร้างสำเร็จเท่านั้น — สร้างพลาดยังกลับมาใช้สิทธิ์ได้
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(StorageConstants.freeMeritUsed, true);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'รับสิทธิ์มูฟรีแล้ว 🙏 ทีมงานจะไหว้ให้และส่งรูปยืนยันถึงคุณ'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MeritOrderStatusScreen(order: created),
+        ),
+      );
+    } catch (e) {
+      debugPrint('MeritWeeklyOrderScreen._submitFreeOrder error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('ส่งคำขอไม่สำเร็จ ลองใหม่อีกครั้งนะคะ ($e)'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmittingFree = false);
+    }
   }
 
   void _submitOrder() {
@@ -1006,15 +1108,26 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         description: null,
         items: selectedPackage.features,
         price: selectedPackage.price,
-        photoCount: selectedPackage.id == 'basic'
-            ? 3
-            : (selectedPackage.id == 'standard' ? 5 : 10),
-        hasVideo: selectedPackage.id != 'basic',
+        photoCount: switch (selectedPackage.id) {
+          'free_trial' => 1,
+          'basic' => 3,
+          'standard' => 5,
+          _ => 10,
+        },
+        hasVideo: selectedPackage.id == 'standard' ||
+            selectedPackage.id == 'premium',
         hasLive: selectedPackage.id == 'premium',
         isActive: true,
         sortOrder: 0,
       ),
     );
+
+    // แพ็คฟรี: ไม่มีอะไรต้องจ่าย — สร้างคำสั่งบุญเลยแล้วพาไปหน้าสถานะ
+    // (ข้ามหน้าชำระเงิน/แนบสลิปทั้งหมด)
+    if (_isFreeSelected) {
+      _submitFreeOrder(order);
+      return;
+    }
 
     // Display-only breakdown data for the payment screen's สรุปคำสั่งบุญ —
     // MeritOrder itself carries only the final `price` total, so the

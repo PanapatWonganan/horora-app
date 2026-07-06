@@ -80,4 +80,21 @@ void main() {
       expect(schedule.cheapestPackagePrice, WeeklyOrderPackage.cheapestPrice);
     });
   });
+  group('WeeklyOrderPackage.freeTrial (มูฟรีครั้งแรก)', () {
+    test('is free and resolvable via byId', () {
+      expect(WeeklyOrderPackage.freeTrial.price, 0);
+      expect(WeeklyOrderPackage.byId('free_trial'),
+          same(WeeklyOrderPackage.freeTrial));
+    });
+
+    test('is NOT part of defaultPackages (paid list stays intact)', () {
+      expect(
+        WeeklyOrderPackage.defaultPackages
+            .any((p) => p.id == WeeklyOrderPackage.freeTrial.id),
+        isFalse,
+      );
+      // ราคาเริ่มต้นที่โชว์บนหน้า landing ต้องไม่กลายเป็น 0 เพราะแพ็คฟรี
+      expect(WeeklyOrderPackage.cheapestPrice, greaterThan(0));
+    });
+  });
 }

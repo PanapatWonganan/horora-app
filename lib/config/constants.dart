@@ -56,6 +56,9 @@ class StorageConstants {
   static const String meritShowcaseSeen = 'merit_showcase_seen';
   static const String meritDayShowcaseSeen = 'merit_day_showcase_seen';
   static const String meritOrderShowcaseSeen = 'merit_order_showcase_seen';
+  // สิทธิ์ "มูฟรีครั้งแรก" — ใช้แล้วหรือยัง (ต่อเครื่อง; ฝั่ง backend ควร
+  // enforce ซ้ำอีกชั้นในอนาคต)
+  static const String freeMeritUsed = 'free_merit_used';
 }
 
 // ค่าคงที่สำหรับราศี

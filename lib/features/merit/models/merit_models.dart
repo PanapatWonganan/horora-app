@@ -245,6 +245,21 @@ class WeeklyOrderPackage {
 
   String get priceFormatted => '฿${price.toStringAsFixed(0)}';
 
+  /// แพ็ค "มูฟรีครั้งแรก" — ไหว้ให้ + รูปยืนยัน 1 รูป ราคา 0 บาท
+  /// สร้างความมั่นใจให้ผู้ใช้ใหม่ว่าบริการไหว้จริง ส่งหลักฐานจริง
+  /// ไม่อยู่ใน [defaultPackages] — หน้าฟอร์มแทรกให้เฉพาะเครื่องที่ยังไม่เคย
+  /// ใช้สิทธิ์ (ดู StorageConstants.freeMeritUsed)
+  /// TODO(backend): enforce หนึ่งสิทธิ์ต่อผู้ใช้ฝั่งเซิร์ฟเวอร์ด้วย
+  static const WeeklyOrderPackage freeTrial = WeeklyOrderPackage(
+    id: 'free_trial',
+    name: '🎁 มูฟรี ครั้งแรก',
+    price: 0,
+    features: [
+      '🙏 ไหว้ให้ที่วัดจริง',
+      '📸 รูปถ่ายยืนยัน 1 รูป',
+    ],
+  );
+
   static const List<WeeklyOrderPackage> defaultPackages = [
     WeeklyOrderPackage(
       id: 'basic',
@@ -290,6 +305,7 @@ class WeeklyOrderPackage {
 
   /// หาแพ็คด้วย id — คืนค่า null ถ้าไม่พบ (กันการ throw เวลาข้อมูลไม่ตรง)
   static WeeklyOrderPackage? byId(String id) {
+    if (id == freeTrial.id) return freeTrial;
     for (final p in defaultPackages) {
       if (p.id == id) return p;
     }

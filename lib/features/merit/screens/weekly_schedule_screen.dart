@@ -42,10 +42,14 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   // ฝากมู · ร่วมบุญ ให้รู้ขั้นตอนถัดไป (ไม่ยิงตอนวันถูกเลือกอัตโนมัติ)
   final GlobalKey _scOrderButton = GlobalKey();
 
+  // ยังมีสิทธิ์ "มูฟรีครั้งแรก" อยู่ไหม — ใช้สลับข้อความ pill ราคา
+  bool _freeTrialEligible = false;
+
   @override
   void initState() {
     super.initState();
     _selectedDay = _defaultSelectedDay();
+    _loadFreeTrialEligibility();
 
     _showcaseView = ShowcaseView.register(
       scope: SacredShowcase.meritScope,
@@ -54,6 +58,17 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       disableBarrierInteraction: true,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
+  }
+
+  /// เช็คสิทธิ์มูฟรีครั้งแรก — ผิดพลาดถือว่าไม่มีสิทธิ์ (แสดงราคาปกติ)
+  Future<void> _loadFreeTrialEligibility() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final used = prefs.getBool(StorageConstants.freeMeritUsed) ?? false;
+      if (mounted && !used) setState(() => _freeTrialEligible = true);
+    } catch (e) {
+      debugPrint('WeeklyScheduleScreen._loadFreeTrialEligibility error: $e');
+    }
   }
 
   /// โชว์ครั้งเดียวต่อเครื่อง — บันทึก "เห็นแล้ว" ตั้งแต่ตอนเริ่ม
@@ -774,6 +789,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   /// hardcode ซ้ำ ให้ราคาบนหน้า landing กับหน้าฟอร์มตรงกันเสมอ
   Widget _buildStartingPricePill(WeeklyMeritSchedule schedule) {
     final price = schedule.cheapestPackagePrice;
+    // ยังมีสิทธิ์มูฟรีครั้งแรก → ชูข้อเสนอฟรีแทนราคาเริ่มต้น (hook เข้า
+    // funnel ตั้งแต่หน้า landing; การ์ดแพ็คฟรีจริงอยู่ในหน้าฟอร์ม)
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -783,7 +800,9 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        'เริ่มต้น ฿${price.toStringAsFixed(0)}',
+        _freeTrialEligible
+            ? '🎁 ครั้งแรก มูฟรี'
+            : 'เริ่มต้น ฿${price.toStringAsFixed(0)}',
         style: GoogleFonts.kanit(
           color: Colors.white,
           fontSize: 12.5,
