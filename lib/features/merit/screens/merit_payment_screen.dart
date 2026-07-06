@@ -300,10 +300,19 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
               SacredPrimaryButton(
                 label: 'ดูสถานะคำสั่งบุญ',
                 onTap: () {
+                  // ใช้วัด/แพ็คตามที่ผู้ใช้เลือกจริงจาก widget.order —
+                  // backend คืน default มาเมื่อไม่รู้จัก id ของ flow รายสัปดาห์
+                  final displayOrder = _createdOrder!.copyWith(
+                    location: widget.order.location,
+                    package: widget.order.package,
+                    price: widget.order.price,
+                    prayerName: widget.order.prayerName,
+                    prayerWish: widget.order.prayerWish,
+                  );
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) =>
-                          MeritOrderStatusScreen(order: _createdOrder!),
+                          MeritOrderStatusScreen(order: displayOrder),
                     ),
                   );
                 },

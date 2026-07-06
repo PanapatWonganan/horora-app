@@ -308,7 +308,14 @@ class MeritOrderStatusScreen extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          _StatusPill(status: order.status),
+          _StatusPill(
+            status: order.status,
+            // ออเดอร์มูฟรี (฿0) ไม่มีขั้นชำระเงิน — "รอชำระเงิน" จะทำให้งง
+            labelOverride: order.price == 0 &&
+                    order.status == MeritOrderStatus.pending
+                ? 'รอทีมงานยืนยัน'
+                : null,
+          ),
         ],
       ),
     );
@@ -451,7 +458,11 @@ class MeritOrderStatusScreen extends StatelessWidget {
 class _StatusPill extends StatelessWidget {
   final MeritOrderStatus status;
 
-  const _StatusPill({required this.status});
+  /// ข้อความแทน [MeritOrderStatus.displayName] เมื่อบริบทต่างไป
+  /// (เช่นออเดอร์ฟรีที่ไม่มีขั้นชำระเงิน)
+  final String? labelOverride;
+
+  const _StatusPill({required this.status, this.labelOverride});
 
   Color get _color {
     switch (status) {
@@ -487,7 +498,7 @@ class _StatusPill extends StatelessWidget {
           ),
           const SizedBox(width: 7),
           Text(
-            status.displayName,
+            labelOverride ?? status.displayName,
             style: GoogleFonts.kanit(
               color: _color,
               fontSize: 13,

@@ -1039,10 +1039,20 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               'รับสิทธิ์มูฟรีแล้ว 🙏 ทีมงานจะไหว้ให้และส่งรูปยืนยันถึงคุณ'),
         ),
       );
+      // แสดงวัด/แพ็ค/ราคา "ตามที่ผู้ใช้เลือกจริง" — backend ยังไม่รู้จัก
+      // locationId/packageId ของ flow รายสัปดาห์ เลยคืนค่า default กลับมา
+      // (คงเลขที่ออเดอร์/สถานะ/เวลาจากเซิร์ฟเวอร์ไว้)
+      final displayOrder = created.copyWith(
+        location: order.location,
+        package: order.package,
+        price: order.price,
+        prayerName: order.prayerName,
+        prayerWish: order.prayerWish,
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => MeritOrderStatusScreen(order: created),
+          builder: (_) => MeritOrderStatusScreen(order: displayOrder),
         ),
       );
     } catch (e) {
