@@ -1,16 +1,27 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../../core/widgets/sacred_showcase.dart';
 
 class AppBottomNavigation extends StatelessWidget {
   final int currentIndex;
 
+  // Keys ของ feature tour หน้า Home (null = ไม่มี showcase — ทุกแท็บอื่น)
+  // copy ของ tooltip อยู่ที่นี่เพราะเป้าหมายทั้งสามอยู่บนแถบนี้
+  final GlobalKey? meritShowcaseKey;
+  final GlobalKey? chatShowcaseKey;
+  final GlobalKey? profileShowcaseKey;
+
   const AppBottomNavigation({
     Key? key,
     required this.currentIndex,
+    this.meritShowcaseKey,
+    this.chatShowcaseKey,
+    this.profileShowcaseKey,
   }) : super(key: key);
 
   // ── Sacred Astrology nav palette ──────────────────────────────────────────
@@ -81,29 +92,79 @@ class AppBottomNavigation extends StatelessWidget {
                 // ทำบุญ — core revenue feature, always visually prominent as a
                 // floating CTA. The active state is still communicated separately
                 // by the label/indicator so it does not steal selection from Home.
-                _MeritCtaTab(
-                  isSelected: currentIndex == 2,
-                  onTap: () => _handleNavigation(context, 2),
+                _withShowcase(
+                  showcaseKey: meritShowcaseKey,
+                  title: 'ทำบุญออนไลน์',
+                  description:
+                      'ร่วมบุญกับวัดจริง เลือกวันไหว้ตามความเชื่อของคุณ '
+                      'มีรูปและวิดีโอยืนยันการไหว้ส่งถึงคุณทุกครั้ง',
+                  // วงกลมทองถูกวาดลอยเหนือกล่อง layout (Transform.translate
+                  // -22px) — ขยาย highlight ขึ้นด้านบนให้ครอบปุ่มพอดี
+                  targetPadding: const EdgeInsets.fromLTRB(8, 30, 8, 2),
+                  targetBorderRadius: BorderRadius.circular(40),
+                  child: _MeritCtaTab(
+                    isSelected: currentIndex == 2,
+                    onTap: () => _handleNavigation(context, 2),
+                  ),
                 ),
-                _buildNavItem(
-                  context: context,
-                  index: 3,
-                  iconPath: AppIcons.chat,
-                  activeIconPath: AppIcons.chatFilled,
-                  label: 'สนทนา',
+                _withShowcase(
+                  showcaseKey: chatShowcaseKey,
+                  title: 'สนทนากับ AI ดูดวง',
+                  description:
+                      'ถามเรื่องดวง ความรัก การงาน การเงิน ได้ทุกเมื่อ '
+                      'เหมือนมีหมอดูส่วนตัวอยู่ข้างกาย',
+                  child: _buildNavItem(
+                    context: context,
+                    index: 3,
+                    iconPath: AppIcons.chat,
+                    activeIconPath: AppIcons.chatFilled,
+                    label: 'สนทนา',
+                  ),
                 ),
-                _buildNavItem(
-                  context: context,
-                  index: 4,
-                  iconPath: AppIcons.person,
-                  activeIconPath: AppIcons.personFilled,
-                  label: 'โปรไฟล์',
+                _withShowcase(
+                  showcaseKey: profileShowcaseKey,
+                  title: 'โปรไฟล์ของคุณ',
+                  description:
+                      'แก้ไขวันเกิดและข้อมูลดวงได้ที่นี่ '
+                      'สมัครสมาชิกเพื่อเก็บประวัติดูดวงและบุญของคุณไว้ครบทุกอย่าง',
+                  actions: SacredShowcase.finishAction('เริ่มใช้งาน'),
+                  child: _buildNavItem(
+                    context: context,
+                    index: 4,
+                    iconPath: AppIcons.person,
+                    activeIconPath: AppIcons.personFilled,
+                    label: 'โปรไฟล์',
+                  ),
                 ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  /// ห่อไอเทมด้วย showcase ธีม Sacred เมื่อหน้า Home ส่ง key มา —
+  /// แท็บอื่นส่ง null จึง render ตามเดิมทุกประการ
+  Widget _withShowcase({
+    required GlobalKey? showcaseKey,
+    required String title,
+    required String description,
+    required Widget child,
+    EdgeInsets targetPadding = const EdgeInsets.fromLTRB(4, 6, 4, 2),
+    BorderRadius? targetBorderRadius,
+    List<TooltipActionButton>? actions,
+  }) {
+    if (showcaseKey == null) return child;
+    return SacredShowcase.wrap(
+      showcaseKey: showcaseKey,
+      scope: SacredShowcase.homeScope,
+      title: title,
+      description: description,
+      targetPadding: targetPadding,
+      targetBorderRadius: targetBorderRadius ?? BorderRadius.circular(18),
+      actions: actions,
+      child: child,
     );
   }
 

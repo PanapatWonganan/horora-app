@@ -4,9 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../config/constants.dart';
 import '../../core/routes/routes.dart';
+import '../../core/widgets/sacred_showcase.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
@@ -96,6 +99,14 @@ class _HomeScreenState extends State<HomeScreen>
   static const String _gentleOfferDismissedAtKey = 'gentle_offer_dismissed_at';
   static const int _gentleOfferDismissDays = 14;
 
+  // ── Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่องหลังเข้า Home
+  // ครั้งแรก: ดวงรายวัน → ปุ่มทำบุญ → แท็บสนทนา → แท็บโปรไฟล์
+  late final ShowcaseView _showcaseView;
+  final GlobalKey _scDailyReading = GlobalKey();
+  final GlobalKey _scMeritTab = GlobalKey();
+  final GlobalKey _scChatTab = GlobalKey();
+  final GlobalKey _scProfileTab = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -106,8 +117,35 @@ class _HomeScreenState extends State<HomeScreen>
     _loadUserName();
     _loadGentleOfferVisibility();
 
+    _showcaseView = ShowcaseView.register(
+      scope: SacredShowcase.homeScope,
+      enableAutoScroll: true,
+      globalTooltipActions: SacredShowcase.defaultActions(),
+      globalTooltipActionConfig: SacredShowcase.actionConfig,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
+
     // No automatic commercial popup on Home startup. A calm, dismissible offer
     // card lives in-page instead (see [_buildGentleOffer]).
+  }
+
+  /// เริ่ม feature tour เฉพาะครั้งแรกของเครื่อง — บันทึกว่า "เห็นแล้ว"
+  /// ตั้งแต่ตอนเริ่ม (ไม่ใช่ตอนจบ) เพื่อไม่รบกวนซ้ำแม้ปิดแอปกลาง tour
+  /// หน่วงให้ StaggeredReveal เล่นจบก่อน ไม่ให้ highlight ชี้การ์ดที่ยังเลื่อนอยู่
+  Future<void> _maybeStartShowcase() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(StorageConstants.homeShowcaseSeen) ?? false) return;
+      await prefs.setBool(StorageConstants.homeShowcaseSeen, true);
+      if (!mounted) return;
+      _showcaseView.startShowCase(
+        [_scDailyReading, _scMeritTab, _scChatTab, _scProfileTab],
+        delay: const Duration(milliseconds: 900),
+      );
+    } catch (e) {
+      // อ่าน/เขียน prefs พลาด — ข้าม tour ไปเลย ดีกว่าเสี่ยงโชว์ทุกครั้ง
+      debugPrint('HomeScreen._maybeStartShowcase error: $e');
+    }
   }
 
   /// Loads the last-dismissed timestamp for the gentle offer and shows the
@@ -152,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    _showcaseView.unregister();
     _celestialRotation.dispose();
     // บันทึกว่าออกจากหน้า Home แล้ว
     HomeScreenState.hasLeftHome = true;
@@ -253,7 +292,19 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(height: 32),
                       // ดูดวงประจำวัน — the free daily reading opens Home first:
                       // value before any commerce ask.
-                      StaggeredReveal(index: 1, child: _buildDailyHoroscope()),
+                      StaggeredReveal(
+                        index: 1,
+                        child: SacredShowcase.wrap(
+                          showcaseKey: _scDailyReading,
+                          scope: SacredShowcase.homeScope,
+                          title: 'ดวงประจำวันของคุณ',
+                          description:
+                              'อัปเดตใหม่ทุกวันจากวันเกิดของคุณ กลับมาเช็คฟรี'
+                              'ได้ทุกเช้า พร้อมเลขนำโชคและแนวทางประจำวัน',
+                          targetBorderRadius: BorderRadius.circular(28),
+                          child: _buildDailyHoroscope(),
+                        ),
+                      ),
                       const SizedBox(height: 34),
                       // แนวทางวันนี้ + ร่วมบุญ — astrology guidance and the
                       // suitable merit of the day, woven into one calm card.
@@ -281,7 +332,12 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ),
       ),
-      bottomNavigationBar: const AppBottomNavigation(currentIndex: 0),
+      bottomNavigationBar: AppBottomNavigation(
+        currentIndex: 0,
+        meritShowcaseKey: _scMeritTab,
+        chatShowcaseKey: _scChatTab,
+        profileShowcaseKey: _scProfileTab,
+      ),
     );
   }
 

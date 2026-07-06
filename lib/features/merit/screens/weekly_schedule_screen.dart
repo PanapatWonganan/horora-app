@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../config/constants.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/celestial_effects.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../../core/widgets/sacred_showcase.dart';
 import '../models/merit_models.dart';
 import '../widgets/merit_ui.dart';
 import 'merit_weekly_order_screen.dart';
@@ -29,10 +33,44 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       WeeklyMeritSchedule.defaultSchedule;
   MeritDay? _selectedDay;
 
+  // Showcase จุดเดียว (contextual) ชี้แถบเลือกวันไหว้ — โชว์ครั้งแรก
+  // ที่เข้าหน้านี้เท่านั้น ช่วยให้ผู้ใช้ใหม่รู้ว่าแต่ละวันเลือกดูได้
+  late final ShowcaseView _showcaseView;
+  final GlobalKey _scWeekSelector = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     _selectedDay = _defaultSelectedDay();
+
+    _showcaseView = ShowcaseView.register(
+      scope: SacredShowcase.meritScope,
+      enableAutoScroll: true,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
+  }
+
+  /// โชว์ครั้งเดียวต่อเครื่อง — บันทึก "เห็นแล้ว" ตั้งแต่ตอนเริ่ม
+  /// (แนวเดียวกับ tour หน้า Home) และหน่วงให้ StaggeredReveal เล่นจบก่อน
+  Future<void> _maybeStartShowcase() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(StorageConstants.meritShowcaseSeen) ?? false) return;
+      await prefs.setBool(StorageConstants.meritShowcaseSeen, true);
+      if (!mounted) return;
+      _showcaseView.startShowCase(
+        [_scWeekSelector],
+        delay: const Duration(milliseconds: 900),
+      );
+    } catch (e) {
+      debugPrint('WeeklyScheduleScreen._maybeStartShowcase error: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _showcaseView.unregister();
+    super.dispose();
   }
 
   /// ค่าเริ่มต้นของวันที่เลือก: วันนี้ถ้ามีรอบมู มิเช่นนั้นเลือกวันที่มีรอบมู
@@ -203,7 +241,21 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
                             ),
                             const SizedBox(height: 14),
                             StaggeredReveal(
-                                index: 2, child: _buildWeekSelector()),
+                              index: 2,
+                              child: SacredShowcase.wrap(
+                                showcaseKey: _scWeekSelector,
+                                scope: SacredShowcase.meritScope,
+                                title: 'เลือกวันไหว้ของคุณ',
+                                description:
+                                    'แต่ละวันมีพิธีและความเชื่อต่างกัน '
+                                    'แตะวันที่ต้องการเพื่อดูรายละเอียด '
+                                    'แล้วกดร่วมบุญได้เลย',
+                                targetBorderRadius: BorderRadius.circular(22),
+                                actions:
+                                    SacredShowcase.finishAction('เข้าใจแล้ว'),
+                                child: _buildWeekSelector(),
+                              ),
+                            ),
                             const SizedBox(height: 22),
                             if (selected != null)
                               StaggeredReveal(
