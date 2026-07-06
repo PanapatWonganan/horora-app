@@ -54,6 +54,7 @@ class StorageConstants {
   // Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่อง
   static const String homeShowcaseSeen = 'home_showcase_seen';
   static const String meritShowcaseSeen = 'merit_showcase_seen';
+  static const String meritDayShowcaseSeen = 'merit_day_showcase_seen';
 }
 
 // ค่าคงที่สำหรับราศี

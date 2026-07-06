@@ -38,6 +38,10 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   late final ShowcaseView _showcaseView;
   final GlobalKey _scWeekSelector = GlobalKey();
 
+  // Showcase ขั้นที่สอง: หลังผู้ใช้ "กดเลือกวัน" เองครั้งแรก ชี้ปุ่ม
+  // ฝากมู · ร่วมบุญ ให้รู้ขั้นตอนถัดไป (ไม่ยิงตอนวันถูกเลือกอัตโนมัติ)
+  final GlobalKey _scOrderButton = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +68,31 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
       );
     } catch (e) {
       debugPrint('WeeklyScheduleScreen._maybeStartShowcase error: $e');
+    }
+  }
+
+  /// เด้งครั้งเดียว "หลังผู้ใช้กดเลือกวันเอง" — ชี้ปุ่มฝากมูเพื่อบอก
+  /// ขั้นตอนถัดไป จะเริ่มเฉพาะเมื่อวันที่เลือกมีรอบมู (มีปุ่มให้ชี้จริง)
+  /// และยังไม่ consume flag ถ้าผู้ใช้กดวันว่าง — รอวันที่มีรอบครั้งถัดไป
+  Future<void> _maybeShowDayPickedShowcase() async {
+    if (_selectedSchedule == null) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(StorageConstants.meritDayShowcaseSeen) ?? false) {
+        return;
+      }
+      await prefs.setBool(StorageConstants.meritDayShowcaseSeen, true);
+      if (!mounted) return;
+      // รอเฟรมให้ detail ของวันที่เลือก build เสร็จก่อนค่อยชี้ปุ่ม
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _showcaseView.startShowCase(
+          [_scOrderButton],
+          delay: const Duration(milliseconds: 350),
+        );
+      });
+    } catch (e) {
+      debugPrint('WeeklyScheduleScreen._maybeShowDayPickedShowcase error: $e');
     }
   }
 
@@ -380,6 +409,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
               setState(() {
                 _selectedDay = day;
               });
+              _maybeShowDayPickedShowcase();
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
@@ -658,11 +688,23 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
         _sectionTitle('ชุดไหว้พื้นฐาน (รวมในราคา)', icon: AppIcons.checkCircle),
         const SizedBox(height: 12),
         _buildRequiredItemsCard(schedule.requiredItems),
+        // (ปุ่มฝากมูด้านล่างถูกห่อด้วย showcase "ขั้นตอนถัดไป" —
+        // เด้งครั้งแรกที่ผู้ใช้กดเลือกวันเอง ดู _maybeShowDayPickedShowcase)
 
         const SizedBox(height: 28),
 
         // ปุ่มสั่งจอง
-        _buildOrderButton(schedule, nextDate),
+        SacredShowcase.wrap(
+          showcaseKey: _scOrderButton,
+          scope: SacredShowcase.meritScope,
+          title: 'ขั้นตอนถัดไป',
+          description: 'เลือกวันไหว้ได้แล้ว กดปุ่มนี้เพื่อเลือกชุดร่วมบุญ '
+              'และกรอกคำอธิษฐาน แล้วเราจะไหว้แทนคุณ '
+              'พร้อมส่งรูปยืนยันถึงมือ',
+          targetBorderRadius: BorderRadius.circular(18),
+          actions: SacredShowcase.finishAction('เข้าใจแล้ว'),
+          child: _buildOrderButton(schedule, nextDate),
+        ),
       ],
     );
   }
