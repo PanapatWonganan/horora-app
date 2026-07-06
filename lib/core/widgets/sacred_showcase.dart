@@ -16,6 +16,10 @@ class SacredShowcase {
   /// Scope ของ showcase เฉพาะจุดบนหน้าทำบุญ (เลือกวันไหว้)
   static const String meritScope = 'merit_tour';
 
+  /// Scope ของ showcase หน้ารายละเอียดคำสั่งบุญ (เลือกชุดร่วมบุญ) —
+  /// แยกจาก [meritScope] เพราะหน้านี้ถูก push ทับหน้าตารางมูที่ยังมีชีวิตอยู่
+  static const String meritOrderScope = 'merit_order_tour';
+
   static TextStyle get _titleStyle => GoogleFonts.kanit(
         color: AppColors.deepGoldBrown,
         fontSize: 17,
@@ -98,6 +102,10 @@ class SacredShowcase {
       scope: scope,
       title: title,
       description: description,
+      // เดินหน้า tour ได้จากปุ่ม ข้าม/ถัดไป เท่านั้น — ปิด tap บนเป้าหมาย
+      // กัน tap หลงข้าม step โดยไม่ตั้งใจ (คู่กับ disableBarrierInteraction
+      // ที่ฝั่ง ShowcaseView.register)
+      disableDefaultTargetGestures: true,
       titleTextStyle: _titleStyle,
       descTextStyle: _descStyle,
       tooltipBackgroundColor: AppColors.ivorySilk,

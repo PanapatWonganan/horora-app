@@ -50,6 +50,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
     _showcaseView = ShowcaseView.register(
       scope: SacredShowcase.meritScope,
       enableAutoScroll: true,
+      // ปุ่มเท่านั้นที่เลื่อน tour ได้ — barrier tap ไม่ข้าม step
+      disableBarrierInteraction: true,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
   }

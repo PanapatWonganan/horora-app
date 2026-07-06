@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../config/constants.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
+import '../../../core/widgets/sacred_showcase.dart';
 import '../../onboarding/models/onboarding_models.dart';
 import '../models/merit_models.dart';
 import '../widgets/merit_ui.dart';
@@ -103,6 +107,10 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   static const List<WeeklyOrderPackage> _packages =
       WeeklyOrderPackage.defaultPackages;
 
+  // Showcase "เลือกชุดร่วมบุญ" — ชี้การ์ดแพ็คใบแรก ครั้งแรกที่เข้าหน้านี้
+  late final ShowcaseView _showcaseView;
+  final GlobalKey _scFirstPackage = GlobalKey();
+
   WeeklyOrderPackage? get _selectedPackageData => _selectedPackage == null
       ? null
       : WeeklyOrderPackage.byId(_selectedPackage!);
@@ -127,6 +135,34 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   void initState() {
     super.initState();
     _prefillContactInfo();
+
+    _showcaseView = ShowcaseView.register(
+      scope: SacredShowcase.meritOrderScope,
+      enableAutoScroll: true,
+      // ปุ่มเท่านั้นที่เลื่อน tour ได้ — barrier tap ไม่ข้าม step
+      disableBarrierInteraction: true,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
+  }
+
+  /// Showcase จุดเดียวชี้ชุดร่วมบุญใบแรก — ครั้งแรกที่เข้าหน้านี้เท่านั้น
+  /// ให้ผู้ใช้ใหม่เข้าใจว่าต้องเลือกแพ็คก่อน แล้วค่อยเลื่อนลงกรอกข้อมูล
+  /// (แนวเดียวกับ tour หน้า Home: บันทึก "เห็นแล้ว" ตั้งแต่ตอนเริ่ม)
+  Future<void> _maybeStartShowcase() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(StorageConstants.meritOrderShowcaseSeen) ?? false) {
+        return;
+      }
+      await prefs.setBool(StorageConstants.meritOrderShowcaseSeen, true);
+      if (!mounted) return;
+      _showcaseView.startShowCase(
+        [_scFirstPackage],
+        delay: const Duration(milliseconds: 700),
+      );
+    } catch (e) {
+      debugPrint('MeritWeeklyOrderScreen._maybeStartShowcase error: $e');
+    }
   }
 
   /// เติมชื่อ/วันเกิดล่วงหน้าจาก (a) บัญชีที่ล็อกอินอยู่ ก่อน (b) ข้อมูล
@@ -161,6 +197,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
   @override
   void dispose() {
+    _showcaseView.unregister();
     _nameController.dispose();
     _phoneController.dispose();
     _wishController.dispose();
@@ -310,7 +347,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         // อย่างตรงไปตรงมาด้วย badge แทน
         final isPopular = package.id == 'standard';
 
-        return GestureDetector(
+        final card = GestureDetector(
           onTap: () {
             setState(() {
               _selectedPackage = package.id;
@@ -450,6 +487,19 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
               ],
             ),
           ),
+        );
+
+        // การ์ดใบแรกเป็นเป้าของ showcase "เลือกชุดร่วมบุญ" (ครั้งแรกเท่านั้น)
+        if (package.id != _packages.first.id) return card;
+        return SacredShowcase.wrap(
+          showcaseKey: _scFirstPackage,
+          scope: SacredShowcase.meritOrderScope,
+          title: 'เลือกชุดร่วมบุญ',
+          description: 'แต่ละชุดต่างกันที่จำนวนรูปถ่าย วิดีโอ และใบรับรอง '
+              'แตะเลือกชุดที่ใช่ แล้วเลื่อนลงกรอกชื่อกับคำอธิษฐานได้เลย',
+          targetBorderRadius: BorderRadius.circular(16),
+          actions: SacredShowcase.finishAction('เข้าใจแล้ว'),
+          child: card,
         );
       }).toList(),
     );

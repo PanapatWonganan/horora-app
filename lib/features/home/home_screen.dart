@@ -120,8 +120,17 @@ class _HomeScreenState extends State<HomeScreen>
     _showcaseView = ShowcaseView.register(
       scope: SacredShowcase.homeScope,
       enableAutoScroll: true,
+      // ปุ่มเท่านั้นที่เลื่อน tour ได้ — barrier tap ไม่ข้าม step
+      disableBarrierInteraction: true,
       globalTooltipActions: SacredShowcase.defaultActions(),
       globalTooltipActionConfig: SacredShowcase.actionConfig,
+      // debug trace เท่านั้น (debugPrint เป็น no-op บน release) — ไว้ไล่ลำดับ
+      // step ของ tour เวลาเจออาการข้าม step บนบางเครื่อง
+      onStart: (index, key) => debugPrint('HOME_TOUR onStart index=$index'),
+      onComplete: (index, key) =>
+          debugPrint('HOME_TOUR onComplete index=$index'),
+      onDismiss: (key) => debugPrint('HOME_TOUR onDismiss'),
+      onFinish: () => debugPrint('HOME_TOUR onFinish'),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartShowcase());
 

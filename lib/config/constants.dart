@@ -55,6 +55,7 @@ class StorageConstants {
   static const String homeShowcaseSeen = 'home_showcase_seen';
   static const String meritShowcaseSeen = 'merit_showcase_seen';
   static const String meritDayShowcaseSeen = 'merit_day_showcase_seen';
+  static const String meritOrderShowcaseSeen = 'merit_order_showcase_seen';
 }
 
 // ค่าคงที่สำหรับราศี

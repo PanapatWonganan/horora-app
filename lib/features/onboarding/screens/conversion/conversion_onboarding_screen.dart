@@ -259,8 +259,10 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
             child: Padding(
               padding: const EdgeInsets.only(right: 12),
               child: Text('‹',
+                  // w400: เรา bundle Kanit เฉพาะ 400-700 (ไม่มี Light) —
+                  // w300 จะ throw เพราะปิด runtime fetching ของ google_fonts
                   style: CvType.display(26,
-                      weight: FontWeight.w300, color: CvColors.creamA(0.7))),
+                      weight: FontWeight.w400, color: CvColors.creamA(0.7))),
             ),
           ),
           Expanded(
