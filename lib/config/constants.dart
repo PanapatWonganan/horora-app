@@ -59,6 +59,13 @@ class StorageConstants {
   // สิทธิ์ "มูฟรีครั้งแรก" — ใช้แล้วหรือยัง (ต่อเครื่อง; ฝั่ง backend ควร
   // enforce ซ้ำอีกชั้นในอนาคต)
   static const String freeMeritUsed = 'free_merit_used';
+  // ระบบ "เส้นทางสายมู" (พลังศรัทธา ✦ / streak / รางวัล) — ต่อเครื่อง
+  static const String faithPoints = 'faith_points';
+  static const String faithStreak = 'faith_streak';
+  static const String faithLastCheckin = 'faith_last_checkin';
+  static const String faithClaimedMilestones = 'faith_claimed_milestones';
+  static const String faithActivityPrefix = 'faith_activity_';
+  static const String faithCouponExpiry = 'faith_coupon_expiry';
 }
 
 // ค่าคงที่สำหรับราศี
