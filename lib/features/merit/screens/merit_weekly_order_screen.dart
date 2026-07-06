@@ -107,9 +107,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   static const List<WeeklyOrderPackage> _packages =
       WeeklyOrderPackage.defaultPackages;
 
-  // Showcase "เลือกชุดร่วมบุญ" — ชี้การ์ดแพ็คใบแรก ครั้งแรกที่เข้าหน้านี้
+  // Tour หน้านี้ (ครั้งแรกเท่านั้น) 2 step: เลือกชุดร่วมบุญ → กรอกชื่อ
+  // ผู้ขอพร — พาผู้ใช้ไล่จากเลือกแพ็คลงไปถึงฟอร์มกรอกข้อมูลเลย
   late final ShowcaseView _showcaseView;
   final GlobalKey _scFirstPackage = GlobalKey();
+  final GlobalKey _scNameField = GlobalKey();
 
   WeeklyOrderPackage? get _selectedPackageData => _selectedPackage == null
       ? null
@@ -157,7 +159,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       await prefs.setBool(StorageConstants.meritOrderShowcaseSeen, true);
       if (!mounted) return;
       _showcaseView.startShowCase(
-        [_scFirstPackage],
+        [_scFirstPackage, _scNameField],
         delay: const Duration(milliseconds: 700),
       );
     } catch (e) {
@@ -489,16 +491,16 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           ),
         );
 
-        // การ์ดใบแรกเป็นเป้าของ showcase "เลือกชุดร่วมบุญ" (ครั้งแรกเท่านั้น)
+        // การ์ดใบแรกเป็นเป้าของ step 1 "เลือกชุดร่วมบุญ" (ครั้งแรกเท่านั้น)
         if (package.id != _packages.first.id) return card;
         return SacredShowcase.wrap(
           showcaseKey: _scFirstPackage,
           scope: SacredShowcase.meritOrderScope,
           title: 'เลือกชุดร่วมบุญ',
           description: 'แต่ละชุดต่างกันที่จำนวนรูปถ่าย วิดีโอ และใบรับรอง '
-              'แตะเลือกชุดที่ใช่ แล้วเลื่อนลงกรอกชื่อกับคำอธิษฐานได้เลย',
+              'แตะเลือกชุดที่ใช่สำหรับคุณได้เลย',
           targetBorderRadius: BorderRadius.circular(16),
-          actions: SacredShowcase.finishAction('เข้าใจแล้ว'),
+          actions: SacredShowcase.defaultActions(),
           child: card,
         );
       }).toList(),
@@ -664,12 +666,22 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       ),
       child: Column(
         children: [
-          // Name
-          TextFormField(
-            controller: _nameController,
-            style: const TextStyle(color: AppColors.deepText),
-            decoration: _inputDecoration('👤 ชื่อ-นามสกุล ผู้ขอพร'),
-            validator: (v) => (v?.isEmpty ?? true) ? 'กรุณาระบุชื่อ' : null,
+          // Name — step 2 ของ tour หน้านี้: auto-scroll ลงมาชี้ช่องชื่อ
+          // ให้ผู้ใช้รู้ว่าต้องกรอกชื่อคนทำบุญตรงนี้ (เอ่ยชื่อตอนไหว้ให้)
+          SacredShowcase.wrap(
+            showcaseKey: _scNameField,
+            scope: SacredShowcase.meritOrderScope,
+            title: 'กรอกชื่อคนทำบุญ',
+            description: 'ใส่ชื่อ-นามสกุลของผู้ขอพร ทีมงานจะเอ่ยชื่อนี้'
+                'ตอนไหว้ให้ที่วัด พร้อมวันเกิดและคำอธิษฐานด้านล่าง',
+            targetBorderRadius: BorderRadius.circular(12),
+            actions: SacredShowcase.finishAction('เข้าใจแล้ว'),
+            child: TextFormField(
+              controller: _nameController,
+              style: const TextStyle(color: AppColors.deepText),
+              decoration: _inputDecoration('👤 ชื่อ-นามสกุล ผู้ขอพร'),
+              validator: (v) => (v?.isEmpty ?? true) ? 'กรุณาระบุชื่อ' : null,
+            ),
           ),
           const SizedBox(height: 16),
 
