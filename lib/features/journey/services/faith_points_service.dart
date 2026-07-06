@@ -131,6 +131,29 @@ class FaithPointsService {
     }
   }
 
+  /// นับ "ภารกิจวันนี้" ที่ทำแล้ว (0-3): เช็คอินดวงรายวัน / ถาม AI / เปิดไพ่
+  /// ใช้โชว์ x/3 บนแถบภารกิจหน้า Home — อ่านจาก flag รายวันที่มีอยู่แล้ว
+  Future<int> dailyQuestsDone({DateTime? now}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = faithDayKey(now ?? DateTime.now());
+      var done = 0;
+      if (prefs.getString(StorageConstants.faithLastCheckin) == today) done++;
+      if (prefs.getString('${StorageConstants.faithActivityPrefix}ai_chat') ==
+          today) {
+        done++;
+      }
+      if (prefs.getString('${StorageConstants.faithActivityPrefix}tarot') ==
+          today) {
+        done++;
+      }
+      return done;
+    } catch (e) {
+      debugPrint('FaithPointsService.dailyQuestsDone error: $e');
+      return 0;
+    }
+  }
+
   /// วันหมดอายุคูปอง ฿30 (null = ยังไม่เคยรับ)
   Future<DateTime?> couponExpiry() async {
     try {

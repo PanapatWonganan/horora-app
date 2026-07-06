@@ -222,3 +222,29 @@ String faithMantraForWeekday(int? weekday) {
 /// โค้ดคูปองส่วนลดฝากมู (แจ้งทีมงานใน LINE ระหว่างยืนยันยอด)
 const String kFaithMeritCouponCode = 'FAITH30';
 const int kFaithMeritCouponDays = 14;
+
+// ── แถบภารกิจบนหน้า Home (quest strip) ──────────────────────────────────────
+
+/// รางวัลถัดไปที่ควรชี้บนหน้า Home = สถานีแรก (เรียงตามแต้ม) ที่ยังไม่รับ
+/// — ถ้าแต้มถึงแล้วแต่ยังไม่กดรับ ก็ยังเป็น "ถัดไป" (สถานะ claimable)
+/// คืน null เมื่อรับครบทุกสถานีแล้ว
+FaithMilestone? faithNextMilestone(Set<String> claimedIds) {
+  for (final m in FaithMilestone.defaults) {
+    if (!claimedIds.contains(m.id)) return m;
+  }
+  return null;
+}
+
+/// ความคืบหน้า "ช่วงปัจจุบัน" สำหรับขีดบน Home — วิ่งจากสถานีก่อนหน้า →
+/// สถานีถัดไป (ไม่ใช่ 0 → เป้า Level ซึ่งจะดูเต็มช้าจนน่าท้อ)
+/// goal-gradient: เป้าใกล้ = แรงจูงใจแรง
+double faithSegmentProgress({
+  required int points,
+  required FaithMilestone next,
+}) {
+  final idx = FaithMilestone.defaults.indexWhere((m) => m.id == next.id);
+  final prevPoints = idx <= 0 ? 0 : FaithMilestone.defaults[idx - 1].points;
+  final span = next.points - prevPoints;
+  if (span <= 0) return 1.0;
+  return ((points - prevPoints) / span).clamp(0.0, 1.0);
+}

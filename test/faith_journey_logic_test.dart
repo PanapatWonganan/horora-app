@@ -143,4 +143,35 @@ void main() {
       expect(a.length, 3);
     });
   });
+
+  group('home quest strip', () {
+    test('next milestone is the first unclaimed one, even if reachable', () {
+      expect(faithNextMilestone({})!.id, 'wallpaper_teaser');
+      expect(faithNextMilestone({'wallpaper_teaser'})!.id, 'lucky_numbers');
+      // ข้ามรับอันกลาง — อันแรกที่ยังไม่รับยังเป็น "ถัดไป"
+      expect(faithNextMilestone({'lucky_numbers'})!.id, 'wallpaper_teaser');
+      expect(
+        faithNextMilestone({
+          'wallpaper_teaser',
+          'lucky_numbers',
+          'merit_coupon',
+          'level2_box',
+        }),
+        isNull,
+      );
+    });
+
+    test('segment progress runs from previous station to the next', () {
+      final second = FaithMilestone.defaults[1]; // 70 ✦ (ช่วง 30→70)
+      expect(faithSegmentProgress(points: 30, next: second), 0.0);
+      expect(faithSegmentProgress(points: 50, next: second), 0.5);
+      expect(faithSegmentProgress(points: 70, next: second), 1.0);
+      // เกินเป้า/ต่ำกว่าช่วง — clamp ปลอดภัย
+      expect(faithSegmentProgress(points: 999, next: second), 1.0);
+      expect(faithSegmentProgress(points: 0, next: second), 0.0);
+      // สถานีแรกวิ่งจาก 0
+      final first = FaithMilestone.defaults.first; // 30 ✦
+      expect(faithSegmentProgress(points: 15, next: first), 0.5);
+    });
+  });
 }

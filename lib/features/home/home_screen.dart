@@ -15,6 +15,7 @@ import '../../core/theme/celestial_effects.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/guest_session_service.dart';
 import '../../core/utils/app_icons.dart';
+import '../journey/models/faith_models.dart';
 import '../journey/services/faith_points_service.dart';
 import '../merit/models/merit_models.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
@@ -100,10 +101,12 @@ class _HomeScreenState extends State<HomeScreen>
   static const String _gentleOfferDismissedAtKey = 'gentle_offer_dismissed_at';
   static const int _gentleOfferDismissDays = 14;
 
-  // ── เส้นทางสายมู: chip พลังศรัทธา ✦ + เช็คอินรายวันอัตโนมัติ
+  // ── เส้นทางสายมู: แถบภารกิจ (quest strip) + เช็คอินรายวันอัตโนมัติ
   // (Home คือหน้าดวงประจำวัน — เปิดครั้งแรกของวัน = เช็คอิน)
   int _faithPoints = 0;
   int _faithStreak = 0;
+  int _faithDailyDone = 0; // ภารกิจวันนี้ 0-3 (เช็คดวง/ถาม AI/เปิดไพ่)
+  Set<String> _faithClaimed = const {};
 
   // ── Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่องหลังเข้า Home
   // ครั้งแรก: ดวงรายวัน → ปุ่มทำบุญ → แท็บสนทนา → แท็บโปรไฟล์
@@ -156,10 +159,13 @@ class _HomeScreenState extends State<HomeScreen>
     try {
       final result = await FaithPointsService.instance.dailyCheckin();
       final state = await FaithPointsService.instance.loadState();
+      final dailyDone = await FaithPointsService.instance.dailyQuestsDone();
       if (!mounted) return;
       setState(() {
         _faithPoints = state.points;
         _faithStreak = state.streak;
+        _faithDailyDone = dailyDone;
+        _faithClaimed = state.claimedMilestoneIds;
       });
       if (result.isNewDay && !_tourStartedThisSession) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -338,7 +344,11 @@ class _HomeScreenState extends State<HomeScreen>
                     children: [
                       const SizedBox(height: 24),
                       StaggeredReveal(index: 0, child: _buildHeader()),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 14),
+                      // แถบภารกิจเส้นทางสายมู — value ไม่ใช่ ask:
+                      // ขีดวิ่งสู่รางวัลถัดไป + ภารกิจวันนี้ x/3
+                      StaggeredReveal(index: 0, child: _buildQuestStrip()),
+                      const SizedBox(height: 26),
                       // ดูดวงประจำวัน — the free daily reading opens Home first:
                       // value before any commerce ask.
                       StaggeredReveal(
@@ -481,6 +491,107 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// แถบภารกิจ "เส้นทางสายมู" — ขีดบางวิ่งจากสถานีก่อนหน้า → รางวัลถัดไป
+  /// (goal-gradient: เป้าใกล้ดึงใจกว่าขีดยาวถึง Level) + ตัวนับภารกิจวันนี้
+  /// แตะทั้งแถบ = เข้าหน้าเส้นทางสายมู กลับมาแล้วรีเฟรชสถานะ (เผื่อกดรับ
+  /// รางวัลมา)
+  Widget _buildQuestStrip() {
+    final next = faithNextMilestone(_faithClaimed);
+    final claimable = next != null && _faithPoints >= next.points;
+    final progress = next == null
+        ? 1.0
+        : faithSegmentProgress(points: _faithPoints, next: next);
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.faithJourney)
+            .then((_) => _runFaithCheckin());
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(14, 11, 12, 12),
+        decoration: BoxDecoration(
+          color: AppColors.ivorySilk.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: AppColors.candleGold.withValues(alpha: 0.4),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  '✦ $_faithPoints',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.candleGold,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (_faithStreak > 0)
+                  Text(
+                    '  ·  🔥 $_faithStreak วันติด',
+                    style: GoogleFonts.kanit(
+                      color: AppColors.onBackdrop,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                const Spacer(),
+                Text(
+                  'ภารกิจวันนี้ $_faithDailyDone/3',
+                  style: GoogleFonts.kanit(
+                    color: _faithDailyDone >= 3
+                        ? AppColors.candleGold
+                        : AppColors.onBackdrop,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.onBackdropMuted, size: 17),
+              ],
+            ),
+            const SizedBox(height: 9),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 5.5,
+                backgroundColor:
+                    AppColors.ivorySilk.withValues(alpha: 0.14),
+                valueColor:
+                    const AlwaysStoppedAnimation(AppColors.candleGold),
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              next == null
+                  ? 'Level 2 · ${faithLevelName(2)} — รับรางวัลครบแล้ว ✓'
+                  : claimable
+                      ? '🎁 รางวัลพร้อมรับ — ${next.emoji} ${next.title}'
+                      : 'อีก ${next.points - _faithPoints} ✦ → '
+                          '${next.emoji} ${next.title}',
+              style: GoogleFonts.kanit(
+                color: claimable
+                    ? AppColors.candleGold
+                    : AppColors.onBackdropMuted,
+                fontSize: 12,
+                fontWeight:
+                    claimable ? FontWeight.w600 : FontWeight.w400,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -537,51 +648,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 10),
-              // Chip พลังศรัทธา — value ไม่ใช่ ask: ทางเข้า "เส้นทางสายมู"
-              GestureDetector(
-                onTap: () =>
-                    Navigator.pushNamed(context, AppRoutes.faithJourney),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.ivorySilk.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color:
-                          AppColors.candleGold.withValues(alpha: 0.45),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '✦ $_faithPoints',
-                        style: GoogleFonts.kanit(
-                          color: AppColors.candleGold,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (_faithStreak > 0) ...[
-                        Text(
-                          '  ·  🔥 $_faithStreak วันติด',
-                          style: GoogleFonts.kanit(
-                            color: AppColors.onBackdrop,
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right,
-                          color: AppColors.onBackdropMuted, size: 16),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
