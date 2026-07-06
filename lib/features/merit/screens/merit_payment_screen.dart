@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../config/constants.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
@@ -90,6 +91,11 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
         _createdOrder = order;
         _orderCreated = true;
         _isCreatingOrder = false;
+      });
+      // ออเดอร์จ่ายเงินสร้างสำเร็จ — จุดปิด funnel ฝั่ง path จ่ายเงิน
+      AnalyticsService.instance.log('merit_order_created', {
+        'type': 'paid',
+        'amount': widget.order.price.toInt(),
       });
       // พลังศรัทธา: ฝากมูสำเร็จ +50 (fire-and-forget)
       FaithPointsService.instance.awardMeritOrder();
@@ -240,6 +246,9 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () async {
+                // เปิด LINE เพื่อรับภาพ/วิดีโอหลักฐานการทำบุญ
+                AnalyticsService.instance
+                    .log('line_link_tap', {'source': 'payment_proof'});
                 final Uri url = Uri.parse(LineOAConstants.mainOA);
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url, mode: LaunchMode.externalApplication);

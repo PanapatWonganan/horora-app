@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/sacred_ui.dart';
 import '../../core/routes/routes.dart';
+import '../../core/services/analytics_service.dart';
 import '../../core/services/auth_guard.dart';
 import '../shared/widgets/app_bottom_navigation.dart';
 import '../journey/services/faith_points_service.dart';
@@ -179,6 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return ChatEmptyState(
                       onQuestionTap: (question) {
                         viewModel.sendMessage(question);
+                        AnalyticsService.instance.log('ai_chat_message_sent');
                         // พลังศรัทธา: ถาม AI วันละครั้ง (fire-and-forget)
                         FaithPointsService.instance
                             .awardDailyActivity('ai_chat');
@@ -232,6 +234,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 return ChatInput(
                   onSendMessage: (message) {
                     viewModel.sendMessage(message);
+                    AnalyticsService.instance.log('ai_chat_message_sent');
                     // พลังศรัทธา: ถาม AI วันละครั้ง (fire-and-forget)
                     FaithPointsService.instance.awardDailyActivity('ai_chat');
                   },

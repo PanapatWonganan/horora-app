@@ -12,6 +12,7 @@ import '../../core/routes/routes.dart';
 import '../../core/widgets/sacred_showcase.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/celestial_effects.dart';
+import '../../core/services/analytics_service.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/guest_session_service.dart';
 import '../../core/utils/app_icons.dart';
@@ -121,6 +122,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    AnalyticsService.instance.log('home_view');
     _celestialRotation = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 60),
@@ -169,6 +171,13 @@ class _HomeScreenState extends State<HomeScreen>
         _faithClaimed = state.claimedMilestoneIds;
         _faithHasMeritOrder = state.hasMeritOrder;
       });
+      if (result.isNewDay) {
+        // เช็คอินวันใหม่สำเร็จ — จุดวัด retention รายวันของ funnel
+        AnalyticsService.instance.log('faith_checkin', {
+          'streak': result.newStreak,
+          'points': result.pointsEarned,
+        });
+      }
       if (result.isNewDay && !_tourStartedThisSession) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -512,6 +521,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     return GestureDetector(
       onTap: () {
+        AnalyticsService.instance.log('quest_strip_tap');
         Navigator.pushNamed(context, AppRoutes.faithJourney)
             .then((_) => _runFaithCheckin());
       },

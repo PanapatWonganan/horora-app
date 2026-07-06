@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../config/constants.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -31,6 +32,7 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.instance.log('faith_journey_view');
     _load();
   }
 
@@ -64,7 +66,7 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
           body: 'ภาพตัวอย่างจากคอลเลคชั่นมงคล มูลค่า ฿199\n'
               'กดปุ่มด้านล่างเพื่อรับภาพผ่าน LINE ได้เลยค่ะ',
           actionLabel: 'รับภาพใน LINE',
-          onAction: _openLineOA,
+          onAction: () => _openLineOA('wallpaper'),
         );
         break;
       case FaithRewardType.luckyNumbers:
@@ -108,15 +110,20 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
               'สำหรับสมาชิก Premium — แจ้งรับใน LINE ได้เลย '
               'หรือเริ่มทดลอง Premium ฟรี 7 วันก่อนก็ได้ค่ะ',
           actionLabel: 'รับสิทธิ์ใน LINE',
-          onAction: _openLineOA,
+          onAction: () => _openLineOA('level2_box'),
         );
         break;
     }
     await FaithPointsService.instance.markMilestoneClaimed(m.id);
+    // รับรางวัลสถานีสำเร็จ (บันทึกสถานะ claimed แล้ว)
+    AnalyticsService.instance.log('milestone_claimed', {'id': m.id});
     await _load();
   }
 
-  Future<void> _openLineOA() async {
+  /// [source] ระบุบริบทที่กดเปิด LINE (เช่น 'wallpaper'/'level2_box')
+  /// เพื่อแยกที่มาใน funnel event `line_link_tap`
+  Future<void> _openLineOA(String source) async {
+    AnalyticsService.instance.log('line_link_tap', {'source': source});
     try {
       final url = Uri.parse(LineOAConstants.mainOA);
       if (await canLaunchUrl(url)) {

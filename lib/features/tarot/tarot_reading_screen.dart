@@ -9,6 +9,7 @@ import '../../core/models/tarot_card_model.dart';
 import '../../core/utils/simple_markdown.dart';
 import '../../core/widgets/typewriter_rich_text.dart';
 import '../../core/repositories/tarot_repository.dart';
+import '../../core/services/analytics_service.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/laravel_auth_service.dart';
 import '../../core/services/rating_service.dart';
@@ -495,6 +496,8 @@ class _TarotReadingScreenState extends State<TarotReadingScreen>
 
       // พลังศรัทธา: เปิดไพ่สำเร็จ วันละครั้ง (fire-and-forget)
       FaithPointsService.instance.awardDailyActivity('tarot');
+      // เปิดไพ่ + ได้คำทำนายครบแล้ว — จุดวัด engagement ของ funnel
+      AnalyticsService.instance.log('tarot_reading_done');
 
       // บันทึกการอ่าน
       _saveTarotReading({

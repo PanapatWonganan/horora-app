@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../../config/constants.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -151,6 +152,7 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.instance.log('merit_order_view');
     _prefillContactInfo();
     _loadFreeTrialEligibility();
 
@@ -383,6 +385,8 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
 
         final card = GestureDetector(
           onTap: () {
+            AnalyticsService.instance
+                .log('merit_package_selected', {'package_id': package.id});
             setState(() {
               _selectedPackage = package.id;
               // แพ็คฟรีไม่รวม add-on (ของถวายมีต้นทุน) — ล้างที่เลือกไว้
@@ -1030,6 +1034,11 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       if (created == null) {
         throw Exception('ไม่ได้รับข้อมูลคำสั่งบุญจากระบบ');
       }
+      // ออเดอร์มูฟรีสร้างสำเร็จ — จุดปิด funnel ฝั่ง path ฟรี
+      AnalyticsService.instance.log('merit_order_created', {
+        'type': 'free',
+        'amount': order.price.toInt(),
+      });
       // mark สิทธิ์หลังสร้างสำเร็จเท่านั้น — สร้างพลาดยังกลับมาใช้สิทธิ์ได้
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(StorageConstants.freeMeritUsed, true);

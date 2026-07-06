@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../../config/constants.dart';
 import '../../../core/routes/app_routes.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/celestial_effects.dart';
 import '../../../core/theme/merit_colors.dart';
@@ -48,6 +49,7 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.instance.log('merit_landing_view');
     _selectedDay = _defaultSelectedDay();
     _loadFreeTrialEligibility();
 
@@ -423,6 +425,8 @@ class _WeeklyScheduleScreenState extends State<WeeklyScheduleScreen> {
           return _PressScale(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
+              AnalyticsService.instance
+                  .log('merit_day_selected', {'has_schedule': hasSchedule});
               setState(() {
                 _selectedDay = day;
               });

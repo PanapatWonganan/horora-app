@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/constants.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../../../core/services/guest_session_service.dart';
 import '../../models/onboarding_models.dart';
 import '../../services/ab_test_service.dart';
@@ -98,6 +99,8 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
 
   Future<void> _finishAsGuest() async {
     _data = _data.copyWith(name: _nameController.text.trim());
+    // จบ onboarding เข้า Home — จุดปิด funnel ฝั่ง onboarding
+    AnalyticsService.instance.log('onboarding_complete');
     await _abTest.completeOnboarding();
     await GuestSessionService.instance.saveOnboarding(_data);
     await GuestSessionService.instance.markOnboardingCompleted();
@@ -135,6 +138,9 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   void _onPaywallShown() {
     if (_paywallShownTracked) return;
     _paywallShownTracked = true;
+    // paywall โผล่ในตำแหน่ง onboardingEnd (หน้า 11 ของ PageView) —
+    // ตำแหน่ง afterFirstReading ยิงจาก DeferredPaywallScreen.initState แทน
+    AnalyticsService.instance.log('paywall_view');
     _abTest.getPaywallVariant().then((variant) {
       if (mounted) setState(() => _paywallVariant = variant);
     });
@@ -154,6 +160,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
   }
 
   Future<void> _openTrialLineOA() async {
+    AnalyticsService.instance.log('line_link_tap', {'source': 'trial'});
     try {
       final url = Uri.parse(LineOAConstants.mainOA);
       if (await canLaunchUrl(url)) {
@@ -216,6 +223,7 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
               FocusScope.of(context).unfocus();
               setState(() => _page = i);
               _abTest.trackFunnelStep('cv_page_$i');
+              AnalyticsService.instance.log('onboarding_step', {'step': i});
               if (i == 6) _runAnalyzing(); // screen 7 = analyzing
               if (i == 10) {
                 // screen 11 = paywall (onboardingEnd placement only —

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/constants.dart';
+import '../../../../core/services/analytics_service.dart';
 import '../../services/ab_test_service.dart';
 import 'conversion_style.dart';
 
@@ -33,6 +34,9 @@ class _DeferredPaywallScreenState extends State<DeferredPaywallScreen> {
       if (mounted) setState(() => _paywallVariant = variant);
     });
     _abTest.trackPaywallEvent('paywall_shown');
+    // paywall โผล่แบบ deferred (afterFirstReading) — ตำแหน่ง onboardingEnd
+    // ยิงจาก _onPaywallShown ใน ConversionOnboardingScreen แทน
+    AnalyticsService.instance.log('paywall_view');
   }
 
   void _close() {
@@ -41,6 +45,7 @@ class _DeferredPaywallScreenState extends State<DeferredPaywallScreen> {
 
   /// เปิด LINE OA ให้คุยกับทีมงานเพื่อเริ่มทดลองใช้ฟรี 7 วัน
   Future<void> _openTrialLineOA() async {
+    AnalyticsService.instance.log('line_link_tap', {'source': 'trial'});
     try {
       final url = Uri.parse(LineOAConstants.mainOA);
       if (await canLaunchUrl(url)) {
@@ -204,7 +209,12 @@ class PaywallPage extends StatelessWidget {
             children: [
               // Placeholder: both trial + skip enter Home as guest for now.
               CvGoldButton(
-                  label: 'เริ่มทดลองฟรี 7 วัน', onPressed: onStartTrialTapped),
+                  label: 'เริ่มทดลองฟรี 7 วัน',
+                  onPressed: () {
+                    // ยิงที่นี่จุดเดียว ครอบทั้ง host onboarding และ deferred
+                    AnalyticsService.instance.log('trial_cta_tap');
+                    onStartTrialTapped();
+                  }),
               const SizedBox(height: 9),
               Text('จากนั้น ฿599/ปี · ยกเลิกได้ทุกเมื่อ',
                   style: CvType.body(12, color: CvColors.creamA(0.65))),
