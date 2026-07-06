@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../config/constants.dart';
 import '../../services/ab_test_service.dart';
 import 'conversion_style.dart';
 
@@ -37,6 +39,19 @@ class _DeferredPaywallScreenState extends State<DeferredPaywallScreen> {
     if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
+  /// เปิด LINE OA ให้คุยกับทีมงานเพื่อเริ่มทดลองใช้ฟรี 7 วัน
+  Future<void> _openTrialLineOA() async {
+    try {
+      final url = Uri.parse(LineOAConstants.mainOA);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      // เปิด LINE ไม่ได้ (เช่นในเทสต์/ไม่มีแอป) — ไม่ขวางการปิดหน้า
+      debugPrint('openTrialLineOA failed: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,6 +65,7 @@ class _DeferredPaywallScreenState extends State<DeferredPaywallScreen> {
                 _abTest.trackPaywallEvent('paywall_plan_selected', detail: plan),
             onStartTrialTapped: () {
               _abTest.trackPaywallEvent('paywall_start_trial_tapped');
+              _openTrialLineOA();
               _close();
             },
             onSkipped: () {

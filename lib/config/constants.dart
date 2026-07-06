@@ -32,6 +32,13 @@ class ApiConstants {
   static const String tarotGuestPath = '/tarot/guest'; // public (guest)
 }
 
+// ลิงก์ LINE Official Account ของแอป — รวมไว้ที่เดียวเพื่อไม่ให้ลิงก์
+// กระจาย hardcode ตามหน้าจอ (เปลี่ยน OA ครั้งเดียวจบ)
+class LineOAConstants {
+  /// OA หลักสำหรับติดต่อทีมงาน / สมัครทดลองใช้ฟรี 7 วัน
+  static const String mainOA = 'https://lin.ee/ysvOInz';
+}
+
 // ค่าคงที่สำหรับการจัดเก็บข้อมูลในเครื่อง
 class StorageConstants {
   static const String authToken = 'auth_token';

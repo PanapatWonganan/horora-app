@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../config/constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
@@ -236,7 +237,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () async {
-                final Uri url = Uri.parse('https://lin.ee/ysvOInz');
+                final Uri url = Uri.parse(LineOAConstants.mainOA);
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url, mode: LaunchMode.externalApplication);
                 }

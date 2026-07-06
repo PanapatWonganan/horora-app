@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter/material.dart' as material show TimeOfDay;
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../config/constants.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/services/guest_session_service.dart';
@@ -145,7 +147,22 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
 
   void _onPaywallStartTrialTapped() {
     _abTest.trackPaywallEvent('paywall_start_trial_tapped');
+    // เปิด LINE OA ให้คุยกับทีมงานเพื่อเริ่มทดลองใช้ แล้วพาเข้าแอปเป็น guest
+    // รอไว้ — กลับมาจาก LINE จะเจอหน้า Home ไม่ค้างอยู่ที่ paywall
+    _openTrialLineOA();
     _finishAsGuest();
+  }
+
+  Future<void> _openTrialLineOA() async {
+    try {
+      final url = Uri.parse(LineOAConstants.mainOA);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      // เปิด LINE ไม่ได้ (เช่นในเทสต์/ไม่มีแอป) — ไม่ขวางการเข้าแอป
+      debugPrint('openTrialLineOA failed: $e');
+    }
   }
 
   void _onPaywallSkipped() {
