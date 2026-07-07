@@ -227,6 +227,14 @@ class MeritOrderStatusScreen extends StatelessWidget {
                             onShare: () => _showShareSheet(context, temple),
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        // ชวนเพื่อน — วางที่ moment ที่ผู้ใช้ประทับใจสุด
+                        // (บุญสำเร็จ+เห็นหลักฐาน) ตามกฎ 1 ask/หน้า: เป็น value
+                        // ต่อเนื่อง ไม่ใช่ ask หลักของหน้า
+                        StaggeredReveal(
+                          index: 7,
+                          child: _buildInviteCard(context),
+                        ),
                       ] else ...[
                         StaggeredReveal(
                           index: 4,
@@ -235,7 +243,7 @@ class MeritOrderStatusScreen extends StatelessWidget {
                       ],
                       const SizedBox(height: 24),
                       const StaggeredReveal(
-                        index: 7,
+                        index: 8,
                         child: MeritTrustStrip(),
                       ),
                     ],
@@ -254,6 +262,56 @@ class MeritOrderStatusScreen extends StatelessWidget {
     // never invent randomness (no real id yet → readable placeholder).
     final base = (order.id ?? order.prayerName).hashCode.abs() % 1000000;
     return 'MERIT-${base.toString().padLeft(6, '0')}';
+  }
+
+  /// ชวนเพื่อนมาฝากบุญ — เปิดหน้า affiliate share (จัดการสมัคร/ลิงก์เอง)
+  /// วางไว้หลังบุญสำเร็จ (aha moment) โทนอบอุ่น ไม่ใช่ ask หลักของหน้า
+  Widget _buildInviteCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          Navigator.of(context).pushNamed(AppRoutes.affiliateShare),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+        decoration: BoxDecoration(
+          color: AppColors.ivorySilk.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(16),
+          border:
+              Border.all(color: AppColors.candleGold.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            const Text('🤍', style: TextStyle(fontSize: 22)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ชวนเพื่อนมาฝากบุญด้วยกัน',
+                    style: GoogleFonts.kanit(
+                      color: AppColors.deepText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'ส่งต่อความอิ่มบุญให้คนที่คุณรัก',
+                    style: GoogleFonts.kanit(
+                      color: AppColors.deepText.withValues(alpha: 0.6),
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right,
+                color: AppColors.deepGoldBrown, size: 20),
+          ],
+        ),
+      ),
+    );
   }
 
   /// การ์ดฉลอง "ปลดล็อกรางวัล" หลังฝากมู → พาไปเส้นทางสายมู (aha moment)
