@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../core/services/laravel_auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/merit_colors.dart';
 import '../../../core/theme/sacred_ui.dart';
@@ -31,7 +32,12 @@ class _MeritHistoryScreenState extends State<MeritHistoryScreen> {
   Future<void> _loadOrders() async {
     setState(() => _isLoading = true);
     try {
-      final orders = await _meritService.getMyOrders();
+      // login แล้ว → orders ผูก user เดิม; guest → ดึงจาก reference ในเครื่อง
+      // (guest status endpoint authorize ด้วย device_id)
+      final isLoggedIn = await LaravelAuthService.instance.isLoggedIn();
+      final orders = isLoggedIn
+          ? await _meritService.getMyOrders()
+          : await _meritService.getGuestOrders();
       setState(() {
         _orders = orders;
         _isLoading = false;

@@ -63,6 +63,9 @@ class StorageConstants {
   // สิทธิ์ "มูฟรีครั้งแรก" — ใช้แล้วหรือยัง (ต่อเครื่อง; ฝั่ง backend ควร
   // enforce ซ้ำอีกชั้นในอนาคต)
   static const String freeMeritUsed = 'free_merit_used';
+  // reference ออเดอร์บุญของ guest (list ของ {id, orderNumber, createdAt})
+  // — ใช้ดึงสถานะ/รูปไหว้ออเดอร์ตัวเองได้โดยไม่ต้อง login
+  static const String guestMeritOrders = 'guest_merit_orders';
   // ระบบ "เส้นทางสายมู" (พลังศรัทธา ✦ / streak / รางวัล) — ต่อเครื่อง
   static const String faithPoints = 'faith_points';
   static const String faithStreak = 'faith_streak';

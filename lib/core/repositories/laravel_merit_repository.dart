@@ -405,6 +405,25 @@ class LaravelMeritRepository {
     }
   }
 
+  // Get weekly order status as guest (no auth).
+  // authorize ด้วย device_id ที่ผูกออเดอร์ — ตรง → 200 คืน order เต็ม
+  // (location/package/proof_urls); ไม่ตรง/null → 403
+  Future<MeritOrder> getWeeklyOrderStatus(
+    String orderId,
+    String deviceId,
+  ) async {
+    try {
+      final response = await _apiClient.get(
+        '/merit/weekly-orders/$orderId/status',
+        queryParams: {'device_id': deviceId},
+      );
+      return MeritOrder.fromJson(response);
+    } catch (e) {
+      debugPrint('Error fetching weekly order status: $e');
+      rethrow;
+    }
+  }
+
   // Upload slip for weekly order (no auth required).
   // [uploadToken] authorizes this upload against the order (IDOR mitigation);
   // it is the single-use token returned when the order was created.

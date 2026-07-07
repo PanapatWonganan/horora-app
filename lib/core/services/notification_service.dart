@@ -94,11 +94,10 @@ class NotificationService {
     debugPrint('Handling notification action - screen: $screen, id: $id');
 
     // push "ภาพไหว้ของคุณมาแล้ว" จาก backend (data: screen=merit_status,
-    // order_code=MW-XXXXXXXX) → พาไปแท็บทำบุญ (ยังไม่มีหน้าเปิดตามเลข
-    // ออเดอร์ตรงๆ — TODO(backend): เพิ่ม endpoint ดูออเดอร์ตาม code แล้ว
-    // ค่อยเปิดหน้าสถานะออเดอร์นั้นตรงๆ)
+    // order_code=MW-XXXXXXXX) → เปิดหน้าประวัติออเดอร์บุญ ให้เห็นสถานะ+รูป
+    // ทันที (guest ดึงจาก reference ในเครื่องผ่าน guest status endpoint)
     if (screen == 'merit_status') {
-      appNavigatorKey.currentState?.pushNamed(AppRoutes.merit);
+      appNavigatorKey.currentState?.pushNamed(AppRoutes.meritHistory);
     }
   }
 

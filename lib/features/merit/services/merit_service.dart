@@ -5,6 +5,7 @@ import '../../../core/services/device_id_service.dart';
 import '../../../core/services/laravel_auth_service.dart';
 import '../../affiliate/services/affiliate_service.dart';
 import '../models/merit_models.dart';
+import 'guest_order_store.dart';
 
 /// Service สำหรับจัดการระบบทำบุญออนไลน์
 /// ใช้ Laravel API
@@ -187,10 +188,45 @@ class MeritService {
         await AffiliateService().clearReferralCode();
       }
 
-      return _convertLaravelOrderToMeritOrder(laravelOrder);
+      final converted = _convertLaravelOrderToMeritOrder(laravelOrder);
+
+      // เก็บ reference ออเดอร์ลงเครื่อง — ให้ guest ดูสถานะ/รูปไหว้ตัวเองได้
+      // (เก็บทุกออเดอร์ ไม่เฉพาะ guest; ตัว store จะกันซ้ำ/ข้ามถ้าไม่มี id เอง)
+      await GuestOrderStore.instance.add(converted);
+
+      return converted;
     } catch (e) {
       debugPrint('Error creating weekly order: $e');
       rethrow;
+    }
+  }
+
+  /// ดึงคำสั่งซื้อของ guest จาก reference ที่เก็บในเครื่อง
+  /// — ยิง getWeeklyOrderStatus ต่อ id (authorize ด้วย device_id)
+  /// ออเดอร์ที่ยิงพลาด/403 ให้ skip ไม่ให้ทั้ง list ล้ม
+  Future<List<MeritOrder>> getGuestOrders() async {
+    try {
+      final ids = await GuestOrderStore.instance.orderIds();
+      if (ids.isEmpty) return [];
+
+      final deviceId = await DeviceIdService.instance.getOrCreate();
+
+      final results = await Future.wait(
+        ids.map((id) async {
+          try {
+            final order = await _meritRepo.getWeeklyOrderStatus(id, deviceId);
+            return _convertLaravelOrderToMeritOrder(order);
+          } catch (e) {
+            debugPrint('Error fetching guest order $id: $e');
+            return null; // skip ออเดอร์ที่พลาด/403
+          }
+        }),
+      );
+
+      return results.whereType<MeritOrder>().toList();
+    } catch (e) {
+      debugPrint('Error fetching guest orders: $e');
+      return [];
     }
   }
 
