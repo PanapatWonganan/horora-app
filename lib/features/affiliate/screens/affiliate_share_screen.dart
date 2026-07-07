@@ -52,10 +52,10 @@ class _AffiliateShareScreenState extends State<AffiliateShareScreen> {
   void _shareLink() {
     if (_referralLink == null) return;
     Share.share(
-      'ฝากบุญออนไลน์กับ Horora! ไหว้พระ ขอพร สะดวกสบาย\n'
+      'ฝากบุญออนไลน์กับ Mootaewall! ไหว้พระ ขอพร สะดวกสบาย\n'
       'สั่งผ่านลิงก์นี้: ${_referralLink!.referralLink}\n'
       'รหัสแนะนำ: ${_referralLink!.referralCode}',
-      subject: 'Horora - ฝากบุญออนไลน์',
+      subject: 'Mootaewall - ฝากบุญออนไลน์',
     );
   }
 

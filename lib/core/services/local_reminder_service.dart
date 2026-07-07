@@ -33,7 +33,7 @@ class LocalReminderService {
   static const AndroidNotificationDetails _androidDetails =
       AndroidNotificationDetails(
     'horora_reminders',
-    'การแจ้งเตือน Horora',
+    'การแจ้งเตือน Mootaewall',
     channelDescription: 'เตือนเช็คอินรายวันและรายการฝากมูที่ค้างอยู่',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,

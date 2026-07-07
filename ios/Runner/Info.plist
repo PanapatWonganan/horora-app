@@ -9,7 +9,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>แอปนี้ต้องการเข้าถึงไมโครโฟนเพื่อใช้งานเสียง</string>
 	<key>CFBundleDisplayName</key>
-	<string>Astrology App</string>
+	<string>Mootaewall</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

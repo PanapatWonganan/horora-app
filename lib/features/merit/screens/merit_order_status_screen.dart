@@ -533,7 +533,7 @@ class MeritOrderStatusScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'ขออนุโมทนาบุญร่วมกัน 🙏\nทำบุญ ณ $temple ผ่านดวงใจเรียบร้อยแล้ว',
+              'ขออนุโมทนาบุญร่วมกัน 🙏\nทำบุญ ณ $temple ผ่าน Mootaewall เรียบร้อยแล้ว',
               textAlign: TextAlign.center,
               style: GoogleFonts.kanit(
                 color: AppColors.mutedText,

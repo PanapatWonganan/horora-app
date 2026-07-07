@@ -109,7 +109,7 @@ class _AffiliateRegisterScreenState extends State<AffiliateRegisterScreen> {
                     const Icon(Icons.handshake, color: AppColors.candleGold, size: 40),
                     const SizedBox(height: 12),
                     Text(
-                      'เป็นตัวแทน Horora',
+                      'เป็นตัวแทน Mootaewall',
                       style: SacredText.kanit(
                         color: AppColors.onBackdrop,
                         fontSize: 22,

@@ -44,7 +44,7 @@ class _AstrologyAppState extends State<AstrologyApp> {
       child: MaterialApp(
         navigatorKey: navigatorKey,
         navigatorObservers: [routeObserver],
-        title: 'AI Astrology',
+        title: 'Mootaewall',
         // Soft Celestial — a light, pastel Thai-astrology theme.
         theme: AppTheme.lightTheme(),
         localizationsDelegates: const [
