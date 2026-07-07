@@ -96,6 +96,22 @@ void main() {
       expect(faithIsHolyDay(DateTime(2026, 6, 30)), isFalse);
     });
 
+    test('faithNextHolyDayEve คืน 18:00 ของเย็นก่อนวันพระถัดไป', () {
+      // 5 ก.ค. → วันพระถัดไป 7 ก.ค. → eve = 6 ก.ค. 18:00
+      final eve = faithNextHolyDayEve(DateTime(2026, 7, 5, 10));
+      expect(eve, DateTime(2026, 7, 6, 18));
+    });
+
+    test('faithNextHolyDayEve ข้าม eve ที่ผ่านไปแล้ววันนี้', () {
+      // 6 ก.ค. 20:00 (เลย eve ของ 7 ก.ค. แล้ว) → ตัวถัดไป = eve ของ 14 ก.ค.
+      final eve = faithNextHolyDayEve(DateTime(2026, 7, 6, 20));
+      expect(eve, DateTime(2026, 7, 13, 18));
+    });
+
+    test('faithNextHolyDayEve คืน null เมื่อเลยวันพระสุดท้ายในตาราง', () {
+      expect(faithNextHolyDayEve(DateTime(2027, 1, 1)), isNull);
+    });
+
     test('plain check-in on a holy day earns double points', () {
       final r = computeFaithCheckin(
         lastCheckinDayKey: faithDayKey(DateTime(2026, 7, 6)),

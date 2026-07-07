@@ -4,6 +4,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../features/journey/models/faith_models.dart';
 import '../../features/journey/models/reminder_time_logic.dart';
 
 /// Local notification เพื่อ retention loop — ไม่พึ่งเซิร์ฟเวอร์/OneSignal:
@@ -21,6 +22,7 @@ class LocalReminderService {
 
   static const int _checkinNotificationId = 1001;
   static const int _abandonedOrderNotificationId = 1002;
+  static const int _holyDayNotificationId = 1003;
 
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -120,6 +122,28 @@ class LocalReminderService {
     } catch (e) {
       debugPrint(
           'LocalReminderService.scheduleAbandonedOrderReminder error: $e');
+    }
+  }
+
+  /// ตั้งเตือน "เย็นก่อนวันพระ 18:00" ว่าพรุ่งนี้แต้มคูณ 2 (id 1003)
+  /// one-shot วันพระถัดไป แล้ว reschedule ทุกครั้งที่เปิดแอป จึงต่อเนื่อง
+  /// ไม่มีวันพระเหลือในตาราง (เลยปีที่ seed) → ยกเลิกของเดิมแล้วไม่ตั้งใหม่
+  Future<void> scheduleHolyDayReminder() async {
+    if (!_initialized) return;
+    try {
+      await _plugin.cancel(_holyDayNotificationId);
+      final eve = faithNextHolyDayEve(DateTime.now());
+      if (eve == null) return;
+      await _plugin.zonedSchedule(
+        _holyDayNotificationId,
+        '🪷 พรุ่งนี้วันพระ',
+        'เช็คอินและฝากมูพรุ่งนี้ รับพลังศรัทธาคูณ 2 นะคะ',
+        tz.TZDateTime.from(eve, tz.local),
+        _details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    } catch (e) {
+      debugPrint('LocalReminderService.scheduleHolyDayReminder error: $e');
     }
   }
 

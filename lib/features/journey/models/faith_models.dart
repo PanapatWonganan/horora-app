@@ -163,6 +163,24 @@ const Set<String> kFaithHolyDays = {
 /// (ตารางด้านบนใช้ format YYYY-MM-DD ตรงกัน)
 bool faithIsHolyDay(DateTime d) => kFaithHolyDays.contains(faithDayKey(d));
 
+/// เวลา 18:00 ของ "เย็นก่อนวันพระถัดไป" (นับจาก [from]) — ใช้ตั้งเตือนล่วงหน้า
+/// ให้ผู้ใช้รู้ว่าพรุ่งนี้แต้มคูณ 2. คืน null ถ้าไม่เหลือวันพระในตาราง
+/// (เช่นเลยสิ้นปีที่ seed ไว้) — ผู้เรียกไม่ต้องตั้งเตือน
+DateTime? faithNextHolyDayEve(DateTime from) {
+  // ไล่หาวันพระวันแรกที่ "เย็นก่อนหน้า" ยังมาไม่ถึง (เย็น = 18:00)
+  final sorted = kFaithHolyDays.toList()..sort();
+  for (final key in sorted) {
+    final parts = key.split('-');
+    if (parts.length != 3) continue;
+    final holyDay = DateTime(
+        int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+    final eve = holyDay.subtract(const Duration(days: 1));
+    final eveAt6pm = DateTime(eve.year, eve.month, eve.day, 18);
+    if (eveAt6pm.isAfter(from)) return eveAt6pm;
+  }
+  return null;
+}
+
 // ── Check-in (pure) ──────────────────────────────────────────────────────────
 
 class FaithCheckinResult {

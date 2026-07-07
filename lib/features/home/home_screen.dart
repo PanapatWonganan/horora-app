@@ -199,6 +199,8 @@ class _HomeScreenState extends State<HomeScreen>
         streak: state.streak,
         checkedInToday: true,
       );
+      // ตั้งเตือน "เย็นก่อนวันพระ" ว่าพรุ่งนี้แต้มคูณ 2 (reschedule ทุกเปิดแอป)
+      LocalReminderService.instance.scheduleHolyDayReminder();
       if (result.isNewDay && !_tourStartedThisSession) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
