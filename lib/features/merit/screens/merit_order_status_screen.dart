@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/celestial_effects.dart';
 import '../../../core/theme/merit_colors.dart';
+import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/sacred_ui.dart';
 import '../../../core/utils/app_icons.dart';
 import '../models/merit_models.dart';
@@ -26,7 +27,15 @@ import '../widgets/merit_ui.dart';
 class MeritOrderStatusScreen extends StatelessWidget {
   final MeritOrder order;
 
-  const MeritOrderStatusScreen({super.key, required this.order});
+  /// ข้อความฉลอง "ปลดล็อกรางวัล" หลังฝากมูสำเร็จ (null = ไม่โชว์) —
+  /// เชื่อม merit → journey ให้ผู้ใช้เห็น aha moment ทันที
+  final String? unlockedMessage;
+
+  const MeritOrderStatusScreen({
+    super.key,
+    required this.order,
+    this.unlockedMessage,
+  });
 
   // ── Derive timeline position from the order status ──────────────────────────
 
@@ -149,6 +158,13 @@ class MeritOrderStatusScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (unlockedMessage != null) ...[
+                        StaggeredReveal(
+                          index: 0,
+                          child: _buildUnlockBanner(context, unlockedMessage!),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       StaggeredReveal(
                         index: 0,
                         child: _buildOrderSummary(temple),
@@ -238,6 +254,53 @@ class MeritOrderStatusScreen extends StatelessWidget {
     // never invent randomness (no real id yet → readable placeholder).
     final base = (order.id ?? order.prayerName).hashCode.abs() % 1000000;
     return 'MERIT-${base.toString().padLeft(6, '0')}';
+  }
+
+  /// การ์ดฉลอง "ปลดล็อกรางวัล" หลังฝากมู → พาไปเส้นทางสายมู (aha moment)
+  Widget _buildUnlockBanner(BuildContext context, String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: AppColors.candleGold.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.candleGold.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '🎉 $message',
+            style: GoogleFonts.kanit(
+              color: AppColors.deepText,
+              fontSize: 14.5,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutes.faithJourney),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'ไปดูในเส้นทางสายมู',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.deepGoldBrown,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const Icon(Icons.chevron_right,
+                    color: AppColors.deepGoldBrown, size: 18),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildHeader(BuildContext context) {

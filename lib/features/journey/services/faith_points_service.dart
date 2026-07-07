@@ -176,6 +176,47 @@ class FaithPointsService {
     }
   }
 
+  /// ข้อความฉลอง ถ้าการฝากมูครั้งนี้ "ปลดล็อก" รางวัลที่ต้องเคยฝากมู
+  /// (แต้มถึงแล้วก่อนหน้า ติดแค่เงื่อนไข merit) — ใช้โชว์บนหน้าสถานะออเดอร์
+  /// เพื่อเชื่อม merit → journey (คืน null ถ้าไม่มีอะไรเพิ่งปลดล็อก)
+  /// เรียกหลัง awardMeritOrder() แล้วเท่านั้น (ตอนนั้น hasMeritOrder=true แล้ว)
+  Future<String?> unlockedRewardMessageAfterMerit() async {
+    try {
+      final state = await loadState();
+      for (final m in FaithMilestone.defaults) {
+        if (!m.requiresMeritOrder) continue;
+        if (state.claimedMilestoneIds.contains(m.id)) continue;
+        // แต้มถึงเกณฑ์แล้ว + เพิ่งฝากมู → รางวัลนี้ claimable พอดี
+        if (state.points >= m.points) {
+          return 'ปลดล็อก ${m.emoji} ${m.title} แล้ว';
+        }
+      }
+    } catch (e) {
+      debugPrint('FaithPointsService.unlockedRewardMessageAfterMerit error: $e');
+    }
+    return null;
+  }
+
+  /// จำนวนวันครบภารกิจ 3/3 ของสัปดาห์นี้ (0..target) + ได้โบนัสสัปดาห์นี้แล้วไหม
+  /// ใช้โชว์ urgency บน Home ("สัปดาห์นี้ x/3 วัน → โบนัส +30 ✦")
+  Future<({int days, bool bonusClaimed})> weeklyQuestProgress(
+      {DateTime? now}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final weekKey = faithWeekKey(now ?? DateTime.now());
+      return (
+        days: prefs.getInt('${StorageConstants.faithWeekDaysPrefix}$weekKey') ??
+            0,
+        bonusClaimed:
+            prefs.getBool('${StorageConstants.faithWeekBonusPrefix}$weekKey') ??
+                false,
+      );
+    } catch (e) {
+      debugPrint('FaithPointsService.weeklyQuestProgress error: $e');
+      return (days: 0, bonusClaimed: false);
+    }
+  }
+
   /// บันทึกว่ารับรางวัล milestone นี้แล้ว (กันรับซ้ำ)
   Future<void> markMilestoneClaimed(String milestoneId) async {
     try {

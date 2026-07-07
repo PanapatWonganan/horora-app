@@ -62,6 +62,7 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
   File? _slipImage;
   MeritOrder? _createdOrder;
   bool _isCreatingOrder = false;
+  String? _unlockedMessage; // ข้อความปลดล็อกรางวัลหลังฝากมู (ถ้ามี)
   bool _isUploading = false;
   bool _orderCreated = false;
 
@@ -98,8 +99,11 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
         'type': 'paid',
         'amount': widget.order.price.toInt(),
       });
-      // พลังศรัทธา: ฝากมูสำเร็จ +50 (fire-and-forget)
-      FaithPointsService.instance.awardMeritOrder();
+      // พลังศรัทธา: ฝากมูสำเร็จ +50 แล้วเช็คว่าปลดล็อกรางวัลที่ต้องเคยฝากมูไหม
+      await FaithPointsService.instance.awardMeritOrder();
+      final unlocked =
+          await FaithPointsService.instance.unlockedRewardMessageAfterMerit();
+      if (mounted) setState(() => _unlockedMessage = unlocked);
       // ออเดอร์สร้างสำเร็จแล้ว — ยกเลิกเตือนออเดอร์ค้าง 24 ชม.
       LocalReminderService.instance.cancelAbandonedOrderReminder();
     } catch (e) {
@@ -326,8 +330,10 @@ class _MeritPaymentScreenState extends State<MeritPaymentScreen> {
                   );
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) =>
-                          MeritOrderStatusScreen(order: displayOrder),
+                      builder: (context) => MeritOrderStatusScreen(
+                        order: displayOrder,
+                        unlockedMessage: _unlockedMessage,
+                      ),
                     ),
                   );
                 },

@@ -1049,6 +1049,9 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       await prefs.setBool(StorageConstants.freeMeritUsed, true);
       // พลังศรัทธา: ฝากมูสำเร็จ +50 (รวมมูฟรีครั้งแรก)
       await FaithPointsService.instance.awardMeritOrder();
+      // ถ้าฝากมูครั้งนี้ปลดล็อกรางวัลที่ต้องเคยฝากมู → โชว์ฉลองบนหน้าสถานะ
+      final unlockedMessage =
+          await FaithPointsService.instance.unlockedRewardMessageAfterMerit();
       // ออเดอร์สำเร็จแล้ว — ไม่ต้องเตือนออเดอร์ค้างอีก
       LocalReminderService.instance.cancelAbandonedOrderReminder();
       if (!mounted) return;
@@ -1071,7 +1074,10 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => MeritOrderStatusScreen(order: displayOrder),
+          builder: (_) => MeritOrderStatusScreen(
+            order: displayOrder,
+            unlockedMessage: unlockedMessage,
+          ),
         ),
       );
     } on ex.ValidationException catch (e) {

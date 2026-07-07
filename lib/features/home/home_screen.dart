@@ -108,6 +108,8 @@ class _HomeScreenState extends State<HomeScreen>
   int _faithPoints = 0;
   int _faithStreak = 0;
   int _faithDailyDone = 0; // ภารกิจวันนี้ 0-3 (เช็คดวง/ถาม AI/เปิดไพ่)
+  int _faithWeekDays = 0; // จำนวนวันครบภารกิจของสัปดาห์นี้ (0..3)
+  bool _faithWeekBonusClaimed = false; // ได้โบนัสสัปดาห์นี้แล้วไหม
   Set<String> _faithClaimed = const {};
   bool _faithHasMeritOrder = false;
   bool _isHolyDay = false; // วันนี้เป็นวันพระ (แต้มคูณ 2) — โชว์ chip บน strip
@@ -172,11 +174,14 @@ class _HomeScreenState extends State<HomeScreen>
       }
       // โหลด state หลังนับโบนัส เพื่อให้ตัวเลขบน chip รวมโบนัสแล้ว
       final state = await FaithPointsService.instance.loadState();
+      final week = await FaithPointsService.instance.weeklyQuestProgress();
       if (!mounted) return;
       setState(() {
         _faithPoints = state.points;
         _faithStreak = state.streak;
         _faithDailyDone = dailyDone;
+        _faithWeekDays = week.days;
+        _faithWeekBonusClaimed = week.bonusClaimed;
         _faithClaimed = state.claimedMilestoneIds;
         _faithHasMeritOrder = state.hasMeritOrder;
         _isHolyDay = result.isHolyDay;
@@ -664,6 +669,24 @@ class _HomeScreenState extends State<HomeScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
+            // urgency โบนัสสัปดาห์ — โชว์เฉพาะตอนยังไม่ได้โบนัสสัปดาห์นี้และ
+            // ยังไม่ครบเป้า (โทนชวน ไม่กดดัน)
+            if (!_faithWeekBonusClaimed &&
+                _faithWeekDays < kFaithWeeklyBonusTargetDays)
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Text(
+                  'สัปดาห์นี้ $_faithWeekDays/$kFaithWeeklyBonusTargetDays วัน '
+                  '→ โบนัส +$kFaithWeeklyBonusPoints ✦',
+                  style: GoogleFonts.kanit(
+                    color: AppColors.onBackdropMuted,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
           ],
         ),
       ),
