@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
+import '../routes/app_navigator.dart';
+import '../routes/app_routes.dart';
+import 'device_id_service.dart';
+
 /// Service for managing OneSignal push notifications
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -41,6 +45,16 @@ class NotificationService {
     _setupNotificationHandlers();
 
     _isInitialized = true;
+
+    // ผูก external id = device_id เพื่อให้ backend ยิง push รายคนได้
+    // (เช่นแจ้ง "ภาพไหว้มาแล้ว" ไปที่เครื่องเจ้าของออเดอร์)
+    try {
+      final deviceId = await DeviceIdService.instance.getOrCreate();
+      await OneSignal.login(deviceId);
+    } catch (e) {
+      debugPrint('OneSignal.login(deviceId) failed: $e');
+    }
+
     debugPrint('OneSignal initialized successfully');
   }
 
@@ -79,11 +93,13 @@ class NotificationService {
 
     debugPrint('Handling notification action - screen: $screen, id: $id');
 
-    // You can use a GlobalKey<NavigatorState> or other navigation method here
-    // Example:
-    // if (screen == 'horoscope') {
-    //   navigatorKey.currentState?.pushNamed('/horoscope', arguments: {'id': id});
-    // }
+    // push "ภาพไหว้ของคุณมาแล้ว" จาก backend (data: screen=merit_status,
+    // order_code=MW-XXXXXXXX) → พาไปแท็บทำบุญ (ยังไม่มีหน้าเปิดตามเลข
+    // ออเดอร์ตรงๆ — TODO(backend): เพิ่ม endpoint ดูออเดอร์ตาม code แล้ว
+    // ค่อยเปิดหน้าสถานะออเดอร์นั้นตรงๆ)
+    if (screen == 'merit_status') {
+      appNavigatorKey.currentState?.pushNamed(AppRoutes.merit);
+    }
   }
 
   bool get _canUseOneSignal => !kIsWeb && _isInitialized;

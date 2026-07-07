@@ -271,6 +271,11 @@ class ApiClient {
         }
       case 400:
         throw ex.ValidationException('Bad request: ${response.body}');
+      case 422:
+        // Laravel validation error — ดึง message ภาษาไทยจาก server มาโชว์ตรงๆ
+        // (เช่น "สิทธิ์มูฟรีใช้ได้ 1 ครั้งต่อผู้ใช้ค่ะ")
+        throw ex.ValidationException(_extractMessage(response.body) ??
+            'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง');
       case 401:
         // token หมดอายุ/ถูกเพิกถอน → แจ้งให้ auth เคลียร์ session (กัน stale login)
         clearAuthToken();
@@ -287,6 +292,17 @@ class ApiClient {
         throw ex.ServerException();
       default:
         throw ex.ApiException('API error with status code: $statusCode');
+    }
+  }
+
+  // ดึงฟิลด์ message จาก error body (รูปแบบ Laravel) — null ถ้า parse ไม่ได้
+  String? _extractMessage(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      final message = decoded is Map<String, dynamic> ? decoded['message'] : null;
+      return message is String && message.isNotEmpty ? message : null;
+    } catch (_) {
+      return null;
     }
   }
 

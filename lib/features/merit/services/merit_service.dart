@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../../core/repositories/laravel_merit_repository.dart' as laravel;
+import '../../../core/services/device_id_service.dart';
 import '../../../core/services/laravel_auth_service.dart';
 import '../../affiliate/services/affiliate_service.dart';
 import '../models/merit_models.dart';
@@ -144,6 +145,7 @@ class MeritService {
         prayerWish: order.prayerWish,
         prayerPhone: order.prayerPhone,
         referralCode: referralCode,
+        deviceId: await DeviceIdService.instance.getOrCreate(),
       );
 
       // Clear referral code after successful order
@@ -176,6 +178,8 @@ class MeritService {
         prayerPhone: order.prayerPhone,
         price: order.price,
         referralCode: referralCode,
+        packageId: order.packageId,
+        deviceId: await DeviceIdService.instance.getOrCreate(),
       );
 
       // Clear referral code after successful order

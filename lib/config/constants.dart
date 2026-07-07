@@ -30,6 +30,10 @@ class ApiConstants {
   static const String chatSessionsPath = '/chat/sessions'; // auth
   static const String tarotReadingsPath = '/tarot/readings'; // auth
   static const String tarotGuestPath = '/tarot/guest'; // public (guest)
+
+  // ระบบพลังศรัทธาฝั่ง server (public, ระบุตัวด้วย device_id)
+  static const String faithCouponsPath = '/faith/coupons'; // POST ขอคูปองรายคน
+  static const String faithSyncPath = '/faith/sync'; // POST mirror แต้ม/สถานะ
 }
 
 // ลิงก์ LINE Official Account ของแอป — รวมไว้ที่เดียวเพื่อไม่ให้ลิงก์
@@ -67,6 +71,11 @@ class StorageConstants {
   static const String faithActivityPrefix = 'faith_activity_';
   static const String faithCouponExpiry = 'faith_coupon_expiry';
   static const String faithHasMeritOrder = 'faith_has_merit_order';
+  // โค้ดคูปองรายคนจาก server (FAITH-XXXX) — ถ้าไม่มีใช้โค้ดกลางเดิม
+  static const String faithCouponCode = 'faith_coupon_code';
+  // รหัสประจำเครื่อง (uuid v4) — ใช้ผูกออเดอร์/คูปอง/แต้มกับเครื่อง และเป็น
+  // external id ของ OneSignal สำหรับ push รายคน
+  static const String deviceId = 'device_id';
 }
 
 // ค่าคงที่สำหรับราศี

@@ -310,6 +310,7 @@ class LaravelMeritRepository {
     String? prayerWish,
     String? prayerPhone,
     String? referralCode,
+    String? deviceId,
   }) async {
     try {
       final response = await _apiClient.post('/merit/orders', data: {
@@ -320,6 +321,8 @@ class LaravelMeritRepository {
         'prayer_wish': prayerWish,
         'prayer_phone': prayerPhone,
         if (referralCode != null) 'referral_code': referralCode,
+        // device_id ผูกออเดอร์กับเครื่อง (target push แจ้งภาพพร้อม)
+        if (deviceId != null) 'device_id': deviceId,
       });
       return MeritOrder.fromJson(response);
     } catch (e) {
@@ -376,6 +379,8 @@ class LaravelMeritRepository {
     String? prayerPhone,
     required double price,
     String? referralCode,
+    String? packageId,
+    String? deviceId,
   }) async {
     try {
       final response = await _apiClient.post('/merit/weekly-orders', data: {
@@ -387,6 +392,11 @@ class LaravelMeritRepository {
         'prayer_phone': prayerPhone,
         'price': price,
         if (referralCode != null) 'referral_code': referralCode,
+        // package_id ให้ server แยกออเดอร์ฟรี ('free_trial') ได้ชัดเจน
+        if (packageId != null) 'package_id': packageId,
+        // device_id ผูกออเดอร์กับเครื่อง — server ใช้กันสิทธิ์มูฟรีซ้ำ
+        // และเป็น target ของ push "ภาพไหว้มาแล้ว"
+        if (deviceId != null) 'device_id': deviceId,
       });
       return MeritOrder.fromJson(response);
     } catch (e) {

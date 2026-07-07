@@ -81,18 +81,23 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
         );
         break;
       case FaithRewardType.meritCoupon:
+        // ขอโค้ดรายคนจาก server (FAITH-XXXX ผูกเครื่อง กันแชร์ต่อ) —
+        // ล้มเหลว/ออฟไลน์จะ fallback เป็นโค้ดกลางเดิมภายใน 3 วิ
+        final coupon = await FaithPointsService.instance.requestCoupon();
+        AnalyticsService.instance
+            .log('coupon_issued', {'server': coupon.fromServer ? 1 : 0});
+        if (!mounted) return;
         await _showRewardDialog(
           emoji: '🎟️',
           title: 'ส่วนลดฝากมู ฿30',
-          body: 'โค้ด: $kFaithMeritCouponCode (ใช้ได้ภายใน '
+          body: 'โค้ด: ${coupon.code} (ใช้ได้ภายใน '
               '$kFaithMeritCouponDays วัน)\n'
               'แจ้งโค้ดนี้กับทีมงานใน LINE ตอนยืนยันยอดฝากมู '
               'เพื่อรับส่วนลดทันที',
           actionLabel: 'คัดลอกโค้ด',
           closeOnAction: false,
           onAction: () async {
-            await Clipboard.setData(
-                const ClipboardData(text: kFaithMeritCouponCode));
+            await Clipboard.setData(ClipboardData(text: coupon.code));
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('คัดลอกโค้ดแล้ว')),

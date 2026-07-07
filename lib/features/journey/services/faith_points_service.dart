@@ -1,8 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../config/constants.dart';
+import '../../../core/api/api_client.dart';
+import '../../../core/services/device_id_service.dart';
 import '../models/faith_models.dart';
+
+/// ผลการขอคูปองส่วนลด — [fromServer] = ได้โค้ดรายคนจริงจาก backend
+/// (false = fallback โค้ดกลางเดิม ตอน endpoint ยังไม่พร้อม/ออฟไลน์)
+class FaithCouponResult {
+  final String code;
+  final bool fromServer;
+  const FaithCouponResult({required this.code, required this.fromServer});
+}
 
 /// สถานะระบบ "เส้นทางสายมู" ที่หน้าจอใช้แสดงผล
 class FaithState {
@@ -32,6 +44,9 @@ class FaithState {
 class FaithPointsService {
   FaithPointsService._();
   static final FaithPointsService instance = FaithPointsService._();
+
+  ApiClient? _api;
+  ApiClient get _client => _api ??= ApiClient();
 
   Future<FaithState> loadState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -66,6 +81,7 @@ class FaithPointsService {
           (prefs.getInt(StorageConstants.faithPoints) ?? 0) +
               result.pointsEarned,
         );
+        unawaited(syncToServer());
       }
       return result;
     } catch (e) {
@@ -107,6 +123,7 @@ class FaithPointsService {
       );
       // ปลดล็อกเงื่อนไข "เคยฝากมูแล้ว" ของรางวัลกลุ่มวอลเปเปอร์
       await prefs.setBool(StorageConstants.faithHasMeritOrder, true);
+      unawaited(syncToServer());
       return kFaithMeritPoints;
     } catch (e) {
       debugPrint('FaithPointsService.awardMeritOrder error: $e');
@@ -126,7 +143,10 @@ class FaithPointsService {
             StorageConstants.faithClaimedMilestones, claimed);
       }
       // คูปองส่วนลด: เก็บวันหมดอายุไว้โชว์/ตรวจ (แจ้งโค้ดผ่าน LINE)
-      if (milestoneId == 'merit_coupon') {
+      // — ถ้า requestCoupon() ได้ค่าจาก server มาแล้ว จะมี expiry อยู่ก่อน
+      // ไม่ทับ (ค่า server แม่นกว่า)
+      if (milestoneId == 'merit_coupon' &&
+          !prefs.containsKey(StorageConstants.faithCouponExpiry)) {
         await prefs.setString(
           StorageConstants.faithCouponExpiry,
           DateTime.now()
@@ -134,8 +154,68 @@ class FaithPointsService {
               .toIso8601String(),
         );
       }
+      unawaited(syncToServer());
     } catch (e) {
       debugPrint('FaithPointsService.markMilestoneClaimed error: $e');
+    }
+  }
+
+  /// ขอคูปองส่วนลดรายคนจาก server (โค้ด FAITH-XXXX ผูกกับเครื่อง —
+  /// กันโค้ดกลางหลุดไปแชร์ต่อ) — ขอซ้ำได้ใบเดิมจนกว่าจะหมดอายุ/ถูกใช้
+  ///
+  /// ล้มเหลว/ช้าเกิน 3 วิ (endpoint ยังไม่ deploy, ออฟไลน์) → fallback
+  /// โค้ดกลาง [kFaithMeritCouponCode] แบบเดิม — user ไม่เจอ error
+  /// TODO(backend-deploy): เมื่อ backend ขึ้น production แล้ว fallback
+  /// ควรเจอเฉพาะตอนออฟไลน์เท่านั้น
+  Future<FaithCouponResult> requestCoupon() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // มีโค้ดรายคนอยู่แล้ว → ใช้ใบเดิม
+      final saved = prefs.getString(StorageConstants.faithCouponCode);
+      if (saved != null && saved.isNotEmpty) {
+        return FaithCouponResult(code: saved, fromServer: true);
+      }
+      final deviceId = await DeviceIdService.instance.getOrCreate();
+      final response = await _client
+          .post(ApiConstants.faithCouponsPath, data: {'device_id': deviceId})
+          .timeout(const Duration(seconds: 3));
+      final code = response is Map ? response['code'] : null;
+      if (code is String && code.isNotEmpty) {
+        await prefs.setString(StorageConstants.faithCouponCode, code);
+        final expiresAt = response['expires_at'];
+        if (expiresAt is String && DateTime.tryParse(expiresAt) != null) {
+          await prefs.setString(StorageConstants.faithCouponExpiry, expiresAt);
+        }
+        return FaithCouponResult(code: code, fromServer: true);
+      }
+    } catch (e) {
+      debugPrint('FaithPointsService.requestCoupon error: $e');
+    }
+    return const FaithCouponResult(
+        code: kFaithMeritCouponCode, fromServer: false);
+  }
+
+  /// Mirror แต้ม/สถานะขึ้น server (fire-and-forget) — เพื่อ visibility /
+  /// ตรวจ abuse ฝั่งแอดมิน server เก็บ max(points) เอง client ส่งค่าจริงได้
+  /// TODO(backend): ระยะยาวย้ายเป็น server-authoritative แล้ว client อ่านกลับ
+  Future<void> syncToServer() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final deviceId = await DeviceIdService.instance.getOrCreate();
+      await _client.post(ApiConstants.faithSyncPath, data: {
+        'device_id': deviceId,
+        'points': prefs.getInt(StorageConstants.faithPoints) ?? 0,
+        'streak': prefs.getInt(StorageConstants.faithStreak) ?? 0,
+        'last_checkin_date':
+            prefs.getString(StorageConstants.faithLastCheckin),
+        'has_merit_order':
+            prefs.getBool(StorageConstants.faithHasMeritOrder) ?? false,
+        'claimed_milestones':
+            prefs.getStringList(StorageConstants.faithClaimedMilestones) ?? [],
+      }).timeout(const Duration(seconds: 5));
+    } catch (e) {
+      // เงียบ — sync พลาดไม่กระทบ UX (รอบหน้า sync ใหม่เอง)
+      debugPrint('FaithPointsService.syncToServer skipped: $e');
     }
   }
 

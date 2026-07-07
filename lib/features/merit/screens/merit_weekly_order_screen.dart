@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 import '../../../config/constants.dart';
 import '../../../core/services/analytics_service.dart';
+import '../../../core/utils/exceptions.dart' as ex;
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/guest_session_service.dart';
 import '../../../core/services/local_reminder_service.dart';
@@ -1073,6 +1074,29 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
           builder: (_) => MeritOrderStatusScreen(order: displayOrder),
         ),
       );
+    } on ex.ValidationException catch (e) {
+      // server ปฏิเสธ (422) — เคสหลักคือใช้สิทธิ์มูฟรีไปแล้ว (เบอร์/เครื่อง
+      // เดิมเคยรับสิทธิ์ เช่น ลบแอปลงใหม่) → จำสถานะไว้ ซ่อนการ์ดฟรีถาวร
+      // และโชว์ข้อความจริงจาก server แทนการพาไปหน้าสถานะเหมือนสำเร็จ
+      debugPrint('MeritWeeklyOrderScreen._submitFreeOrder rejected: $e');
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(StorageConstants.freeMeritUsed, true);
+      } catch (_) {}
+      if (mounted) {
+        setState(() {
+          _freeTrialEligible = false;
+          if (_isFreeSelected) {
+            _selectedPackage = WeeklyOrderPackage.defaultPackages.first.id;
+          }
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     } catch (e) {
       debugPrint('MeritWeeklyOrderScreen._submitFreeOrder error: $e');
       if (mounted) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/routes/app_navigator.dart';
 import 'core/routes/app_router.dart';
 import 'core/routes/app_routes.dart';
 import 'core/theme/app_theme.dart';
@@ -15,7 +16,9 @@ class AstrologyApp extends StatefulWidget {
 }
 
 class _AstrologyAppState extends State<AstrologyApp> {
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  // ใช้ key กลางจาก app_navigator.dart เพื่อให้ service นอก widget tree
+  // (push notification ฯลฯ) นำทางได้
+  final GlobalKey<NavigatorState> navigatorKey = appNavigatorKey;
 
   @override
   void initState() {
