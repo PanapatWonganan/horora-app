@@ -594,14 +594,14 @@ class _HomeScreenState extends State<HomeScreen>
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                // วันพระ = แต้มคูณ 2 — Flexible + ellipsis กันชน label ขวา
-                // บนจอแคบ
+                // วันพระ = แต้มคูณ 2 — badge สั้นๆ กันโดน ellipsis บนจอแคบ
+                // (คำอธิบายเต็มอยู่ใน snackbar เช็คอิน + หน้าเส้นทางสายมู)
                 if (_isHolyDay)
                   Flexible(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Text(
-                        '🪷 วันพระ ✦×2',
+                        '🪷 ×2',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.kanit(
