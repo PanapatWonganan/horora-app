@@ -334,8 +334,8 @@ String faithMantraForWeekday(int? weekday) {
   }
 }
 
-/// โค้ดคูปองส่วนลดฝากมู (แจ้งทีมงานใน LINE ระหว่างยืนยันยอด)
-const String kFaithMeritCouponCode = 'FAITH30';
+/// อายุคูปองส่วนลดฝากมู (วัน) — โค้ดจริงออกรายคนจาก server (FAITH-XXXX)
+/// ไม่มีโค้ดกลางฝั่ง client อีกต่อไป (กันแชร์ต่อ)
 const int kFaithMeritCouponDays = 14;
 
 // ── แถบภารกิจบนหน้า Home (quest strip) ──────────────────────────────────────

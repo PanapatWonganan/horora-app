@@ -8,12 +8,13 @@ import '../../../core/api/api_client.dart';
 import '../../../core/services/device_id_service.dart';
 import '../models/faith_models.dart';
 
-/// ผลการขอคูปองส่วนลด — [fromServer] = ได้โค้ดรายคนจริงจาก backend
-/// (false = fallback โค้ดกลางเดิม ตอน endpoint ยังไม่พร้อม/ออฟไลน์)
+/// ผลการขอคูปองส่วนลด — [code] เป็น null ถ้าออกโค้ดไม่สำเร็จ
+/// (ออฟไลน์/server พลาด) → หน้าจอให้ผู้ใช้ลองใหม่ ไม่แจกโค้ดกลางที่แชร์ต่อได้
 class FaithCouponResult {
-  final String code;
-  final bool fromServer;
-  const FaithCouponResult({required this.code, required this.fromServer});
+  final String? code;
+  const FaithCouponResult({this.code});
+
+  bool get isSuccess => code != null && code!.isNotEmpty;
 }
 
 /// สถานะระบบ "เส้นทางสายมู" ที่หน้าจอใช้แสดงผล
@@ -207,22 +208,21 @@ class FaithPointsService {
   /// ขอคูปองส่วนลดรายคนจาก server (โค้ด FAITH-XXXX ผูกกับเครื่อง —
   /// กันโค้ดกลางหลุดไปแชร์ต่อ) — ขอซ้ำได้ใบเดิมจนกว่าจะหมดอายุ/ถูกใช้
   ///
-  /// ล้มเหลว/ช้าเกิน 3 วิ (endpoint ยังไม่ deploy, ออฟไลน์) → fallback
-  /// โค้ดกลาง [kFaithMeritCouponCode] แบบเดิม — user ไม่เจอ error
-  /// TODO(backend-deploy): เมื่อ backend ขึ้น production แล้ว fallback
-  /// ควรเจอเฉพาะตอนออฟไลน์เท่านั้น
+  /// ออกโค้ดไม่สำเร็จ (ออฟไลน์/server พลาด) → คืน code = null ให้หน้าจอ
+  /// แจ้งผู้ใช้ลองใหม่ — **ไม่แจกโค้ดกลางที่แชร์ต่อได้** (โค้ดต้องมาจาก
+  /// server เท่านั้น เพราะเป็นส่วนลดที่มีมูลค่าเงิน)
   Future<FaithCouponResult> requestCoupon() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       // มีโค้ดรายคนอยู่แล้ว → ใช้ใบเดิม
       final saved = prefs.getString(StorageConstants.faithCouponCode);
       if (saved != null && saved.isNotEmpty) {
-        return FaithCouponResult(code: saved, fromServer: true);
+        return FaithCouponResult(code: saved);
       }
       final deviceId = await DeviceIdService.instance.getOrCreate();
       final response = await _client
           .post(ApiConstants.faithCouponsPath, data: {'device_id': deviceId})
-          .timeout(const Duration(seconds: 3));
+          .timeout(const Duration(seconds: 5));
       final code = response is Map ? response['code'] : null;
       if (code is String && code.isNotEmpty) {
         await prefs.setString(StorageConstants.faithCouponCode, code);
@@ -230,13 +230,12 @@ class FaithPointsService {
         if (expiresAt is String && DateTime.tryParse(expiresAt) != null) {
           await prefs.setString(StorageConstants.faithCouponExpiry, expiresAt);
         }
-        return FaithCouponResult(code: code, fromServer: true);
+        return FaithCouponResult(code: code);
       }
     } catch (e) {
       debugPrint('FaithPointsService.requestCoupon error: $e');
     }
-    return const FaithCouponResult(
-        code: kFaithMeritCouponCode, fromServer: false);
+    return const FaithCouponResult(code: null);
   }
 
   /// Mirror แต้ม/สถานะขึ้น server (fire-and-forget) — เพื่อ visibility /

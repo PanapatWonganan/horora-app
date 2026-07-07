@@ -83,12 +83,22 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
         );
         break;
       case FaithRewardType.meritCoupon:
-        // ขอโค้ดรายคนจาก server (FAITH-XXXX ผูกเครื่อง กันแชร์ต่อ) —
-        // ล้มเหลว/ออฟไลน์จะ fallback เป็นโค้ดกลางเดิมภายใน 3 วิ
+        // ขอโค้ดรายคนจาก server (FAITH-XXXX ผูกเครื่อง กันแชร์ต่อ)
         final coupon = await FaithPointsService.instance.requestCoupon();
         AnalyticsService.instance
-            .log('coupon_issued', {'server': coupon.fromServer ? 1 : 0});
+            .log('coupon_issued', {'ok': coupon.isSuccess ? 1 : 0});
         if (!mounted) return;
+        if (!coupon.isSuccess) {
+          // ออกโค้ดไม่สำเร็จ — ไม่มาร์ค claimed เพื่อให้กดรับใหม่ได้
+          // (return ก่อนถึง markMilestoneClaimed ท้ายเมธอด)
+          await _showRewardDialog(
+            emoji: '🎟️',
+            title: 'ส่วนลดฝากมู ฿30',
+            body: 'ระบบกำลังออกโค้ดส่วนลดให้คุณ '
+                'กรุณาเช็คสัญญาณเน็ตแล้วกด "รับรางวัล" อีกครั้งนะคะ',
+          );
+          return;
+        }
         await _showRewardDialog(
           emoji: '🎟️',
           title: 'ส่วนลดฝากมู ฿30',
@@ -99,7 +109,7 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
           actionLabel: 'คัดลอกโค้ด',
           closeOnAction: false,
           onAction: () async {
-            await Clipboard.setData(ClipboardData(text: coupon.code));
+            await Clipboard.setData(ClipboardData(text: coupon.code!));
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('คัดลอกโค้ดแล้ว')),

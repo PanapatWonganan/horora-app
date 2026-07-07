@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api_client.dart';
 import '../../config/constants.dart';
+import 'device_id_service.dart';
 
 /// User model for Laravel API
 class LaravelUser {
@@ -175,6 +176,8 @@ class LaravelAuthService {
           'password': password,
           'name': name,
           'birth_date': birthDate?.toIso8601String().split('T')[0],
+          // ผูกออเดอร์/คูปอง/แต้มที่สะสมตอนเป็น guest เข้าบัญชีใหม่
+          'device_id': await DeviceIdService.instance.getOrCreate(),
         },
       );
 
@@ -199,6 +202,8 @@ class LaravelAuthService {
         data: {
           'email': email,
           'password': password,
+          // merge guest data (ที่สะสมบนเครื่องนี้ก่อน login) เข้าบัญชี
+          'device_id': await DeviceIdService.instance.getOrCreate(),
         },
       );
 
