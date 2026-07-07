@@ -128,6 +128,7 @@ flutter:
     - assets/images/tarot/
     - assets/images/backgrounds/
     - assets/images/banners/
+    - assets/images/reviews/
     - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1015,12 +1015,101 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
               title: 'ติดตามสถานะได้',
               subtitle: 'รู้ทุกความเคลื่อนไหวของบุญที่คุณร่วม',
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 22),
+            _partnersNote(),
+            const SizedBox(height: 20),
+            _reviewCarousel(),
+            const SizedBox(height: 16),
             _testimonial(),
           ],
         ),
       ),
       cta: CvGoldButton(label: 'ดำเนินการต่อ', onPressed: _next),
+    );
+  }
+
+  /// แถบ "เคยร่วมงานกับ" — ใช้ข้อความแทนโลโก้ (เลี่ยงปัญหาเครื่องหมายการค้า
+  /// จนกว่าจะได้อนุญาตใช้โลโก้เป็นลายลักษณ์อักษร) เขียนเชิงข้อเท็จจริง
+  Widget _partnersNote() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: CvColors.whiteA(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CvColors.goldA(0.25)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('เคยร่วมงานด้านวอลเปเปอร์มงคลกับ',
+              style: CvType.eyebrow(size: 11, color: CvColors.goldSoft)),
+          const SizedBox(height: 8),
+          Text('Downy · Successmore',
+              style: CvType.display(17, height: 1.3)),
+          const SizedBox(height: 4),
+          Text('และแบรนด์ชั้นนำที่ไว้วางใจงานสายมงคลของเรา',
+              style: CvType.body(12, color: CvColors.creamA(0.6))),
+        ],
+      ),
+    );
+  }
+
+  /// รีวิวลูกค้าแบบรูป — เลื่อนแนวนอน แสดง placeholder ถ้ายังไม่มีไฟล์จริง
+  /// (วางไฟล์ที่ assets/images/reviews/review_1..3.jpg)
+  Widget _reviewCarousel() {
+    const paths = [
+      'assets/images/reviews/review_1.jpg',
+      'assets/images/reviews/review_2.jpg',
+      'assets/images/reviews/review_3.jpg',
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('รีวิวจากลูกค้าจริง',
+            style: CvType.eyebrow(size: 11, color: CvColors.goldSoft)),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 190,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: paths.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, i) => _reviewImageCard(paths[i]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _reviewImageCard(String path) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.asset(
+        path,
+        width: 152,
+        height: 190,
+        fit: BoxFit.cover,
+        // ยังไม่มีไฟล์จริง → placeholder สุภาพ ไม่ทำแอปพัง
+        errorBuilder: (_, __, ___) => Container(
+          width: 152,
+          height: 190,
+          decoration: BoxDecoration(
+            color: CvColors.whiteA(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: CvColors.goldA(0.2)),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('🖼️', style: TextStyle(fontSize: 26)),
+              const SizedBox(height: 8),
+              Text('รีวิวลูกค้า',
+                  style: CvType.body(12, color: CvColors.creamA(0.5))),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
