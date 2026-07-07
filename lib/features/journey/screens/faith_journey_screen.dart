@@ -28,6 +28,7 @@ class FaithJourneyScreen extends StatefulWidget {
 class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
   FaithState? _state;
   DateTime? _birthDate;
+  bool _isHolyDay = false; // วันนี้เป็นวันพระ (แต้มคูณ 2)
 
   @override
   void initState() {
@@ -51,6 +52,7 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
       setState(() {
         _state = state;
         _birthDate = birth;
+        _isHolyDay = faithIsHolyDay(DateTime.now());
       });
     }
   }
@@ -232,6 +234,12 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
                                 StaggeredReveal(
                                     index: 0,
                                     child: _buildLevelCard(state)),
+                                if (_isHolyDay) ...[
+                                  const SizedBox(height: 12),
+                                  StaggeredReveal(
+                                      index: 1,
+                                      child: _buildHolyDayChip()),
+                                ],
                                 const SizedBox(height: 16),
                                 StaggeredReveal(
                                     index: 1, child: _buildEarnHints()),
@@ -393,6 +401,27 @@ class _FaithJourneyScreenState extends State<FaithJourneyScreen> {
                 color: AppColors.mutedText, fontSize: 12.5),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Chip แจ้งว่าวันนี้เป็นวันพระ — ทุกกิจกรรมได้แต้มคูณ 2
+  Widget _buildHolyDayChip() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppColors.candleGold.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: AppColors.candleGold.withValues(alpha: 0.55)),
+      ),
+      child: Text(
+        '🪷 วันนี้วันพระ — แต้มคูณ 2',
+        style: GoogleFonts.kanit(
+          color: AppColors.candleGold,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

@@ -92,20 +92,22 @@ class FaithPointsService {
   }
 
   /// กิจกรรมรายวัน (ถาม AI / เปิดไพ่) — ให้แต้มวันละครั้งต่อประเภท
-  /// คืนแต้มที่ได้ (0 = วันนี้รับไปแล้ว)
+  /// คืนแต้มที่ได้ (0 = วันนี้รับไปแล้ว) — วันพระคูณ 2
   Future<int> awardDailyActivity(String activityKey, {DateTime? now}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final key = '${StorageConstants.faithActivityPrefix}$activityKey';
-      final today = faithDayKey(now ?? DateTime.now());
+      final ts = now ?? DateTime.now();
+      final today = faithDayKey(ts);
       if (prefs.getString(key) == today) return 0;
+      final earned =
+          faithIsHolyDay(ts) ? kFaithActivityPoints * 2 : kFaithActivityPoints;
       await prefs.setString(key, today);
       await prefs.setInt(
         StorageConstants.faithPoints,
-        (prefs.getInt(StorageConstants.faithPoints) ?? 0) +
-            kFaithActivityPoints,
+        (prefs.getInt(StorageConstants.faithPoints) ?? 0) + earned,
       );
-      return kFaithActivityPoints;
+      return earned;
     } catch (e) {
       debugPrint('FaithPointsService.awardDailyActivity error: $e');
       return 0;
@@ -113,20 +115,62 @@ class FaithPointsService {
   }
 
   /// ฝากมูสำเร็จ (ไม่มีเพดานรายวัน — หนึ่งออเดอร์หนึ่งครั้ง เรียกจากจุด
-  /// สร้างออเดอร์สำเร็จเท่านั้น)
-  Future<int> awardMeritOrder() async {
+  /// สร้างออเดอร์สำเร็จเท่านั้น) — ฝากมูวันพระได้คูณ 2 (+100 ✦) ตั้งใจให้
+  /// เป็นแรงจูงใจสั่งออเดอร์ในวันพระ
+  Future<int> awardMeritOrder({DateTime? now}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final earned = faithIsHolyDay(now ?? DateTime.now())
+          ? kFaithMeritPoints * 2
+          : kFaithMeritPoints;
       await prefs.setInt(
         StorageConstants.faithPoints,
-        (prefs.getInt(StorageConstants.faithPoints) ?? 0) + kFaithMeritPoints,
+        (prefs.getInt(StorageConstants.faithPoints) ?? 0) + earned,
       );
       // ปลดล็อกเงื่อนไข "เคยฝากมูแล้ว" ของรางวัลกลุ่มวอลเปเปอร์
       await prefs.setBool(StorageConstants.faithHasMeritOrder, true);
       unawaited(syncToServer());
-      return kFaithMeritPoints;
+      return earned;
     } catch (e) {
       debugPrint('FaithPointsService.awardMeritOrder error: $e');
+      return 0;
+    }
+  }
+
+  /// บันทึกว่า "วันนี้ทำภารกิจครบ 3/3" — เรียกจากจุดที่ dailyQuestsDone แตะ 3
+  /// นับได้วันละครั้ง สะสมรายสัปดาห์ (ISO week, จันทร์เริ่ม) ครบ
+  /// [kFaithWeeklyBonusTargetDays] วัน → โบนัส +[kFaithWeeklyBonusPoints] ✦
+  /// ครั้งเดียวต่อสัปดาห์ (วันพระคูณ 2) — คืนแต้มโบนัสที่ได้ (0 = ไม่มี)
+  Future<int> recordFullQuestDay({DateTime? now}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final ts = now ?? DateTime.now();
+      final weekKey = faithWeekKey(ts);
+      final daysKey = '${StorageConstants.faithWeekDaysPrefix}$weekKey';
+      final bonusKey = '${StorageConstants.faithWeekBonusPrefix}$weekKey';
+      final result = computeFaithWeeklyQuest(
+        lastFullQuestDayKey:
+            prefs.getString(StorageConstants.faithLastFullQuestDay),
+        daysThisWeek: prefs.getInt(daysKey) ?? 0,
+        bonusClaimed: prefs.getBool(bonusKey) ?? false,
+        now: ts,
+      );
+      if (!result.countsToday) return 0;
+      await prefs.setString(
+          StorageConstants.faithLastFullQuestDay, faithDayKey(ts));
+      await prefs.setInt(daysKey, result.newDaysThisWeek);
+      if (result.pointsEarned > 0) {
+        await prefs.setBool(bonusKey, true);
+        await prefs.setInt(
+          StorageConstants.faithPoints,
+          (prefs.getInt(StorageConstants.faithPoints) ?? 0) +
+              result.pointsEarned,
+        );
+        unawaited(syncToServer());
+      }
+      return result.pointsEarned;
+    } catch (e) {
+      debugPrint('FaithPointsService.recordFullQuestDay error: $e');
       return 0;
     }
   }

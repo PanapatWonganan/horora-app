@@ -73,6 +73,11 @@ class StorageConstants {
   static const String faithHasMeritOrder = 'faith_has_merit_order';
   // โค้ดคูปองรายคนจาก server (FAITH-XXXX) — ถ้าไม่มีใช้โค้ดกลางเดิม
   static const String faithCouponCode = 'faith_coupon_code';
+  // โบนัสภารกิจรายสัปดาห์ — daykey ล่าสุดที่นับเป็น "วันครบภารกิจ 3/3"
+  // (กันนับซ้ำวันเดียวกัน) + ตัวนับ/ธงรับโบนัสแยกราย ISO week key
+  static const String faithLastFullQuestDay = 'faith_last_full_quest_day';
+  static const String faithWeekDaysPrefix = 'faith_week_days_';
+  static const String faithWeekBonusPrefix = 'faith_week_bonus_';
   // รหัสประจำเครื่อง (uuid v4) — ใช้ผูกออเดอร์/คูปอง/แต้มกับเครื่อง และเป็น
   // external id ของ OneSignal สำหรับ push รายคน
   static const String deviceId = 'device_id';

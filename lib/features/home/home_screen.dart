@@ -110,6 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
   int _faithDailyDone = 0; // ภารกิจวันนี้ 0-3 (เช็คดวง/ถาม AI/เปิดไพ่)
   Set<String> _faithClaimed = const {};
   bool _faithHasMeritOrder = false;
+  bool _isHolyDay = false; // วันนี้เป็นวันพระ (แต้มคูณ 2) — โชว์ chip บน strip
 
   // ── Feature tour (showcaseview) — โชว์ครั้งเดียวต่อเครื่องหลังเข้า Home
   // ครั้งแรก: ดวงรายวัน → ปุ่มทำบุญ → แท็บสนทนา → แท็บโปรไฟล์
@@ -162,8 +163,15 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _runFaithCheckin() async {
     try {
       final result = await FaithPointsService.instance.dailyCheckin();
-      final state = await FaithPointsService.instance.loadState();
       final dailyDone = await FaithPointsService.instance.dailyQuestsDone();
+      // ภารกิจวันนี้ครบ 3/3 → นับเป็น "วันครบภารกิจ" ของสัปดาห์ (ครบ 3 วัน
+      // ในสัปดาห์เดียว = โบนัส +30 ✦ ครั้งเดียวต่อสัปดาห์ — กันซ้ำใน service)
+      var weeklyBonus = 0;
+      if (dailyDone >= 3) {
+        weeklyBonus = await FaithPointsService.instance.recordFullQuestDay();
+      }
+      // โหลด state หลังนับโบนัส เพื่อให้ตัวเลขบน chip รวมโบนัสแล้ว
+      final state = await FaithPointsService.instance.loadState();
       if (!mounted) return;
       setState(() {
         _faithPoints = state.points;
@@ -171,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen>
         _faithDailyDone = dailyDone;
         _faithClaimed = state.claimedMilestoneIds;
         _faithHasMeritOrder = state.hasMeritOrder;
+        _isHolyDay = result.isHolyDay;
       });
       if (result.isNewDay) {
         // เช็คอินวันใหม่สำเร็จ — จุดวัด retention รายวันของ funnel
@@ -178,6 +187,10 @@ class _HomeScreenState extends State<HomeScreen>
           'streak': result.newStreak,
           'points': result.pointsEarned,
         });
+      }
+      if (weeklyBonus > 0) {
+        AnalyticsService.instance
+            .log('faith_weekly_bonus', {'points': weeklyBonus});
       }
       // ตั้งเตือนเช็คอินครั้งถัดไป (พรุ่งนี้ 19:00) — เปิดแอปวันนี้ =
       // เช็คอินแล้วเสมอ (checkin อัตโนมัติด้านบน) fire-and-forget:
@@ -190,8 +203,23 @@ class _HomeScreenState extends State<HomeScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '☀️ เช็คอินวันนี้ +${result.pointsEarned} ✦ · '
-              'ต่อเนื่อง ${result.newStreak} วัน',
+              result.isHolyDay
+                  ? '🪷 วันพระ แต้มคูณ 2! เช็คอิน +${result.pointsEarned} ✦ '
+                      '· ต่อเนื่อง ${result.newStreak} วัน'
+                  : '☀️ เช็คอินวันนี้ +${result.pointsEarned} ✦ · '
+                      'ต่อเนื่อง ${result.newStreak} วัน',
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      // โบนัสสัปดาห์ — snackbar แยกใบ (ScaffoldMessenger จัดคิวต่อกันเอง)
+      // และเคารพ flag ปิด snackbar ตอน tour เหมือน checkin
+      if (weeklyBonus > 0 && !_tourStartedThisSession) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '🎉 โบนัสสัปดาห์นี้ +$weeklyBonus ✦ (ครบภารกิจ 3 วัน)',
             ),
             duration: const Duration(seconds: 3),
           ),
@@ -564,6 +592,24 @@ class _HomeScreenState extends State<HomeScreen>
                       color: AppColors.onBackdrop,
                       fontSize: 12.5,
                       fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                // วันพระ = แต้มคูณ 2 — Flexible + ellipsis กันชน label ขวา
+                // บนจอแคบ
+                if (_isHolyDay)
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        '🪷 วันพระ ✦×2',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.kanit(
+                          color: AppColors.candleGold,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 const Spacer(),

@@ -22,6 +22,11 @@ const int kFaithActivityPoints = 5;
 /// ฝากมูสำเร็จ (รวมมูฟรีครั้งแรก)
 const int kFaithMeritPoints = 50;
 
+/// โบนัสรายสัปดาห์: ทำภารกิจรายวันครบ 3/3 อย่างน้อย
+/// [kFaithWeeklyBonusTargetDays] วันในสัปดาห์เดียวกัน (จันทร์–อาทิตย์)
+const int kFaithWeeklyBonusPoints = 30;
+const int kFaithWeeklyBonusTargetDays = 3;
+
 /// เป้า Level 2 — ผู้ใช้สม่ำเสมอ ~2 สัปดาห์
 const int kFaithLevel2Points = 200;
 
@@ -141,6 +146,23 @@ FaithMilestoneState faithMilestoneState({
   return FaithMilestoneState.claimable;
 }
 
+// ── วันพระ (แต้มคูณ 2 ทุกกิจกรรม) ───────────────────────────────────────────
+
+/// วันพระ ก.ค.–ธ.ค. 2569 (2026) — อ้างอิงปฏิทินวันธรรมสวนะ
+/// TODO(2027): เติมตารางปีถัดไปก่อนสิ้นปี (หรือย้ายไปดึงจาก backend config)
+const Set<String> kFaithHolyDays = {
+  '2026-07-07', '2026-07-14', '2026-07-22', '2026-07-29', '2026-07-30',
+  '2026-08-06', '2026-08-13', '2026-08-21', '2026-08-28',
+  '2026-09-05', '2026-09-11', '2026-09-19', '2026-09-26',
+  '2026-10-04', '2026-10-11', '2026-10-19', '2026-10-26',
+  '2026-11-03', '2026-11-09', '2026-11-17', '2026-11-24',
+  '2026-12-02', '2026-12-09', '2026-12-17', '2026-12-24',
+};
+
+/// วันนี้เป็นวันพระไหม — เทียบด้วย key รายวันเดียวกับ [faithDayKey]
+/// (ตารางด้านบนใช้ format YYYY-MM-DD ตรงกัน)
+bool faithIsHolyDay(DateTime d) => kFaithHolyDays.contains(faithDayKey(d));
+
 // ── Check-in (pure) ──────────────────────────────────────────────────────────
 
 class FaithCheckinResult {
@@ -149,10 +171,14 @@ class FaithCheckinResult {
   final int pointsEarned;
   final int newStreak;
 
+  /// วันนี้เป็นวันพระ (แต้มคูณ 2) — ใช้แต่งข้อความ feedback ฝั่ง UI
+  final bool isHolyDay;
+
   const FaithCheckinResult({
     required this.isNewDay,
     required this.pointsEarned,
     required this.newStreak,
+    this.isHolyDay = false,
   });
 }
 
@@ -167,17 +193,21 @@ String faithDayKey(DateTime d) =>
 /// กติกา streak: เช็คอินวันถัดจากครั้งล่าสุด → streak+1, เว้นวัน → เริ่ม 1 ใหม่
 /// โบนัสให้เฉพาะตอน streak "แตะ" 3 หรือ 7 พอดี (ขาดแล้วสร้างใหม่จนแตะอีก
 /// ครั้งก็ได้อีก — จงใจ เพื่อจูงใจให้กลับมาต่อ streak ใหม่)
+///
+/// วันพระ: แต้มที่ได้ทั้งก้อน (รวมโบนัส streak) คูณ 2
 FaithCheckinResult computeFaithCheckin({
   required String? lastCheckinDayKey,
   required int currentStreak,
   required DateTime now,
 }) {
   final today = faithDayKey(now);
+  final isHolyDay = faithIsHolyDay(now);
   if (lastCheckinDayKey == today) {
     return FaithCheckinResult(
       isNewDay: false,
       pointsEarned: 0,
       newStreak: currentStreak,
+      isHolyDay: isHolyDay,
     );
   }
 
@@ -187,11 +217,76 @@ FaithCheckinResult computeFaithCheckin({
   var earned = kFaithDailyCheckin;
   if (newStreak == 3) earned += kFaithStreak3Bonus;
   if (newStreak == 7) earned += kFaithStreak7Bonus;
+  if (isHolyDay) earned *= 2;
 
   return FaithCheckinResult(
     isNewDay: true,
     pointsEarned: earned,
     newStreak: newStreak,
+    isHolyDay: isHolyDay,
+  );
+}
+
+// ── โบนัสภารกิจรายสัปดาห์ (pure) ────────────────────────────────────────────
+
+/// แปลง DateTime → ISO week key เช่น '2026-W28' (จันทร์เป็นวันแรกของสัปดาห์)
+/// ใช้กติกา ISO 8601: สัปดาห์เป็นของปีที่ "วันพฤหัสของสัปดาห์นั้น" ตกอยู่
+/// — ครอบเคสคาบปีอัตโนมัติ (เช่น 1 ม.ค. 2027 อยู่ '2026-W53')
+String faithWeekKey(DateTime d) {
+  // เลื่อนไปวันพฤหัสของสัปดาห์เดียวกัน (constructor ปรับ overflow วันให้เอง)
+  final thursday =
+      DateTime(d.year, d.month, d.day + (DateTime.thursday - d.weekday));
+  final jan1 = DateTime(thursday.year, 1, 1);
+  final week = thursday.difference(jan1).inDays ~/ 7 + 1;
+  return '${thursday.year}-W${week.toString().padLeft(2, '0')}';
+}
+
+class FaithWeeklyQuestResult {
+  /// วันนี้นับเป็น "วันครบภารกิจ" วันใหม่ (false = วันนี้นับไปแล้ว)
+  final bool countsToday;
+
+  /// จำนวนวันครบภารกิจของสัปดาห์นี้หลังนับวันนี้
+  final int newDaysThisWeek;
+
+  /// แต้มโบนัสที่ได้ (0 = ยังไม่แตะเป้า/รับโบนัสสัปดาห์นี้ไปแล้ว)
+  final int pointsEarned;
+
+  const FaithWeeklyQuestResult({
+    required this.countsToday,
+    required this.newDaysThisWeek,
+    required this.pointsEarned,
+  });
+}
+
+/// คำนวณผลการนับ "วันครบภารกิจ 3/3" ของสัปดาห์ — ไม่แตะ storage
+///
+/// [daysThisWeek] และ [bonusClaimed] เป็นค่าของ week key ปัจจุบัน (ฝั่ง
+/// service เก็บ key แยกรายสัปดาห์ → ข้ามสัปดาห์แล้วเริ่มนับ 0 ใหม่เอง)
+/// โบนัสให้ครั้งเดียวต่อสัปดาห์ตอนแตะ [kFaithWeeklyBonusTargetDays] วัน
+/// และคูณ 2 เมื่อวันนั้นเป็นวันพระ
+FaithWeeklyQuestResult computeFaithWeeklyQuest({
+  required String? lastFullQuestDayKey,
+  required int daysThisWeek,
+  required bool bonusClaimed,
+  required DateTime now,
+}) {
+  if (lastFullQuestDayKey == faithDayKey(now)) {
+    return FaithWeeklyQuestResult(
+      countsToday: false,
+      newDaysThisWeek: daysThisWeek,
+      pointsEarned: 0,
+    );
+  }
+  final newDays = daysThisWeek + 1;
+  var earned = 0;
+  if (newDays >= kFaithWeeklyBonusTargetDays && !bonusClaimed) {
+    earned = kFaithWeeklyBonusPoints;
+    if (faithIsHolyDay(now)) earned *= 2;
+  }
+  return FaithWeeklyQuestResult(
+    countsToday: true,
+    newDaysThisWeek: newDays,
+    pointsEarned: earned,
   );
 }
 
