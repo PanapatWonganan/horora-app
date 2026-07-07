@@ -1075,21 +1075,28 @@ class _MeritWeeklyOrderScreenState extends State<MeritWeeklyOrderScreen> {
         ),
       );
     } on ex.ValidationException catch (e) {
-      // server ปฏิเสธ (422) — เคสหลักคือใช้สิทธิ์มูฟรีไปแล้ว (เบอร์/เครื่อง
-      // เดิมเคยรับสิทธิ์ เช่น ลบแอปลงใหม่) → จำสถานะไว้ ซ่อนการ์ดฟรีถาวร
-      // และโชว์ข้อความจริงจาก server แทนการพาไปหน้าสถานะเหมือนสำเร็จ
+      // server ปฏิเสธ (422). แยก 2 กรณี:
+      // (a) code == 'free_trial_used' → ใช้สิทธิ์ไปแล้วจริง (เบอร์/เครื่องเดิม
+      //     เช่น ลบแอปลงใหม่) → จำสถานะ ซ่อนการ์ดฟรีถาวร
+      // (b) validation error อื่น (เช่นชื่อ/เบอร์ผิด) → **ห้ามเผาสิทธิ์**
+      //     แค่โชว์ข้อความให้แก้แล้วลองใหม่ได้
       debugPrint('MeritWeeklyOrderScreen._submitFreeOrder rejected: $e');
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(StorageConstants.freeMeritUsed, true);
-      } catch (_) {}
+      final alreadyUsed = e.code == 'free_trial_used';
+      if (alreadyUsed) {
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(StorageConstants.freeMeritUsed, true);
+        } catch (_) {}
+      }
       if (mounted) {
-        setState(() {
-          _freeTrialEligible = false;
-          if (_isFreeSelected) {
-            _selectedPackage = WeeklyOrderPackage.defaultPackages.first.id;
-          }
-        });
+        if (alreadyUsed) {
+          setState(() {
+            _freeTrialEligible = false;
+            if (_isFreeSelected) {
+              _selectedPackage = WeeklyOrderPackage.defaultPackages.first.id;
+            }
+          });
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.message),

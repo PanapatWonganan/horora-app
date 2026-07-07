@@ -221,9 +221,14 @@ class _ConversionOnboardingScreenState extends State<ConversionOnboardingScreen>
             physics: const NeverScrollableScrollPhysics(),
             onPageChanged: (i) {
               FocusScope.of(context).unfocus();
+              // ยิง funnel step เฉพาะตอนก้าวหน้า — กดถอยหลัง (previousPage)
+              // ไม่นับ เพื่อไม่ให้ dashboard funnel เพี้ยน (5→4→5)
+              final movedForward = i > _page;
               setState(() => _page = i);
               _abTest.trackFunnelStep('cv_page_$i');
-              AnalyticsService.instance.log('onboarding_step', {'step': i});
+              if (movedForward) {
+                AnalyticsService.instance.log('onboarding_step', {'step': i});
+              }
               if (i == 6) _runAnalyzing(); // screen 7 = analyzing
               if (i == 10) {
                 // screen 11 = paywall (onboardingEnd placement only —
